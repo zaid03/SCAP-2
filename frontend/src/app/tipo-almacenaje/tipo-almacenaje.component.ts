@@ -189,7 +189,6 @@ export class TipoAlmacenajeComponent {
         }
       })
     }
-
   }
 
   limpiarSearch() {
@@ -197,6 +196,82 @@ export class TipoAlmacenajeComponent {
     this.searchTerm = '';
     this.fetchAlmacenajes();
   }
+
+  excelDownload() {
+    this.limpiarMessages();
+    const rows = this.almacenajes;
+    if (!rows || rows.length === 0) {
+      this.almacenajesError = 'No hay datos para exportar.';
+      return;
+    }
+  
+    const exportRows = rows.map((row: any, index: number) => ({
+      '#': index + 1,
+      Entidad: row.ent ?? '',
+      Ejercicio: row.mtacod ?? '',
+      Estado: row.mtades ?? '',
+    }));
+  
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['listas de tipos de Almacenajes']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Entidad', 'Código', 'Descripción']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
+
+    worksheet['!cols'] = [
+      { wch: 6 },
+      { wch: 12 },
+      { wch: 15 },
+      { wch: 20 }
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ejercicios');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'tipos-almacenaje.xlsx'
+    );
+  }
+
+  pdfDownload() {
+    this.limpiarMessages();
+    const source = this.almacenajes;
+    if (!source?.length) {
+      this.almacenajesError = 'No hay datos para exportar.';
+      return;
+    }
+
+    const rows = source.map((row: any, index: number) => ({
+      index: index + 1,
+      ent: row.ent ?? '',
+      mtacod: row.mtacod ?? '',
+      mtades: row.mtades ?? ''
+    }));
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Listado de tipos de almacenajes', 40, 40);
+
+    const columns = [
+      { header: '#', dataKey: 'index' },
+      { header: 'Entidad', dataKey: 'ent' },
+      { header: 'Código', dataKey: 'mtacod' },
+      { header: 'Descripción', dataKey: 'mtades' }
+    ];
+
+    autoTable(doc, {
+      startY: 60,
+      head: [columns.map(col => col.header)],
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' }
+    });
+
+    doc.save('tipos-almacenajes.pdf');
+  }
+
 
   //misc
   limpiarMessages() {
