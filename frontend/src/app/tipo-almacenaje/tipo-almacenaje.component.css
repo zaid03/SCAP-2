@@ -1,0 +1,12 @@
+/* search */
+.title-area {width: 28%;}
+.margin-title {width: 100%; text-align: right;}
+.search-holder {width: 71%; }
+.search-container {width: 50%; justify-content: flex-start;}
+.search-form {width: 45%;}
+.search-container .btns {width: 25%;}
+/* search */
+/* main table */
+.services-list {width: 50%;}
+.services-list thead th:first-child { width: 25%; }
+/* main table */

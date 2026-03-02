@@ -353,7 +353,8 @@ app-sidebar { flex-shrink: 0; z-index: 2000; }
 .proveedores-container.blurred,
 .credito-container.blurred,
 .facturas-container.blurred,
-.contratos-container.blurred { filter: blur(1.2px); pointer-events: none; user-select: none; }
+.contratos-container.blurred,
+.almacenaje-container.blurred { filter: blur(1.2px); pointer-events: none; user-select: none; }
 .facturas-page,
 .proveedores-page,
 .familia-page,
@@ -365,7 +366,8 @@ app-sidebar { flex-shrink: 0; z-index: 2000; }
 .persona-page,
 .ejercicio-page,
 .personasServices-page,
-.contratos-page { display: flex; min-height: 100vh; background: #f0f0f0; }
+.contratos-page,
+.almacenaje-page { display: flex; min-height: 100vh; background: #f0f0f0; }
 .proveedores-container,
 .facturas-container,
 .familia-container,
@@ -376,7 +378,8 @@ app-sidebar { flex-shrink: 0; z-index: 2000; }
 .persona-container,
 .ejercicio-container,
 .personasServices-container,
-.contratos-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #f0f0f0; padding: 0 0 40px 0; min-height: 100vh; z-index: 1; }
+.contratos-container,
+.almacenaje-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: #f0f0f0; padding: 0 0 40px 0; min-height: 100vh; z-index: 1; }
 .proveedores-list,
 .facturas-list,
 .credito-list,
