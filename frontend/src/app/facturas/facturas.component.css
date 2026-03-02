@@ -1,0 +1,103 @@
+/* search container and inputs */
+.search-container { gap: 20px; }
+.search-form { gap: 20px; }
+.more-search-options { display: flex; align-items: center; gap: 10px; }
+.more-search-options select,
+.more-search-options input[type="date"],
+.right-search input[type="text"],
+.right-search input[type="date"],
+.search-chunk input[type="date"] { padding: 4px 6px; border-radius: 20px; border: 1px solid #bbb; color: #25176b; font-size: 15px; transition: border 0.2s, box-shadow 0.2s; outline: none; box-shadow: 0 1px 4px rgba(56,36,155,0.04); }
+.more-search-options select:focus,
+.more-search-options input[type="date"]:focus { outline: none; }
+.successBtn { margin-top: 5px; }
+/* search container and inputs */
+/* table style */
+.facturas-table tbody td:nth-child(6),
+.facturas-table tbody td:nth-child(13),
+.detail-grid .albaranes-table tbody td:nth-child(4),
+.app tbody td:nth-child(3),
+.desc tbody td:nth-child(5),
+.desc tbody td:nth-child(7) { text-align: right; }
+.facturas-table thead th:last-child {width: 75px;}
+.facturas-table thead th:nth-child(14) {width: 50px;}
+/* table style */
+/* main-detail grid */
+.detail-container { display: flex; flex-wrap: wrap; align-items: center; padding: 5px; gap: 10px; }
+.chunk-one,
+.chunk-two,
+.chunk-three,
+.chunk-four,
+.chunk-five,
+.chunk-six { width: 32%; display: flex; padding: 2px; }
+.left { width: 30%; display: flex; flex-direction: column; gap: 10px; }
+.right { width: 70%; display: flex; flex-direction: column; gap: 12px;}
+.gap {gap: 15px !important;}
+.special-needs {width: 50%;}
+.on-three,
+.on-two { display: flex; gap: 10px; align-items: center;}
+.chunk-six h1,
+.chunk-one h1,
+.chunk-two h1,
+.chunk-three h1,
+.chunk-four h1,
+.chunk-five h1 {font-size: 16px;}
+.special-chunk { width: 33%; }
+.tallTextarea {width: 220px; max-width: 240px;}
+.averageTextarea{ width: 100px; max-width: 160px;}
+.averageSecond {width: 160px; max-width: 290px;}
+.smallTextarea{width: 60px; max-width: 100px;}
+.pagoSmallWidth {width: 45px !important; min-width: 10px !important; max-width: 50px;}
+.observ { width: 50%; display: flex; gap: 5px; align-items: center;}
+.observ textarea { width: 90%; max-width: 100%; height: 40px;}
+.gap {gap: 20px;}
+.moreGap {gap: 25px}
+.pagoFix {margin-left: 14px;}
+.input-style {border: 1px solid grey; width: 90px;}
+/* main-detail grid */
+/* sub detail grids */
+.detail-grid { display: flex; flex-direction: column; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); padding: 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f9fafb; }
+.albaranes-table { width: 100%; }
+.width-last tbody td:last-child,
+.app tbody td:last-child {display: flex; justify-content: center;}
+.width-last thead th:last-child,
+.app thead th:last-child {width: 50px;}
+.applicacionesTextarea {width: 85%;}
+.alignment {justify-content: center;}
+.albaranes-btns {display: flex; justify-content: center; align-items: center; justify-content: center;}
+/* sub detail grids */
+/* cargar facturas */
+.factura-cargar { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 85%; min-height: 120px; max-height: 80vh; z-index: 3000; display: flex; flex-direction: column; align-items: center;}
+.factura-cargar .title {width: 50%;}
+.info-D {display: flex; width: 100%; gap: 10px; justify-content: center; margin: 10px;}
+.info-content {display: flex; align-items: center; width: 30%; gap: 10px;}
+.art-title {width: 25%; font-size: 23px;}
+.info-content p,
+.info-content h1 {font-size: 18px;}
+.search-option-container,
+.albaran-search-options {display: flex; width: 100%; gap: 10px; margin: 5px;}
+.chunk-one-search {width: 30%; display: flex;}
+.left-search {width: 30%; display: flex; flex-direction: column; gap: 15px;}
+.right-search {width: 70%; display: flex; flex-direction: column; gap: 10px;}
+.alignTitleSearch {justify-content: center;}
+.widthIput {width: 90% !important;}
+.factura-cargar .search-options-btns,
+.albaran-search-options .albaran-options-btns {display: flex; width: 6%; gap: 10px; justify-content: center;}
+.factura-cargar .search-options-btns {flex-direction: column;}
+/* cargar facturas */
+/* add albaranes grid */
+.albran-add .art-title {width: 28%;}
+.albran-add .albaranes-table tbody td:nth-child(3) {text-align: right;}
+.proveedor-info {width: 20%; display: flex; gap: 10px; align-items: center;}
+.search-chunk {display: flex; align-items: center; gap: 10px; width: 30%;}
+.widthInputAlbaran {width: 75% !important;}
+.albaran-search-options .albaran-options-btns {width: 10%;}
+.selected-row {background-color: #cce6ff;}
+.selected {text-align: center; margin: 0px;}
+/* add albaranes grid */
+/* delete modal */
+.delete-confirm-modal .margin {margin-left: 10px;}
+/* delete modal */
+@media (min-width: 1700px) { .tallTextarea {width: 250px; max-width: 300px;}
+.averageTextarea{ width: 120px; max-width: 190px;} }
+@media (max-width: 1450px) { .display .right h1 {font-size: 14px !important;}
+.averageSecond {width: 160px; max-width: 200px;} }

@@ -1,0 +1,37 @@
+<div class="table-container">
+  <div class="table-wrapper">
+
+    <div *ngIf="loading" class="color">Cargando...</div>
+
+    <table *ngIf="!loading && tableData.length" class="styled-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Centro Gestor</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tableData">
+          <td>{{ t.cge.cgecod }}</td>
+            <td>{{ t.cge.cgedes }}</td>
+          <td>
+            <button (click)="selectRow(t)">Seleccionar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && !tableData.length" class="message">
+      Sin centros gestor (continuando sin selección).
+      <div class="buttons">
+        <button class="next-btn" (click)="continuarSin()">Continuar</button>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="cancel-btn" (click)="cancelar()" [disabled]="loading">Cancelar</button>
+      <button *ngIf="!loading && tableData.length" class="next-btn" (click)="continuarSin()">Continuar sin seleccionar</button>
+    </div>
+  </div>
+</div>

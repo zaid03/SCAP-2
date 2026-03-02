@@ -1,0 +1,693 @@
+<div class="contratos-page">
+    
+    <div 
+    class="sidebar-backdrop" 
+    *ngIf="!sidebar.collapsed" 
+    (click)="sidebar.collapsed = true"
+    >
+    </div>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="contratos-container" [class.blurred]="!sidebar.collapsed">
+        
+        <div class="title-menu">
+            <div class="title-area">
+                <h2 class="margin-title">Gestión de contratos</h2>  
+            </div>
+            <div class="search-holder">
+                <div class="search-container">
+                    <form class="search-form">
+                        <input 
+                            type="text" 
+                            class="search-bar" 
+                            placeholder="Buscar contratos" 
+                            name="search" 
+                            [(ngModel)]="searchInput"
+                        />
+                        <div class="search-options">
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="optiones" 
+                                    value="Todos" 
+                                    [(ngModel)]="searchOption"
+                                /> Todos
+                                <input 
+                                    type="radio" 
+                                    name="optiones" 
+                                    value="noBloque" 
+                                    [(ngModel)]="searchOption"
+                                /> No Bloqueados
+                                <input 
+                                    type="radio" 
+                                    name="optiones" 
+                                    value="Bloque" 
+                                    [(ngModel)]="searchOption"
+                                /> Bloqueados
+                            </label>
+                        </div>
+                        <div class="search-btns">
+                            <button type="button" class="search-button-proveedores" (click)="search()">Buscar</button>
+                            <button type="button" class="search-button-proveedores" (click)="limpiarSearch()">Limpiar</button>
+                        </div>
+                    </form>
+                </div> 
+            </div>
+            <div class="group-menu" (click)="toggleMenu($event)">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="menu-panel" *ngIf="showMenu">
+                    <button type="button" (click)="excelDownload()">Exportar a Excel</button>
+                    <button type="button" (click)="exportPdf()">Exportar a PDF</button>
+                    <button type="button" (click)="openAdd()">Añadir Contrato</button>
+                </div>
+            </div>
+        </div>
+        <div class="contratos-list">
+            <h1 class="errorBtn">{{mainError}}</h1>
+            <h1 class="successBtn">{{mainSuccess}}</h1>
+            <div *ngIf="isLoading" class="loading-message">
+                <div class="spinner"></div>
+                <span>Cargando</span>
+            </div>
+            <table class="contratos-table">
+                <thead>
+                    <tr>
+                        <th class="sortable resizable" (click)="toggleSort('concod')">
+                            Número
+                            <span class="sort-indicator" *ngIf="sortField === 'concod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 0)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('conlot')">
+                            Económica
+                            <span class="sort-indicator" *ngIf="sortField === 'conlot'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 1)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('condes')">
+                            Descripción
+                            <span class="sort-indicator" *ngIf="sortField === 'condes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 2)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('confin')">
+                            Fecha inicio
+                            <span class="sort-indicator" *ngIf="sortField === 'confin'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 3)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('conffi')">
+                            Fecha fin
+                            <span class="sort-indicator" *ngIf="sortField === 'conffi'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 4)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('conblo')">
+                            Bloqueado
+                            <span class="sort-indicator" *ngIf="sortField === 'conblo'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 5)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('tercod')">
+                            Cód Proveedor
+                            <span class="sort-indicator" *ngIf="sortField === 'tercod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 6)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('ternom')">
+                            Proveedor
+                            <span class="sort-indicator" *ngIf="sortField === 'ternom'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 7)"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let c of paginatedContratos">
+                        <td (click)="openDetails(c)" class="pointer">{{c.concod}}</td>
+                        <td>{{c.conlot}}</td>
+                        <td>{{c.condes}}</td>
+                        <td>{{c.confin?.slice(0,10)}}</td>
+                        <td>{{c.conffi?.slice(0,10)}}</td>
+                        <td>{{setBloqueado(c.conblo)}}</td>
+                        <td>{{c.tercod}}</td>
+                        <td>{{c.ternom}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination-controls">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+                <span>Página</span>
+                <input
+                type="number"
+                min="1"
+                [max]="totalPages"
+                [value]="page + 1"
+                (change)="goToPage($event)"
+                class="pagination-input"
+                />
+                <span>de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+            </div>
+            <div class="modal-backdrop" *ngIf="selectedContrato" (click)="closeDetails()"></div>
+            <div class="display">
+                <div class="modal" *ngIf="selectedContrato">
+                    <div class="btns">
+                        <div class="title-detail">
+                            <h3>detalles del contrato</h3>
+                        </div>
+                        <button class="save-btn" (click)="updateContrato(selectedContrato.concod, selectedContrato.conblo, confin.value, conffi.value, desc.value)">✔</button>
+                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                    </div> 
+                    <h1 class="successBtn">{{updateContratoSuccess}}</h1>
+                    <h1 class="errorBtn">{{updateContratoError}}</h1>
+                    <div *ngIf="isUpdating" class="loading-message">
+                        <div class="spinner"></div>
+                        <span>actualizando</span>
+                    </div> 
+                    <div class="detail-container">
+                        <div class="chunk-one">
+                            <div class="content">
+                                <p>Número</p>
+                                <h1>{{selectedContrato.concod || '#'}}</h1>
+                            </div>
+                            <div class="content">
+                                <p>Económica</p>
+                                <h1>{{selectedContrato.conlot || '#'}}</h1>
+                            </div>
+                            <div class="content">
+                                <p>Proveedor</p>
+                                <h1>{{selectedContrato.tercod || '#'}}</h1>
+                                <h1>{{selectedContrato.ternom || '#'}}</h1>
+                            </div>
+                            <div class="content">
+                                <input 
+                                    type="checkbox"
+                                    class="check"
+                                    [checked]="selectedContrato.conblo === 1" 
+                                    (change)="selectedContrato.conblo = $any($event.target).checked ? 1 : 0"
+                                /><span class="bloq">Bloqueado</span>
+                            </div>
+                        </div>
+                        <div class="chunk-two">
+                            <div class="left">
+                                <div class="left-left">
+                                    <p>Fecha inicio</p>
+                                    <p>Fecha fin</p>
+                                </div>
+                                <div class="left-right">
+                                    <textarea class="average" [(ngModel)]="selectedContrato.confin" #confin></textarea>
+                                    <textarea class="average" [(ngModel)]="selectedContrato.conffi" #conffi></textarea>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <div class="content">
+                                    <p>Descripción</p>
+                                    <textarea class="long" [(ngModel)]="selectedContrato.condes" #desc></textarea>
+                                </div>
+                            </div>  
+                        </div>
+                    </div>
+                    <div class="more-detail-container">
+                        <div class="tabs" role="tablist" aria-label="Detalle tabs">
+                            <button
+                                class="tab-btn"
+                                role="tab"
+                                [attr.aria-selected]="activeDetailTab === 'articulos'"
+                                [class.active-tab]="activeDetailTab === 'articulos'"
+                                (click)="showArticulos(selectedContrato.concod)"
+                            >
+                                Artículos
+                            </button>
+                            <button
+                                class="tab-btn"
+                                role="tab"
+                                [attr.aria-selected]="activeDetailTab === 'centroGestor'"
+                                [class.active-tab]="activeDetailTab === 'centroGestor'"
+                                (click)="showcentroGestor(selectedContrato.concod)"
+                            >
+                                Centros Gestores / D
+                            </button> 
+                        </div>
+                    </div>
+                    <div class="custom-grid-modal" *ngIf="showArticulosGrid">
+                        <button class="add-btn" (click)="showArticulosAddGrid(selectedContrato.conlot)">+</button>
+                        <h1 class="errorBtn">{{articulosError}}</h1>
+                        <h1 class="successBtn">{{articulosSuccess}}</h1>
+                        <div *ngIf="isLoadingArticulos" class="loading-message">
+                            <div class="spinner"></div>
+                            <span>Cargando</span>
+                        </div>
+                        <table class="articulo-table">
+                            <thead>
+                                <tr>
+                                    <th>Familia</th>
+                                    <th>Subfamilia</th>
+                                    <th>Cód. Artículo</th>
+                                    <th>Artículo</th>
+                                    <th>Precio unitario</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let a of paginatedArticulos">
+                                    <td>{{a.art.afacod}}</td>
+                                    <td>{{a.art.asucod}}</td>
+                                    <td>{{a.art.artcod}}</td>
+                                    <td>{{a.art.artdes}}</td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            class="currenc"
+                                            [value]="a.editingPrice ? a.editingValue : formatPrice(a.coapre)"
+                                            (focus)="startEditingPrice(a, $event)"
+                                            (blur)="stopEditingPrice(a, $event)"
+                                            (input)="onPriceTyping($event, a)"
+                                        />
+                                    <td>
+                                        <button class="delete-btn" (click)="openDeleteArticulo(selectedContrato, a.art)">-</button>
+                                        <button class="save-btn" (click)="updateArticulo(selectedContrato.concod, a.art.afacod, a.art.asucod, a.art.artcod, a.coapre)">✔</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination-controls">
+                            <button (click)="prevPageART()" [disabled]="pageARt === 0">Anterior</button>
+                            <span>Página</span>
+                            <input
+                                type="number"
+                                min="1"
+                                [max]="totalPagesART"
+                                [value]="pageARt + 1"
+                                (change)="goToPageART($event)"
+                                class="pagination-input"
+                            />
+                            <span>de {{ totalPagesART }}</span>
+                            <button (click)="nextPageART()" [disabled]="pageARt + 1 >= totalPagesART">Siguiente</button>
+                        </div>
+                    </div>
+                    <div class="custom-grid-modal" *ngIf="showCentroGestorGrid">
+                        <button class="add-btn" (click)="showAddCentro()">+</button>
+                        <h1 class="errorBtn">{{cgeError}}</h1>
+                        <h1 class="successBtn">{{cgeSuccess}}</h1>
+                        <div *ngIf="isLoadingCentroGestor" class="loading-message">
+                            <div class="spinner"></div>
+                            <span>Cargando</span>
+                        </div>
+                        <div *ngIf="isAddingD" class="loading-message">
+                            <div class="spinner"></div>
+                            <span>añadiendo</span>
+                        </div>
+                        <table class="centroGestor-table">
+                            <thead>
+                                <tr>
+                                    <th>Cód. C. Gestor</th>
+                                    <th>Centro Gestor</th>
+                                    <th>Orgánica</th>
+                                    <th>Programa</th>
+                                    <th>Referencia “D”</th>
+                                    <th>Importe D</th>
+                                    <th>Importe Pedidos</th>
+                                    <th>Disponible</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let c of paginatedCentros">
+                                    <td>{{c.cgecod}}</td>
+                                    <td>{{c.cge.cgedes}}</td>
+                                    <td>{{c.cge.cgeorg}}</td>
+                                    <td>{{c.cge.cgefun}}</td>
+                                    <td>{{c.cogopd}}</td>
+                                    <td>{{c.cogimp}}</td>
+                                    <td>{{c.cogaip}}</td>
+                                    <td>{{getKdisponible(c.COGIMP, c.COGIAP)}}</td>
+                                    <td class="borderI">
+                                        <button class="delete-btn" (click)="showDeleteCentro(c)">-</button>
+                                        <button class="save-btn" (click)="checkBeforeAdd(c)">D</button>
+                                        <!-- <button class="save-btn" >✔</button> -->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination-controls">
+                            <button (click)="prevpageCNT()" [disabled]="pageCNT === 0">Anterior</button>
+                            <span>Página</span>
+                            <input
+                                type="number"
+                                min="1"
+                                [max]="totalPagesCNT"
+                                [value]="pageCNT + 1"
+                                (change)="goTopageCNT($event)"
+                                class="pagination-input"
+                            />
+                            <span>de {{ totalPagesCNT }}</span>
+                            <button (click)="nextpageCNT()" [disabled]="pageCNT + 1 >= totalPagesCNT">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddGrid" (click)="closeAdd()"></div>
+<div class="add-confirm-modal" *ngIf="showAddGrid">
+    <div class="btns">
+        <div class="title">
+            <h3>Añadir un contrato</h3>
+        </div>
+        <button class="add-btn" (click)="addContrato(economica.value, description.value, fechaIni.value, fechaFin.value)">+</button>
+        <button class="close-btn-btn" (click)="closeAdd()">✖</button>
+    </div>
+    <h1 class="errorBtn">{{addContratoError}}</h1>
+    <div *ngIf="isAdding" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <div class="add-container">
+        <div class="container-wrap">
+            <div class="left-add">
+                <p>Fecha inicio</p>
+                <p>Económica*</p>
+            </div>
+            <div class="right-add">
+                <div class="on-two">
+                    <textarea class="long-add" #fechaIni></textarea>
+                    <p class="patch">Fecha fin</p>
+                    <textarea class="long-add" #fechaFin></textarea>
+                </div>
+                <div class="on-two">
+                    <textarea class="long-add" #economica></textarea>
+                    <p>Descripción*</p>
+                    <textarea class="long-add height" #description></textarea>
+                </div>  
+            </div>
+        </div>
+    </div>
+    <div class="proveedor-select">
+        <h1 *ngIf="proveedorTernom">El proveedor {{proveedorTernom}} ha sido seleccionado</h1>
+        <button class="proveedor" (click)="openProveedores()">⧉</button>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showProveedorGrid" (click)="closeProveedores()"></div>
+<div class="proveedor-grid-modal" *ngIf="showProveedorGrid">
+    <div class="btns">
+        <div class="title">
+            <h1>seleccione un proveedor</h1>
+        </div>
+        <button class="close-btn-btn" (click)="closeProveedores()">✖</button>
+    </div>
+    <div class="search-holder">
+        <div class="search-container">
+            <form class="search-form">
+                <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm" (keyup.enter)="search()"/>
+                <div class="search-options">
+                    <label>
+                        <input type="radio" name="optiones" value="Todos" [(ngModel)]="filterOption" /> Todos
+                        <input type="radio" name="optiones" value="noBloqueados" [(ngModel)]="filterOption" /> No Bloqueados
+                        <input type="radio" name="optiones" value="Bloqueados" [(ngModel)]="filterOption"  /> Bloqueados
+                    </label>
+                </div>
+                <div class="search-btns">
+                    <button type="button" class="search-button-proveedores" (click)="searchProveedor()">Buscar</button>
+                    <button type="button" class="search-button-proveedores" (click)="clearSearch()">Limpiar</button>
+                </div>
+            </form>
+        </div> 
+    </div>
+    <h1 class="errorBtn">{{error}}</h1>
+    <div *ngIf="isLoadingPro" class="loading-message">
+        <div class="spinner"></div>
+        <span>Cargando</span>
+    </div>
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>NIF</th>
+                <th>Alias</th>
+                <th>Teléfono</th>
+                <th>Domicilio</th>
+                <th>Código Postal</th>
+                <th>Municipio</th>
+                <th>Código contable</th>
+                <th>Fax</th>
+                <th>Web</th>
+                <th>Correo electrónico</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let p of paginatedProveedores" [class.grey-row]="p.terblo == 1">
+                <td style="cursor: pointer;" (click)="selectProveedor(p)">{{ p.tercod }}</td>
+                <td>{{ p.ternom }}</td>
+                <td>{{ p.ternif }}</td>
+                <td>{{ p.terali }}</td>
+                <td>{{ p.tertel }}</td>
+                <td>{{ p.terdom }}</td>
+                <td>{{ p.tercpo }}</td>
+                <td>{{ p.terpob }}</td>
+                <td>{{ p.terayt }}</td>
+                <td>{{ p.terfax }}</td>
+                <td>{{ p.terweb }}</td>
+                <td>{{ p.tercoe }}</td>
+                <td>{{ p.terobs }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="container-pag-wrap">
+        <div class="pagination-controls">
+            <button class="pag-btn" (click)="prevPagePro()" [disabled]="pagePro === 0">Anterior</button>
+            <span>Página</span>
+            <input
+            type="number"
+            min="1"
+            [max]="totalPagesPro"
+            [value]="pagePro + 1"
+            (change)="goToPagePro($event)"
+            class="pagination-input"
+            />
+            <span>de {{ totalPagesPro }}</span>
+            <button class="pag-btn" (click)="nextPagePro()" [disabled]="pagePro + 1 >= totalPagesPro">Siguiente</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="deleteArticuloGrid" (click)="closeDeleteArticulo()"></div>
+<div class="delete-confirm-modal" *ngIf="deleteArticuloGrid">
+    <h3>¿Seguro que quieres eliminar este Contrato?</h3>
+    <div *ngIf="articuloToDelete">
+        <div *ngIf="isDeleting" class="loading-message">
+            <div class="spinner"></div>
+            <span>borrando</span>
+        </div>
+        <p class="delete-info">Familia: {{articuloToDelete[0].concod}}</p>
+    </div>
+    <h1 class="errorBtn">{{detallesMessageErrorDelete}}</h1>
+    <button class="delete-btn" (click)="deleteArticulo(articuloToDelete[0]?.concod, articuloToDelete[1]?.afacod, articuloToDelete[1]?.asucod, articuloToDelete[1]?.artcod)">-</button>
+    <button class="save-btn margin" (click)="closeDeleteArticulo()">✖</button>
+</div>
+
+<div class="modal-backdrop" *ngIf="articulosAddGrid" (click)="closeArticuloAddGrid()"></div>
+<div class="hello-modal" *ngIf="articulosAddGrid">
+    <div class="btns">
+        <div class="title">
+            <h1 class="art-title">Añadir articulo</h1>
+        </div>
+        <button class="save-btn" (click)="saveArticulos()">+</button>
+        <button class="close-btn-btn" (click)="closeArticuloAddGrid()">✖</button>
+    </div>
+    <div *ngIf="isAddingArticulo" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <h1 class="successBtn">{{ArticuloAddSuccess}}</h1>
+    <h1 class="errorBtn">{{articulosAddError}}</h1>
+    <div *ngIf="isLoadingArticulo" class="loading-message">
+        <div class="spinner"></div>
+        <span>Cargando</span>
+    </div>
+    <form class="anadir-articulo-form">
+        <div class="search-anadir-input">
+            <input 
+                type="text" 
+                class="search-bar"
+                placeholder="Buscar familia, subfamilia o artículo" 
+                name="search"
+                [(ngModel)]="searchValue"
+            />
+            <div class="btns">
+                <button class="save-btn" (click)="searchArticuloAdd()">Buscar</button>
+                <button class="save-btn" (click)="limpiarArticulosAdd()">Limpiar</button>
+            </div>
+        </div>
+        <table class="anadir-proveedores-table">
+            <thead>
+                <th>Familia</th>
+                <th>Subfamilia</th>
+                <th>Artículo</th>
+                <th>Descripción</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let a of paginatedSearchResults" 
+                    (click)="selectArticulosAdd(a)"
+                    [class.selected-row]="isArticulosSelected(a)"
+                >
+                    <td>{{a.afacod}}</td>
+                    <td>{{a.asucod}}</td>
+                    <td>{{a.artcod}}</td>
+                    <td>{{a.artdes}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="selected" *ngIf="coughtArticulos.length > 0">{{coughtArticulos.length}} artículos seleccionados</p>
+        <div class="pagination-controls" *ngIf="articulosAdd.length > searchPageSize">
+            <button class="pag-btn" (click)="searchPage = searchPage - 1" [disabled]="searchPage === 0">Anterior</button>
+            <span> {{ searchPage + 1 }} de {{ searchTotalPages }}</span>
+            <button class="pag-btn" (click)="searchPage = searchPage + 1" [disabled]="searchPage + 1 >= searchTotalPages">Siguiente</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal-backdrop" *ngIf="centroGestorDelete" (click)="closeDeleteCentro()"></div>
+<div class="delete-confirm-modal" *ngIf="centroGestorDelete">
+    <h3>¿Quiere borrar el centro gestor y su D del contrato?</h3>
+    <div *ngIf="centroToDelete">
+        <div *ngIf="isDeletingCentro" class="loading-message">
+            <div class="spinner"></div>
+            <span>borrando</span>
+        </div>
+        <div class="delete-info-titles">
+            <div class="left-delete">
+                <p class="delete-info">Centro gestor:</p>
+                <p class="delete-info">Descripción:</p>
+            </div>
+            <div class="right-delete">
+                <p class="delete-info delete">{{centroToDelete.cgecod}}</p>
+                <p class="delete-info delete">{{centroToDelete.cge.cgedes}}</p>
+            </div>
+        </div>
+    </div>
+    <h1 class="errorBtn">{{centroDeleteError}}</h1>
+    <button class="delete-btn" (click)="deleteCentroGestor(centroToDelete.cgecod)">-</button>
+    <button class="save-btn margin" (click)="closeDeleteCentro()">✖</button>
+</div>
+
+<div class="modal-backdrop" *ngIf="addCentroGestor" (click)="closeAddCentro()"></div>
+<div class="hello-modal" *ngIf="addCentroGestor">
+    <div class="btns">
+        <div class="title">
+            <h1 class="art-title">Añadir centro Gestor</h1>
+        </div>
+        <button class="save-btn" (click)="saveCentroGestores()">+</button>
+        <button class="close-btn-btn" (click)="closeAddCentro()">✖</button>
+    </div>
+    <div *ngIf="isAddingCentro" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <h1 class="errorBtn">{{centroErrorMessage}}</h1>
+    <div *ngIf="isLoadingCentroAdd" class="loading-message">
+        <div class="spinner"></div>
+        <span>Cargando</span>
+    </div>
+    <form class="anadir-articulo-form">
+        <div class="search-anadir-input">
+            <input 
+                type="text" 
+                class="search-bar"
+                placeholder="Buscar centro gestor" 
+                name="search"
+                [(ngModel)]="searchCentro"
+            />
+            <div class="btns">
+                <button class="save-btn" (click)="searchCentroGestores()">Buscar</button>
+                <button class="save-btn" (click)="limpiarSearchCentroGetores()">Limpiar</button>
+            </div>
+        </div>
+        <table class="centroGetor-table">
+            <thead>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Orgánica</th>
+                <th>Programa</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let a of paginatedSearchResultsCentro" 
+                    (click)="selectCentrosAdd(a)"
+                    [class.selected-row]="isCentroSelected(a)"
+                >
+                    <td>{{a.cgecod}}</td>
+                    <td>{{a.cgedes}}</td>
+                    <td>{{a.cgeorg}}</td>
+                    <td>{{a.cgefun}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="selected" *ngIf="coughtCentros.length > 0">{{coughtCentros.length}} centro gestores seleccionados</p>
+        <div class="pagination-controls" *ngIf="centroGestoresAdd.length > searchPageSizeCentro">
+            <button class="pag-btn" (click)="searchPageCentro = searchPageCentro - 1" [disabled]="searchPageCentro === 0">Anterior</button>
+            <span> {{ searchPageCentro + 1 }} de {{ searchTotalPagesCentro }}</span>
+            <button class="pag-btn" (click)="searchPageCentro = searchPageCentro + 1" [disabled]="searchPageCentro + 1 >= searchTotalPagesCentro">Siguiente</button>
+        </div>
+    </form>
+</div>
+
+<div class="modal-backdrop" *ngIf="DGridShow" (click)="closeAddD()"></div>
+<div class="D-modal" *ngIf="DGridShow">
+    <div class="btns">
+        <div class="title">
+            <h1 class="art-title">Asignar D</h1>
+        </div>
+        <button class="save-btn">+</button>
+        <button class="delete-btn" (click)="closeAddD()">✖</button>
+    </div>
+    <h1 class="errorBtn">{{DErrorMessage}}</h1>
+    <div *ngIf="isLoadingD" class="loading-message">
+        <div class="spinner"></div>
+        <span>Cargando</span>
+    </div>
+    <div class="info-D">
+        <div class="info-content">
+            <p>Oficina gestora RC:</p>
+            <h1>AL</h1>
+        </div>
+        <div class="info-content">
+            <p>Orgánica:</p>
+            <h1>{{organica}}</h1>
+        </div>
+        <div class="info-content">
+            <p>Programa:</p>
+            <h1>{{programa}}</h1>
+        </div>
+        <div class="info-content">
+            <p>Económica:</p>
+            <h1>{{economica}}</h1>
+        </div>
+    </div>
+    <table class="D-table">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Referencia</th>
+                <th>Of. Gestora</th>
+                <th>Fecha</th>
+                <th>Orgánica</th>
+                <th>Programa</th>
+                <th>Económica</th>
+                <th>Importe</th>
+                <th>Saldo</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr 
+                *ngFor="let d of paginatedSearchResultsD"
+                (click)="updateDContrato(d)"
+            >
+                <!-- later -->
+            </tr>
+        </tbody>
+    </table>
+    <div class="pagination-controls" *ngIf="centroGestoresAdd.length > searchPageSizeD">
+        <button class="pag-btn" (click)="searchPageD = searchPageD - 1" [disabled]="searchPageD === 0">Anterior</button>
+        <span> {{ searchPageD + 1 }} de {{ searchTotalPagesD }}</span>
+        <button class="pag-btn" (click)="searchPageD = searchPageD + 1" [disabled]="searchPageD + 1 >= searchTotalPagesD">Siguiente</button>
+    </div>
+</div>

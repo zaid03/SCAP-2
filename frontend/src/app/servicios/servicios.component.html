@@ -1,0 +1,561 @@
+<div class="services-page">
+    <div 
+        class="sidebar-backdrop" 
+        *ngIf="!sidebar.collapsed" 
+        (click)="sidebar.collapsed = true">
+    </div>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="services-container" [class.blurred]="!sidebar.collapsed">
+        <div class="title-menu">
+            <div class="title-area">
+                <h2 class="margin-title">Servicios</h2>  
+            </div>
+            <div class="search-holder">
+                <div class="search-container">
+                    <div class="search-form">
+                        <label>Servicio</label>
+                        <input 
+                            type="text" 
+                            class="search-bar"
+                            placeholder="servicios" 
+                            [(ngModel)]="searchServicio"
+                        >
+                        <label>Centro gestor</label>
+                        <input 
+                            type="text" 
+                            class="search-bar"
+                            placeholder="centro gestor"
+                            (input)="setInputToUpper($event)"
+                            [(ngModel)]="searchCentroGestor" 
+                        >
+                        <label for="">Perfil de servicio</label>
+                        <select [(ngModel)]="searchPerfil">
+                            <option value="almacen">Almacén / Farmacia</option>
+                            <option value="comprador">Comprador</option>
+                            <option value="contabilidad">Contabilidad</option>
+                            <option value="peticionario">Centro peticionario</option>
+                            <option value="todos">Todos</option>
+                        </select>
+                    </div>
+                    <div class="btns Widthy">
+                        <button class="search-btn" (click)="search()">Buscar</button>
+                        <button class="search-btn" (click)="clearSearch()">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="group-menu" (click)="toggleMenu($event)">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="menu-panel" *ngIf="showMenu">
+                    <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
+                    <button class="print-btn" (click)="exportPdf()">Exportar a PDF</button>
+                    <button class="add-familia-btn" (click)="launchAddService()">Añadir</button>
+                </div>
+            </div>
+        </div>
+        <div class="services-list">
+            <h1 class="successBtn">{{ servicesMessageSuccess }}</h1>
+            <h1 class="errorBtn">{{ servicessMessageError }}</h1>
+            <div *ngIf="isLoading" class="loading-message">
+                <div class="spinner"></div>
+                <span>Cargando</span>
+            </div>
+            <table class="services-table">
+                <thead>
+                    <tr>
+                        <th class="sortable resizable" (click)="toggleSort('depcod')">
+                            Servicio
+                            <span class="sort-indicator" *ngIf="sortField === 'depcod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 0)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('depdes')">
+                            Descripción
+                            <span class="sort-indicator" *ngIf="sortField === 'depdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 1)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('cgecod')">
+                            Cód.C.G
+                            <span class="sort-indicator" *ngIf="sortField === 'cgecod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 2)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('ccocod')">
+                            Centro de Coste
+                            <span class="sort-indicator" *ngIf="sortField === 'ccocod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 3)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('depalm')">
+                            Almacén / Farmacia
+                            <span class="sort-indicator" *ngIf="sortField === 'depalm'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 4)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('depcom')">
+                            Comprador
+                            <span class="sort-indicator" *ngIf="sortField === 'depcom'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 5)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('depint')">
+                            Contabilidad
+                            <span class="sort-indicator" *ngIf="sortField === 'depint'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 6)"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let s of paginatedServices">
+                        <td (click)="showDetails(s)" style="cursor: pointer;">
+                            {{ s.depcod }}
+                        </td>
+                        <td>{{ s.depdes }}</td>
+                        <td>{{ s.cgecod }}</td>
+                        <td>{{ s.ccocod }}</td>
+                        <td>
+                            <input 
+                                type="checkbox"
+                                [checked]="s.depalm === 1"
+                                class="locked-radio"
+                                (click)="$event.preventDefault()"
+                            >  
+                        </td>
+                        <td>
+                            <input 
+                                type="checkbox"
+                                [checked]="s.depcom === 1"
+                                class="locked-radio"
+                                (click)="$event.preventDefault()"
+                            >
+                        </td>
+                        <td>
+                            <input
+                                type="checkbox"
+                                [checked]="s.depint === 1"
+                                class="locked-radio"
+                                (click)="$event.preventDefault()"
+                            >   
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination-controls">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+                <span>Página</span>
+                <input
+                type="number"
+                min="1"
+                [max]="totalPages"
+                [value]="page + 1"
+                (change)="goToPage($event)"
+                class="pagination-input"
+                />
+                <span>de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+            </div>
+            <div class="modal-backdrop" *ngIf="selectedService" (click)="closeDetails()"></div>
+            <div class="display" >
+                <div class="modal" *ngIf="selectedService">
+                    <div class="btns">
+                        <div class="title-detail">
+                            <h3>Detalles de Servicio</h3>
+                        </div>
+                        <button class="save-btn" (click)="updateService(selectedService.depcod, des.value); updateServiceSecond(selectedService.depcod, d1c.value, d1d.value, d2c.value, d2d.value, d3c.value, d3d.value, dco.value, den.value)">✔</button>
+                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                    </div>  
+                    <h1 class="successBtn">{{ updateServiceSuccessMessage }}</h1>
+                    <h1 class="errorBtn">{{ updateServiceErrorMessage }}</h1>
+                    <div *ngIf="isUpdating" class="loading-message">
+                        <div class="spinner"></div>
+                        <span>actualizando</span>
+                    </div> 
+                    <div class="detail-container">
+                        <div class="chunk-one">
+                            <div class="left">
+                                <p>Código</p>
+                                <p>Descripción</p>
+                                <p>Centro Gestor</p>
+                            </div>
+                            <div class="right">
+                                <div class="on-two">
+                                    <h1>{{selectedService.depcod || '#'}}</h1>
+                                    <p>Centro de coste</p>  
+                                    <h1>{{selectedService.ccocod || '#'}}</h1>
+                                </div>
+                                <textarea 
+                                    class="long" 
+                                    [(ngModel)]="selectedService.depdes"
+                                    #des
+                                ></textarea>
+                                <div class="on-two">
+                                    <h1>{{selectedService.cgecod || '#'}}</h1>
+                                    <h1>{{selectedService.cgedes || '#'}}</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chunk-two">
+                            <div class="left">
+                                <p>Unidad tramitadora</p>
+                                <p>Órgano gestor</p>
+                                <p>Oficina contable</p>
+                            </div>
+                            <div class="right">
+                                <div class="on-two">
+                                    <textarea 
+                                        class="short"
+                                        [(ngModel)]="selectedService.depd1C"
+                                        #d1c
+                                    ></textarea>
+                                    <textarea 
+                                        [(ngModel)]="selectedService.depd1D" 
+                                        class="long"
+                                        #d1d
+                                    ></textarea>
+                                </div>
+                                <div class="on-two">
+                                    <textarea 
+                                        class="short"
+                                        [(ngModel)]="selectedService.depd2C"
+                                        #d2c
+                                    ></textarea>
+                                    <textarea 
+                                        [(ngModel)]="selectedService.depd2D" 
+                                        class="long"
+                                        #d2d
+                                    ></textarea>
+                                </div>
+                                <div class="on-two">
+                                    <textarea 
+                                        class="short"
+                                        [(ngModel)]="selectedService.depd3C"
+                                        #d3c
+                                    ></textarea>
+                                    <textarea 
+                                        [(ngModel)]="selectedService.depd3D" 
+                                        class="long"
+                                        #d3d
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chunk-three">
+                            <input
+                                type="checkbox"
+                                [ngModel]="detailFlags.depalm"
+                                (ngModelChange)="toggleDetailFlag('depalm', $event)"
+                            > <span class="name">Almacenar</span> <br>
+                            <input
+                                type="checkbox"
+                                [ngModel]="detailFlags.depcom"
+                                (ngModelChange)="toggleDetailFlag('depcom', $event)"
+                            > <span class="name">Comprar</span> <br>
+                            <input
+                                type="checkbox"
+                                [ngModel]="detailFlags.depint"
+                                (ngModelChange)="toggleDetailFlag('depint', $event)"
+                            > <span class="name">Contabilizar</span>
+                        </div>
+                    </div>
+                    <div class="chunk-four">
+                        <div class="first-det">
+                            <p>Datos de contacto</p>
+                            <textarea 
+                                class="heighty long"
+                                [(ngModel)]="selectedService.depdco"
+                                #dco
+                            ></textarea>
+                        </div>
+                        <div class="second-det">
+                            <p>Datos de entrega</p>
+                            <textarea 
+                                class="heighty long"
+                                [(ngModel)]="selectedService.depden"
+                                #den
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div class="btns">
+                        <button class="delete-btn">-</button>
+                    </div>
+                    <div class="more-detail-container">
+                        <div class="tabs" role="tablist" aria-label="Detalle tabs">
+                            <button
+                                class="tab-btn"
+                                role="tab"
+                                [attr.aria-selected]="option === 'personas'"
+                                [class.active-tab]="option === 'personas'"
+                                (click)="setOption('personas')"
+                            > Personas
+                            </button>
+                            <button 
+                                class="tab-btn"
+                                role="tab"
+                                [attr.aria-selected]="option === 'almacen'"
+                                [class.active-tab]="option === 'almacen'"
+                                (click)="[setOption('almacen'), almacenDatos(selectedService.depcod)]"
+                                [disabled]="selectedService?.depalm !== 1"
+                            > Almacen
+                            </button>
+                        </div>
+                    </div>
+                    <div class="custom-grid-modal" [ngSwitch]="option">
+                        <ng-container *ngSwitchCase="'personas'">
+                            <button class="add-btn" (click)="showAddPersonas()">+</button>
+                            <h1 class="errorBtn">{{personasError}}</h1>
+                            <h1 class="successBtn">{{personasSuccess}}</h1>
+                            <div *ngIf="isLoading" class="loading-message">
+                                <div class="spinner"></div>
+                                <span>Cargando</span>
+                            </div>
+                            <div *ngIf="isAdding" class="loading-message">
+                                <div class="spinner"></div>
+                                <span>añadiendo</span>
+                            </div>
+                            <div class="personas-list">
+                                <table class="personas-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Código Persona</th>
+                                            <th>Nombre</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of paginatedPersonas">
+                                            <td>{{ p.percod }}</td>
+                                            <td>{{ p.pernom }}</td>
+                                            <td><button class="delete-btn" (click)="showDelete(p)">-</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="pagination-controls">
+                                    <button (click)="personasPrevPage()" [disabled]="personasPage === 0">Anterior</button>
+                                    <span>Página</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        [max]="personasTotalPages"
+                                        [value]="personasPage + 1"
+                                        (change)="personasGoToPage($event)"
+                                        class="pagination-input"
+                                    />
+                                    <span>de {{ personasTotalPages }}</span>
+                                    <button (click)="personasNextPage()" [disabled]="personasPage + 1 >= personasTotalPages">Siguiente</button>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'almacen'">
+                            <div *ngIf="isLoading" class="loading-message">
+                                <div class="spinner"></div>
+                                <span>Cargando</span>
+                            </div>
+                            <div class="almacen-title" *ngIf="almacenArray">
+                                <p>Nombre</p>
+                                <h1>{{almacenArray.magnom}}</h1>  
+                            </div>
+                            <h1 class="errorBtn">{{almacenErro}}</h1>
+                            <div class="almacen-list">
+                                <table class="almacen-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Código Tipo</th>
+                                            <th>Tipo de Almacenaje</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let a of almacenDatosArray">
+                                            <td>{{ a.mtacod}}</td>
+                                            <td>{{ a.mtades }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddConfirm" (click)="closeAddConfirm()"></div>
+<div class="add-confirm-modal" *ngIf="showAddConfirm">
+    <div class="btns">
+        <div class="title">
+            <h3>Añadir un servicio</h3>
+        </div>
+        <button class="add-btn" (click)="addService(codigo.value, description.value, centroCoste.value, centroGestor.value, d1c_add.value, d1d_add.value, d2c_add.value, d2d_add.value, d3c_add.value, d3d_add.value, den_add.value, dco_add.value)">+</button>
+        <button class="close-btn-btn" (click)="closeAddConfirm()">✖</button>
+    </div>
+    <h1 class="errorBtn">{{ addServiceErrorMessage }}</h1>
+    <div *ngIf="isAdding" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <div class="add-container">
+        <div class="first-content">
+            <div class="left-add">
+                <p>Código*</p>
+                <p>Descripción*</p>
+            </div>
+            <div class="right-add">
+                <div class="on-three">
+                    <textarea class="short-add" (input)="setInputToLimit($event)" #codigo ></textarea>
+                    <p>Centro de Coste*</p>
+                    <textarea (input)="setInputToUpper($event)"  class="short-add" #centroCoste ></textarea>
+                    <p>Centro Gestor*</p>
+                    <textarea (input)="setInputToUpper($event)" class="short-add" #centroGestor></textarea>
+                </div>
+                <textarea class="long-add" #description></textarea>
+            </div>
+        </div>
+        <div class="second-content">
+            <div class="checkboxes">
+                <input type="checkbox" [(ngModel)]="addDepalm">
+                <span class="name">Almacén/Farmacia</span>
+                <input type="checkbox" [(ngModel)]="addDepcom">
+                <span class="name">Comprador</span>
+                <input type="checkbox" [(ngModel)]="addDepint">
+                <span class="name">Contabilidad</span>
+            </div>
+        </div>
+        <div class="third-content">
+            <div class="left-add">
+                <p>Unidad tramitadora</p>
+                <p>Órgano gestor</p>
+                <p>Oficina contable</p>
+            </div>
+            <div class="right-add">
+                <div class="on-two">
+                    <textarea 
+                        class="short-add"
+                        #d1c_add
+                    ></textarea>
+                    <textarea 
+                        class="average-add"
+                        #d1d_add
+                    ></textarea>
+                </div>
+                <div class="on-two">
+                    <textarea 
+                        class="short-add"
+                        #d2c_add
+                    ></textarea>
+                    <textarea 
+                        class="average-add"
+                        #d2d_add
+                    ></textarea>
+                </div>
+                <div class="on-two">
+                    <textarea 
+                        class="short-add"
+                        #d3c_add
+                    ></textarea>
+                    <textarea 
+                        class="average-add"
+                        #d3d_add
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="fourth-content">
+            <div class="left-special">
+                <p>Datos de entrega</p>
+                <p>Datos de contacto</p>
+            </div>
+            <div class="right-special">
+                <textarea 
+                    class="long-add hei"
+                    #den_add
+                ></textarea>
+                <textarea 
+                    class="long-add hei"
+                    #dco_add
+                ></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
+<div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <h3>¿Seguro que quieres eliminar este Persona?</h3>
+    <h1 class="errorBtn">{{deleErr}}</h1>
+    <div class="persona-details">
+        <p>Código:</p>
+        <p>{{personaTodelete.percod}}</p>
+    </div>
+    <div *ngIf="isDeleting" class="loading-message">
+        <div class="spinner"></div>
+        <span>borrando</span>
+    </div>
+    <div class="btns">
+        <button class="delete-btn" (click)="confirmDelete(personaTodelete.percod)">-</button>
+        <button class="save-btn" (click)="closeDeleteConfirm()">✖</button>
+    </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="addPersonas" (click)="closeAddPersonas()"></div>
+<div class="proveedor-grid-modal" *ngIf="addPersonas">
+    <div class="btns">
+        <div class="title">
+            <h3>Selecciona las personas que deseas agregar</h3>
+        </div>
+        <div class="count-selected">
+            <p>seleccionado {{count}} líneas</p>
+        </div>
+        <button class="save-btn" (click)="addPersonasToService(linesSelected)">+</button>
+        <button class="close-btn-btn" (click)="closeAddPersonas()">✖</button>
+    </div>
+    <div class="search-holder">
+        <div class="search-container">
+            <div class="search-form">
+                <input 
+                    type="text" 
+                    class="search-bar"
+                    placeholder="Personas" 
+                    [(ngModel)]="searchPersonasCopy"
+                >
+            </div>
+            <div class="btns Widthy">
+                <button class="search-btn" (click)="searchCopy()">Buscar</button>
+                <button class="Limpiar-btn" (click)="limpiarSearcCopy()">Limpiar</button>
+            </div>
+        </div>
+    </div>
+    <h1 class="errorBtn">{{errorCopy}}</h1>
+    <div class="all-add-content">
+        <table class="personas-table-select">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of paginatedPersonasCopy" 
+                    style="cursor: pointer;" 
+                    [class.selected-row]="linesSelected.includes(p.percod)"
+                    (click)="selectLines(p.percod)">
+                    <td>
+                        {{p.percod}}
+                    </td>
+                    <td>{{p.pernom}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pag">
+            <div class="pagination-controls">
+                <button (click)="prevPageCopy()" [disabled]="pageCopy === 0">Anterior</button>
+                <span>Página</span>
+                <input
+                type="number"
+                min="1"
+                [max]="totalPagesCopy"
+                [value]="pageCopy + 1"
+                (change)="goToPageCopy($event)"
+                class="pagination-input"
+                />
+                <span>de {{ totalPagesCopy }}</span>
+                <button (click)="nextPageCopy()" [disabled]="pageCopy + 1 >= totalPagesCopy">Siguiente</button>
+            </div>
+        </div>
+    </div>
+</div>

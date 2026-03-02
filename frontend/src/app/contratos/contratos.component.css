@@ -1,0 +1,91 @@
+/* search */
+.margin-title { margin-left: 20%;}
+.search-options label { display: flex; font-size: 15px; gap: 16px; color: #444; padding: 8px 14px; }
+.search-options input:focus {outline: none;}
+.search-button-proveedores{ margin-right: 10px; }
+.search-btns { margin-left: 10px; } 
+.search-options input[type="radio"],
+.search-anadir input[type="radio"],
+.check { margin: 0 6px 0 0; accent-color: #25176b; width: 18px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
+/* search */
+/* details grid */
+.pointer {cursor: pointer;}
+.detail-container {display: flex; flex-direction: column; gap: 10px;}
+.chunk-one,
+.chunk-two{display: flex; gap: 10px;}
+.left {display: flex; width: 30%; gap: 10px;}
+.left-left {width: 30%; display: flex; flex-direction: column; gap: 10px;}
+.left-right {display: flex; flex-direction: column; gap: 5px;}
+.right {width: 69%;}
+.content {display: flex; gap: 10px; align-items: center;}
+.currenc:focus { outline: none; border-color: #042b5a;}
+.average {width: 150px; max-width: 220px;} 
+.long {width: 600px; max-width: 720px; min-height: 50px;}
+/* details grid */
+/* add grid */
+.title {width: 90%;}
+.add-confirm-modal {width: 70% !important;}
+.add-container {display: flex; flex-direction: column; gap: 10px;}
+.container-wrap {display: flex; gap: 10px;}
+.left-add {text-align: left; display: flex; flex-direction: column; gap: 10px;}
+.right-add {display: flex; flex-direction: column; gap: 5px;}
+.on-two {display: flex; gap: 10px;}
+.add-chunk-three {display: flex; gap: 10px;}
+.add-content {display: flex; align-items: center; gap: 10px;}
+.long-add{width: 280px; max-width: 350px;}
+.patch {margin-right: 25px;}
+.proveedor-select {margin-top: 10px;}
+.height {height: 50px !important;}
+/* add grid */
+/* proveedores grid in add */
+.proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 94%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 5001; display: flex; flex-direction: column; gap: 12px; }
+.proveedor-grid-modal .title {font-size: 10px; color: #38249b; text-align: center; width: 95%;}
+.container-pag-wrap {display: flex; flex-direction: column; align-items: center;}
+/* proveedores grid in add */
+/* articulo grid */
+.add-btn {margin-top: 10px;}
+.articulo-table,
+.centroGestor-table {width: 98%;}
+.articulo-table tbody td:last-child,
+.centroGestor-table tbody td:last-child {display: flex; justify-content: center; gap: 10px; align-items: center;}
+.borderI {border-bottom: none;}
+.currenc {height: 20px; padding: 2px 4px; border-radius: 6px; color: #162a3a; border: 1px solid #bbb; width: 95%; font-weight: bold;}
+/* articulo grid */
+/* delete grid */
+.margin {margin-left: 10px;}
+/* delete grid */
+/* add articulo grid  */
+.hello-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 600px; min-height: 120px; max-height: 80vh; z-index: 3000; display: flex; flex-direction: column; align-items: center;}
+.anadir-articulo-form {display: flex; flex-direction: column; align-items: stretch; gap: 18px; margin: 0 auto; padding: 0; width: 100%; overflow: hidden;}
+.anadir-articulo-form .search-anadir-input {width: 100%; margin: 0; display: flex; align-items: center; gap: 0;}
+.anadir-articulo-form .search-bar {flex: 1; padding: 10px 10px; border-radius: 20px; border: 1px solid #bbb; font-size: 16px; background: #f7f7f7; transition: border-color 0.2s; font-family: inherit; height: 18px;}
+.search-anadir-input .btns {width: 30%;}
+.anadir-articulo-form .search-bar:focus {border-color: #38249b; outline: none; background: #fff;}
+.anadir-articulo-form .search-anadir {display: flex; align-items: center; gap: 18px; margin-bottom: 0; margin-right: 0; padding: 0; justify-content: center;}
+.pagination-controls { justify-content: center;}
+.hello-modal .title {width: 55%;}
+.art-title {font-size: 22px; color: #38249b;}
+.anadir-proveedores-table thead th:first-child,
+.anadir-proveedores-table thead th:nth-child(2),
+.anadir-proveedores-table thead th:nth-child(3) {width: 12%;}
+.selected {text-align: center; margin: 0px;}
+.selected-row {background-color: #cce6ff;}
+/* add articulo grid */
+/* delete grid for centros */
+.delete-info-titles {display: flex; width: 100%;}
+.left-delete {width: 25%;}
+.right-delete {width: 75%;}
+.left-delete,
+.right-delete {text-align: left; gap: 10px; display: flex; flex-direction: column;}
+/* delete grid for centros */
+/* centro gestor add grid */
+.centroGetor-table thead th:first-child,
+.centroGetor-table thead th:nth-child(3),
+.centroGetor-table thead th:last-child {width: 12%;}
+/* centro gestor add grid */
+/* D grid for centro gestor */
+.D-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 85%; min-height: 120px; max-height: 80vh; z-index: 3000; display: flex; flex-direction: column; align-items: center;}
+.D-modal .title {width: 50%;}
+.info-D {display: flex; width: 100%; gap: 10px; justify-content: center; margin: 10px;}
+.info-content {display: flex; align-items: center; width: 30%; gap: 10px;}
+/* D grid for centro gestor */

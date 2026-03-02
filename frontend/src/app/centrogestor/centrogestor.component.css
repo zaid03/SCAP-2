@@ -1,0 +1,17 @@
+.table-container { background-color: #f0f0f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.styled-table { max-width: 95%; }
+.styled-table tbody td:last-child{text-align: center;}
+.table-wrapper { width: 50%; display: flex; flex-direction: column; align-items: center; }
+.buttons{ display: flex; gap: 20px; }
+.color { color: #38249b; font-weight: bold;}
+.styled-table thead th:first-child,
+.styled-table thead th:last-child { width: 95px;}
+@media (min-width: 1600px) {
+  .table-container { padding: 40px 0; }
+  .styled-table { max-width: 70% !important; font-size: 1.2rem; }
+  .styled-table th,
+  .styled-table td { padding: 18px 22px; font-size: 1.05rem; }
+  .styled-table button,
+  .cancel-btn,
+  .message { font-size: 1.2rem; }
+}

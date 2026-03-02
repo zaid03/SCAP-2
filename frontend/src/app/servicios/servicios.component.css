@@ -1,0 +1,88 @@
+/* search */
+.search-container { width: 95%;}
+.search-form { width: 75%;}
+.Widthy { width: 12%;}
+.search-form select { padding: 4px 6px; border-radius: 20px; border: 1px solid #bbb; font-size: 15px; transition: border 0.2s, box-shadow 0.2s; outline: none; box-shadow: 0 1px 4px rgba(56,36,155,0.04); }
+.search-form option { outline: none; font-weight: bold;}
+/* search */
+/* main table */
+.services-list,
+.personas-table,
+.almacen-table { width: 90%; }
+.services-table th:first-child,
+.services-table th:nth-child(3)  { width: 80px; }
+.services-table th:nth-child(4),
+.services-table th:nth-child(5),
+.services-table th:nth-child(6),
+.services-table th:nth-child(7) {width: 120px;}
+.services-table tbody td:nth-child(7),
+.services-table tbody td:nth-child(6),
+.services-table tbody td:nth-child(5) { text-align: center; }
+.custom-grid-modal .personas-table thead th:last-child { width: 80px;}
+.personas-table tbody td:last-child {display: flex; justify-content: center;}
+.custom-grid-modal .personas-table thead th:first-child {width: 220px;}
+.almacen-table thead th:first-child {width: 150px;}
+/* main table */
+/* detail grid */
+.detail-container { display: flex; flex-wrap: wrap;}
+.chunk-one,
+.chunk-two { width: 40%; display: flex;}
+.chunk-two { width: 50%;}
+.chunk-three { width: 8%;}
+.chunk-four { width: 99%; margin-top: 10px; display: flex;}
+.on-two { display: flex; gap: 15px; align-items: center;}
+.left {width: 25%;display: flex; flex-direction: column; gap: 20px;}
+.right {width: 75%;display: flex; flex-direction: column; gap: 17px;}
+.first-det,
+.second-det {width: 50%; display: flex; gap: 10px;}
+.special { width: 70%; height: 100px;}
+.long {width: 70%; max-width: 90%;}
+.special-long { width: 90%; max-width: 95%;}
+.short {width: 80px; max-width: 180px;}
+.services-table tbody td input[type="checkbox"],
+.chunk-three input[type="checkbox"],
+.checkboxes input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
+.name {margin-left: 5px; font-size: 16px;}
+/* detail grid */
+/* detail grid's grids */
+.heighty { height: 50px !important;}
+.almacen-title { margin-top: 5px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;}
+/* detail grid's grids */
+/* add grid */
+.add-confirm-modal { position: fixed; top: 15%; left: 50%; width: 50%; }
+.add-container { display: flex; flex-direction: column; gap: 10px;}
+.first-content,
+.second-content,
+.third-content {display: flex;}
+.left-add,
+.left-special {width: 20%; text-align: left; display: flex; flex-direction: column; gap: 20px;}
+.right-add,
+.right-special {width: 80%; display: flex; flex-direction: column; gap: 10px;}
+.on-three {display: flex; gap: 10px; align-items: center;}
+.second-content {justify-content: center;}
+.checkboxes {display: flex; gap: 10px; align-items: center;}
+.title {width: 80%;}
+.fourth-content {display: flex;}
+.left-special { gap: 50px;}
+.short-add {width: 80px; max-width: 95px;}
+.long-add {width: 475px; max-width: 520px;}
+.average-add {width: 370px; max-width: 415px;}
+.hei {height: 50px !important;}
+/* add grid */
+/* add new service grid */
+.custom-grid-modal .add-btn {margin: 5px;}
+.delete-btn { margin-left: 10px;}
+.delete-confirm-modal { display: flex; flex-direction: column; align-items: center; gap: 2px;}
+.persona-details {width: 90%; display: flex; justify-content: center; gap: 10px;}
+.delete-confirm-modal .btns {justify-content: center;}
+/* add new service grid */
+/* add personas for a service */
+.proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72%; max-width: 95%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 4000; display: flex; flex-direction: column; gap: 12px;}
+.proveedor-grid-modal .search-form {width: 30%;}
+.proveedor-grid-modal .search-container {width: 100%;}
+.proveedor-grid-modal .search-holder {width: 100%;}
+.all-add-content {display: flex; flex-direction: column; align-items: center;}
+.proveedor-grid-modal .personas-table-select thead th:first-child {width: 190px;}
+.proveedor-grid-modal .title {width: 60%;}
+.selected-row {background-color: rgba(28, 93, 140, 0.2);}
+/* add personas for a service */

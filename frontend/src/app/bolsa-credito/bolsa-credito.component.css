@@ -1,0 +1,63 @@
+/* search */
+.title-area {justify-content: flex-end;}
+.search-container {width: 30%;}
+/* search */
+/* centro gestor info */
+.centro-info {display: flex; width: 100%; margin-top: 5px; justify-content: center; gap: 10px;}
+.centro-content {display: flex; flex-direction: column; justify-content: center;}
+.rad-content {display: flex; align-items: flex-start; gap: 10px;}
+.rad {display: flex; gap: 10px; align-items: center;}
+.centro-content h1 {font-size: 20px !important;}
+.widthSmall {width: 10%;}
+.bigWidth {width: 30%;}
+.rad input[type="radio"] {margin: 0 6px 0 0; accent-color: #25176b; width: 18px; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
+/* centro gestor info */
+/* main-table */
+.credito-container td:nth-child(8),
+.credito-container td:nth-child(7),
+.credito-container td:nth-child(6),
+.credito-container td:nth-child(5) { text-align: right; }
+/* main-table */
+/* main grid detail */
+.detail-container,
+.acumolados {width: 99%; padding: 1px; display: flex; flex-wrap: wrap; gap: 5px;}
+.acumolados {flex-direction: column; align-items: center; margin-top: 5px;}
+.detail-title { justify-content: center; display: flex; gap: 10px;}
+.chunk-one,
+.chunk-two { display: flex; flex-direction: column;}
+.chunk-one {width: 35%;}
+.chunk-two {width: 64%; }
+.detail-chunk-container { display: flex; gap: 10px;}
+.detail-chunk-container .left { width: 30%; display: flex; flex-direction: column; gap: 10px; }
+.detail-chunk-container .right { display: flex; flex-direction: column; gap: 10px; }
+.on-two { display: flex; gap: 15px; align-items: center;}
+.special { width: 12% !important;}
+.detail-container h1,
+.acumolados h1 {font-size: 18px;}
+.smallTextarea{width: 80px; max-width: 100px;} 
+.conta-first,   
+.conta-second { display: flex; margin-top: 1%;}
+.conta-one,
+.conta-two,
+.conta-three,
+.conta-four { width: 30%; display: flex; flex-direction: column; gap: 5px;}
+.conta-sign { font-weight: bold; font-size: 22px; width: 8%; display: flex; align-items: flex-end; justify-content: center;}
+.fix {margin-top: 5px;}
+.detail-acumolados-container { width: 80%; display: flex;  justify-content: center; gap: 10px;}
+/* main grid detail */
+/* D grid for centro gestor */
+.D-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 85%; min-height: 120px; max-height: 80vh; z-index: 3000; display: flex; flex-direction: column; align-items: center;}
+.D-modal .title {width: 50%;}
+.info-D {display: flex; width: 100%; gap: 10px; justify-content: center; margin: 10px;}
+.info-content {display: flex; align-items: center; width: 30%; gap: 10px;}
+.art-title {width: 25%; font-size: 23px;}
+.info-content p,
+.info-content h1 {font-size: 18px;}
+/* D grid for centro gestor */
+@media (max-width: 1299px) {
+    .detail-chunk-container .left {width: 10%;}
+    .chunk-one,
+    .chunk-two,
+    .chunk-three { width: 98%;}
+    .detail-container, .acumolados { width: 98%; }
+}

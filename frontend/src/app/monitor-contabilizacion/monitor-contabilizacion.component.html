@@ -1,0 +1,564 @@
+<div class="facturas-page">
+    <div 
+        class="sidebar-backdrop" 
+        *ngIf="!sidebar.collapsed" 
+        (click)="sidebar.collapsed = true"
+    >
+    </div>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="facturas-container" [class.blurred]="!sidebar.collapsed">
+        <div class="title-menu">
+            <div class="title-area">
+                <h2 class="margin-title">Monitor de contabilización</h2>  
+            </div>
+            <div class="search-holder">
+                <div class="search-container">
+                    <div class="search-form">
+                        <input 
+                            type="text" 
+                            class="search-bar" 
+                            placeholder="factura" 
+                            [(ngModel)]="facturaSearch"
+                        >
+                        <input 
+                            type="text" 
+                            name="factura" 
+                            class="search-bar smallWidth"
+                            placeholder="Eje"
+                            [(ngModel)]="ejerSearch"
+                            maxlength="4"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                        />
+                        <input 
+                            type="text" 
+                            class="search-bar smallWidth"
+                            [(ngModel)]="centroGestor"
+                            disabled
+                        />
+                        <div class="more-search-options">
+                            <select [(ngModel)]="fechasType">
+                                <option value="registro">Registro</option>
+                                <option value="factura">Factura</option>
+                            </select>
+                            Desde
+                            <input 
+                                type="date" 
+                                name="desde" 
+                                class="fecha-dato" 
+                                [(ngModel)]="desde"
+                            >   
+                            Hasta
+                            <input 
+                                type="date" 
+                                name="hasta" 
+                                class="fecha-dato" 
+                                [(ngModel)]="hasta"
+                            > 
+                        </div>
+                    </div>
+                    <div class="btns">
+                        <button type="button" class="search-button" (click)="search()">Buscar</button>
+                        <button type="button" class="search-btn" (click)="limpiarSearch()">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="group-menu" (click)="toggleMenu($event)">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="menu-panel" *ngIf="showMenu">
+                    <button class="download-btn" (click)="DownloadPDF()">Exportar a PDF</button>
+                    <button class="download-btn" (click)="DownloadCSV()">Exportar a CSV</button>
+                </div>
+            </div>
+        </div>
+        <h1 class="successBtn">{{estadoMessage}}</h1>
+        <div class="contabilizar-container">
+            <div class="cont-date">
+                Fecha contable
+                <input 
+                    type="date"
+                    name="hasta" 
+                    class="fecha-dato"
+                    [(ngModel)]="fechaContable"
+                />
+            </div>
+            <div class="cont-btn">
+                <button 
+                    class="save-btn"
+                    (click)="contabilizar()"
+                    [disabled]="estadogc === null || estadogc > 0"
+                >
+                    Contabilizar
+                </button>
+            </div>
+        </div>
+        <p class="selected" *ngIf="caughtFacturas.length > 0">{{caughtFacturas.length}} Facturas seleccionados</p>
+        <h1 class="successBtn">{{filterfacturaSuccess}}</h1>
+        <h1 class="errorBtn">{{filterFacturaMessage}}</h1>
+        <div *ngIf="contabilizarResults.length > 0" class="results-container">
+            <div *ngFor="let result of contabilizarResults" 
+                [class.successBtn]="result.success" 
+                [class.errorBtn]="!result.success">
+                <span>Factura {{ result.facnum }}: {{ result.message }}</span>
+            </div>
+        </div>
+        <div class="facturas-list">
+            <div *ngIf="isContabilizando" class="loading-message">
+                <div class="spinner"></div>
+                <span>Contabilizando</span>
+            </div>
+            <div *ngIf="isLoading" class="loading-message">
+                <div class="spinner"></div>
+                <span>Cargando</span>
+            </div>
+            <table class="facturas-table">
+                <thead>
+                    <tr>
+                        <th class="sortable resizable" (click)="toggleSort('facnum')">
+                            Número Registro 
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facnum'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 0)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('tercod')">
+                            Código Prov
+                            <span class="sort-indicator" *ngIf="sortColumn === 'tercod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 1)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('ternom')">
+                            Nombre Proveedor
+                            <span class="sort-indicator" *ngIf="sortColumn === 'ternom'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 2)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('ternif')">
+                            NIF Prov
+                            <span class="sort-indicator" *ngIf="sortColumn === 'ternif'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 3)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facfre')">
+                            F.Registro
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facfre'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 4)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facimp')">
+                            Importe total
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facimp'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 5)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('FACDTO')">
+                            Descuentos
+                            <span class="sort-indicator" *ngIf="sortColumn === 'FACDTO'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 6)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facdoc')">
+                            Núm. Factura
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facdoc'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 7)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facann')">
+                            Año
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facann'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 8)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facfac')">
+                            R.C.F
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facfac'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 9)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facdat')">
+                            F.Factura
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facdat'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 10)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('FACTXT')">
+                            Descripción
+                            <span class="sort-indicator" *ngIf="sortColumn === 'FACTXT'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 11)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facado')">
+                            OP. Contable
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facado'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 12)"></div>
+                        </th>
+                        <th class="sortable resizable" (click)="toggleSort('facfco')">
+                            F.contable
+                            <span class="sort-indicator" *ngIf="sortColumn === 'facfco'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 13)"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr 
+                        *ngFor="let f of paginatedFacturas"
+                        (click)="selectFacturas(f)"
+                        [class.selected-row]="isFacturaSelected(f)"
+                    >
+                        <td (click)="showDetails(f)" style="cursor: pointer;">{{f.facnum}}</td>
+                        <td>{{f.tercod}}</td>
+                        <td>{{f.ter.ternom}}</td>
+                        <td>{{f.ter.ternif}}</td>
+                        <td>{{f.facfre | date:'dd-MM-yyyy'}}</td>
+                        <td>{{f.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</td>
+                        <td>{{f.facdto}}</td>
+                        <td>{{f.facdoc}}</td>
+                        <td>{{f.facann}}</td>
+                        <td>{{f.facfac}}</td>
+                        <td>{{f.facdat | date:'dd-MM-yyyy'}}</td>
+                        <td>{{f.factxt}}</td>
+                        <td>{{f.facado}}</td>
+                        <td>{{f.facfco | date:'dd-MM-yyyy'}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination-controls">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+                <span>Página</span>
+                <input
+                type="number"
+                min="1"
+                [max]="totalPages"
+                [value]="page + 1"
+                (change)="goToPage($event)"
+                class="pagination-input"
+                />
+                <span>de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+            </div>
+        </div>
+        <div class="modal-backdrop" *ngIf="selectedFacturas" (click)="closeDetails()"></div>
+            <div class="display" >
+                <div class="modal" *ngIf="selectedFacturas">
+                    <div class="btns">
+                        <div class="title-detail">
+                            <h3>Detalles del Factura</h3>
+                        </div>
+                        <button class="guardar-btn" >✔</button>
+                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                    </div>
+                    <div *ngIf="isUpdatingFactura" class="loading-message">
+                        <div class="spinner"></div>
+                        <span>actualizando</span>
+                    </div>
+                    <h1 class="successBtn">{{facturaDetailSuccess}}</h1>
+                    <h1 class="errorBtn">{{facturaDetailError}}</h1>
+                    <div class="detail-container">
+                        <div class="chunk-one">
+                            <div class="left">
+                                <p>Núm. Reg.</p>
+                                <p>Núm.Factura:</p>
+                                <p>R.C.F:</p>
+                            </div>
+                            <div class="right">
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.facnum || '#'}}</h1>
+                                    <p>F.Contable</p>
+                                    <h1>{{selectedFacturas.facfco | date:'dd-MM-yyyy'}}</h1>
+                                </div>
+                                <h1>{{selectedFacturas.facdoc || '#'}}</h1>
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.facfac || '#'}}</h1>
+                                    <h1>{{selectedFacturas.facann || '#'}}</h1>
+                                    <h1>{{selectedFacturas.factdc || '#'}}</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chunk-two">
+                            <div class="left">
+                                <p>Proveedor:</p>
+                                <p>NIF</p>
+                                <p>Fecha Factura</p>
+                            </div>
+                            <div class="right">
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.tercod || '#'}}</h1>
+                                    <h1>{{selectedFacturas.ter_TERNOM || '#'}}</h1>
+                                </div>
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.ter_TERNIF || '#'}}</h1>
+                                    <p>C.Gestor</p>
+                                    <h1>{{selectedFacturas.cgecod || '#'}}</h1>
+                                </div>
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.facdat | date:'dd-MM-yyyy'}}</h1>
+                                    <p>F.Registro</p>
+                                    <h1>{{selectedFacturas.facfre| date:'dd-MM-yyyy'}}</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chunk-three special-chunk">
+                            <div class="left special-needs gap">
+                                <p>Tipo de contrato</p>
+                                <p>Criterio de puntuación</p>
+                                <p>Procedimiento de contacto</p>
+                            </div>
+                            <div class="right moreGap">
+                                <h1>{{selectedFacturas.conctp || '#'}}</h1>
+                                <h1>{{selectedFacturas.concpr || '#'}}</h1>
+                                <h1>{{selectedFacturas.conccr || '#'}}</h1>
+                            </div>
+                        </div>
+                        <div class="chunk-four">
+                            <div class="left">
+                                <p>Forma de pago</p>
+                                <p>Ordinal de pago</p>     
+                            </div>
+                            <div class="right">
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.facfpg}}</h1>
+                                    <p class="pagoFix">Tipo de pago</p>
+                                    <h1 class="pagoFix">{{selectedFacturas.factpg || '#'}}</h1>
+                                </div>
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas.facopg || '#'}}</h1>
+                                    <p>Cuenta Tercero</p>
+                                    <h1>{{selectedFacturas.facoct || '#'}}</h1>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chunk-five">
+                            <div class="left moreGap">
+                                <p>Des.Fact/ADO:</p>
+                                <p>ADO</p>
+                            </div>
+                            <div class="right">
+                                <h1>{{selectedFacturas.factxt || '#'}}</h1>
+                                <h1>{{selectedFacturas.facado || '#'}}</h1>
+                            </div>
+                        </div>
+                        <div class="chunk-six">
+                            <div class="left gap">
+                                <p>Total Factura</p>
+                                <p>Apl.diferencias</p>
+                                <p>Descuentos</p>
+                            </div>
+                            <div class="right gap">
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas?.facimp ? (selectedFacturas.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p>Aplicado</p>
+                                    <h1>{{selectedFacturas?.faciec ? (selectedFacturas.faciec | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                </div>
+                                <div class="on-two">
+                                    <h1>{{selectedFacturas?.facidi ? (selectedFacturas.facidi | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p>Pte.Apli</p>
+                                    <h1>{{getPendingApply(selectedFacturas) ? (getPendingApply(selectedFacturas) | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                </div>
+                                <h1>{{selectedFacturas?.facdto ? (selectedFacturas.facdto | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                            </div>
+                        </div>
+                        <div class="observ">
+                            <p>Observaciones:</p>
+                            <h1>{{selectedFacturas.facobs || '#'}}</h1>
+                        </div>
+                    </div>
+                    <div class="more-detail-container">
+                        <div class="tabs" role="tablist" aria-label="Detalle tabs">
+                            <button
+                                class="tab-btn"
+                                role="tab" 
+                                type="button"
+                                [class.active]="detailView === 'Albaranes'"
+                                (click)="detailView = 'Albaranes'"
+                            >
+                                Albaranes
+                            </button>
+                            <button 
+                                class="tab-btn"
+                                role="tab" 
+                                type="button"
+                                [class.active]="detailView === 'Contabilización'"
+                                (click)="detailView = 'Contabilización'"
+                            >
+                                Datos Contabilización
+                            </button>
+                        </div>
+                    </div>
+                    <div class="more-details">
+                        <div class="detail-grid" *ngIf="detailView === 'Albaranes'">
+                            <div class="more-detail-container">
+                                <div class="tabs" role="tablist" aria-label="Opciones de Albaranes">
+                                    <button
+                                        class="tab-btn"
+                                        role="tab"
+                                        type="button"
+                                        [class.active]="albaranesOptio === 'albaranes'"
+                                        (click)="setAlbaranesOptio('albaranes', selectedFacturas?.facnum)"
+                                    >
+                                        Albaranes
+                                    </button>
+                                    <button
+                                        class="tab-btn"
+                                        role="tab"
+                                        type="button"
+                                        [class.active]="albaranesOptio === 'aplicaciones'"
+                                        (click)="setAlbaranesOptio('aplicaciones', selectedFacturas?.facnum)"
+                                    >
+                                        Aplicaciones
+                                    </button>
+                                    <button
+                                        class="tab-btn"
+                                        role="tab"
+                                        type="button"
+                                        [class.active]="albaranesOptio === 'descuentos'"
+                                        (click)="setAlbaranesOptio('descuentos', selectedFacturas?.facnum)"
+                                    >
+                                        Descuentos
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="detail-switch-second-content">
+                                <ng-container [ngSwitch]="albaranesOptio">
+                                    <ng-container *ngSwitchCase="'albaranes'">
+                                        <div class="albaranes-btns">
+                                            <button class="save-btn" >+</button>
+                                        </div>
+                                        <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
+                                        <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
+                                        <div class="detail-card">
+                                            <table class="albaranes-table width-last">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Número albarán</th>
+                                                        <th>Referencia</th>
+                                                        <th>Fecha</th>
+                                                        <th>Base imponible</th>
+                                                        <th>Solicitud</th>
+                                                        <th>Índice</th>
+                                                        <th>Observaciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let a of paginatedAlbaranes">
+                                                        <td>{{ a.albnun }}</td>
+                                                        <td>{{ a.albref }}</td>
+                                                        <td>{{ a.albdat | date:'dd-MM-yyyy' }}</td>
+                                                        <td>{{ a.albbim | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</td>
+                                                        <td>{{ a.solnum }}</td>
+                                                        <td>{{ a.solsub }}</td>
+                                                        <td>{{ a.albobs }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="pagination-controls alignment">
+                                                <button (click)="prevPageAlbaranes()" [disabled]="pageAlbaranes === 0">Anterior</button>
+                                                <span>Página</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    [max]="totalPagesAlbaranes"
+                                                    [value]="pageAlbaranes + 1"
+                                                    (change)="goToPageAlbaranes($event)"
+                                                    class="pagination-input"
+                                                />
+                                                <span>de {{ totalPagesAlbaranes }}</span>
+                                                <button (click)="nextPageAlbaranes()" [disabled]="pageAlbaranes + 1 >= totalPagesAlbaranes">Siguiente</button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'aplicaciones'">
+                                        <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
+                                        <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
+                                        <div *ngIf="isLoading" class="loading-message">
+                                            <div class="spinner"></div>
+                                            <span>Cargando</span>
+                                        </div>
+                                        <div class="detail-card">
+                                            <table class="albaranes-table app">
+                                                <thead>
+                                                    <tr>
+                                                        <th><strong>Referencia</strong></th>
+                                                        <th>Económica</th>
+                                                        <th>Importe</th>
+                                                        <th>diferencias</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let a of paginatedApiciones">
+                                                        <td>{{ a.FDEREF }}</td>
+                                                        <td>{{ a.FDEECO }}</td>
+                                                        <td>{{ a.FDEIMP | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</td>
+                                                        <td>
+                                                            {{ a.FDEIMP | currency:'EUR':'symbol':'1.2-2':'es-ES' }}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="pagination-controls alignment">
+                                                <button (click)="prevPageAplicaiones()" [disabled]="pageAplicaiones === 0">Anterior</button>
+                                                <span>Página</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    [max]="totalPagesAplicaciones"
+                                                    [value]="pageAplicaiones + 1"
+                                                    (change)="goToPageAplicaciones($event)"
+                                                    class="pagination-input"
+                                                />
+                                                <span>de {{ totalPagesAplicaciones }}</span>
+                                                <button (click)="nextPageAplicaciones()" [disabled]="pageAplicaiones + 1 >= totalPagesAplicaciones">Siguiente</button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container    *ngSwitchCase="'descuentos'">
+                                        <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
+                                        <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
+                                        <div *ngIf="isLoading" class="loading-message">
+                                            <div class="spinner"></div>
+                                            <span>Cargando</span>
+                                        </div>
+                                        <div class="detail-card">
+                                            <table class="albaranes-table desc">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Área</th>
+                                                        <th>Orgánica</th>
+                                                        <th>Programa</th>
+                                                        <th>Económica</th>
+                                                        <th>Base</th>
+                                                        <th>% Dto</th>
+                                                        <th>Importe Descuento</th>
+                                                        <th>Descripción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let d of paginatedDescuentos">
+                                                        <td>{{ d.FDTARE }}</td>
+                                                        <td>{{ d.FDTORG }}</td>
+                                                        <td>{{ d.FDTFUN }}</td>
+                                                        <td>{{ d.FDTECO }}</td>
+                                                        <td>{{ d.FDTBSE | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</td>
+                                                        <td>{{ d.FDTPRE | number:'1.1-1' }} %</td>
+                                                        <td>{{ d.FDTDTO | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</td>
+                                                        <td>{{ d.FDTTXT }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="pagination-controls alignment">
+                                                <button (click)="prevPageDescuentos()" [disabled]="pageDescuentos === 0">Anterior</button>
+                                                <span>Página</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    [max]="totalPagesDescuentos"
+                                                    [value]="pageDescuentos + 1"
+                                                    (change)="goToPageDescuentos($event)"
+                                                    class="pagination-input"
+                                                />
+                                                <span>de {{ totalPagesDescuentos }}</span>
+                                                <button (click)="nextPageDescuentos()" [disabled]="pageDescuentos + 1 >= totalPagesDescuentos">Siguiente</button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    <div class="detail-grid" *ngIf="detailView === 'Contabilización'">
+                        <div class="detail-card">
+                            <h4>Later</h4>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>        
+    </div>
+</div>
