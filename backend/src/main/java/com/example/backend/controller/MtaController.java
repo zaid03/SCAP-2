@@ -22,10 +22,19 @@ public class MtaController {
 
     //to fetch all MTAs
     @GetMapping("/all-mta/{ent}")
-    public List<Mta> getAlmacenaje(
+    public ResponseEntity<?> getAlmacenaje(
         @PathVariable Integer ent
     ) {
-        return mtaRepository.findByENT(ent);
+        try {
+            List<Mta> almacenajes = mtaRepository.findByENT(ent);
+            if (almacenajes.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            }
+
+            return ResponseEntity.ok(almacenajes);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+        }
     }
 
     //to fetch by ent and mtacod
@@ -43,6 +52,23 @@ public class MtaController {
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: " + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //search by mtades
+    @GetMapping("/search-almacenaje/{ent}/{mtades}")
+    public ResponseEntity<?> searchAlmacenaje(
+        @PathVariable Integer ent,
+        @PathVariable String mtades
+    ) {
+        try {
+            List<Mta> almacenajes = mtaRepository.findByENTAndMTADESContaining(ent, mtades);
+            if (almacenajes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            }
+            return ResponseEntity.ok(almacenajes);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
         }
     }
 }

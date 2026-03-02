@@ -13,6 +13,9 @@ public interface MtaRepository extends JpaRepository<Mta, MtaId> {
     //to fetch all MTAs
     List<Mta> findByENT(Integer ent);
 
-    //to fetch by ent and mtacod
+    //to fetch by ent and mtacod and to search in almacenajes
     List<Mta> findByENTAndMTACOD(Integer ent, Integer mtacod);
+
+    //to search in almacenajes
+    List<Mta> findByENTAndMTADESContaining(Integer ent, String mtades);
 }
