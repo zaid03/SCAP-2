@@ -98,7 +98,8 @@ app-sidebar { flex-shrink: 0; z-index: 2000; }
 .left-search p,
 .proveedor-info p,
 .proveedor-info h1,
-.search-chunk p {font-size: 18px; font-weight: bold; color: #38249b;}
+.search-chunk p,
+.descDelete {font-size: 18px; font-weight: bold; color: #38249b;}
 .chunk-one h1,
 .chunk-two h1,
 .chunk-three h1,

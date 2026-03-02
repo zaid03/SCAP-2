@@ -272,10 +272,47 @@ export class TipoAlmacenajeComponent {
     doc.save('tipos-almacenajes.pdf');
   }
 
+  //detail grid functions
+  selectedAlmacenaje: any = [];
+  almacenajeDetail: boolean = false;
+  almacenajeDetailError: string = '';
+  almacenajeDetailSuccess: string = '';
+  isUpdatingAlmacenaje: boolean = false;
+  openDetail(p: any) {
+    this.limpiarMessages();
+    this.selectedAlmacenaje = p;
+    this.almacenajeDetail = true;
+  }
+
+  closeDetails() {
+    this.limpiarMessages();
+    this.almacenajeDetail = false;
+    this.selectedAlmacenaje = [];
+  }
+
+  showDeleteConfirm: boolean = false;
+  isDeletingAlmacenaje: boolean = false;
+  deleteMessageError: string = '';
+  openDelete() {
+    this.limpiarMessages();
+    this.showDeleteConfirm = true;
+  }
+
+  closeDelete() {
+    this.limpiarMessages();
+    this.showDeleteConfirm = false;
+  }
+
+  confirmDelete() {
+    const mtacod = this.selectedAlmacenaje.mtacod;
+  }
 
   //misc
   limpiarMessages() {
     this.almacenajesSuccess = '';
     this.almacenajesError = '';
+    this.almacenajeDetailError = '';
+    this.almacenajeDetailSuccess = '';
+    this.deleteMessageError = '';
   }
 }
