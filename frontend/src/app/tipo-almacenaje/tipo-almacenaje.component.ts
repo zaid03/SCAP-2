@@ -35,7 +35,7 @@ export class TipoAlmacenajeComponent {
 
   //global variables
   private entcod: number | null = null;
-  almacenajes: any[] = [];
+  almacenajes: any = [];
   page = 0;
   pageSize = 20;
   almacenajesSuccess: string = '';
@@ -53,12 +53,23 @@ export class TipoAlmacenajeComponent {
       return;
     }
     
-    // this.fetchAlmacenajes();
+    this.fetchAlmacenajes();
   }
 
   //main table functions
   fetchAlmacenajes() {
-
+    this.isLoadingAlmacenajes = true;
+    this.http.get(`${environment.backendUrl}/api/mta/all-mta/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.isLoadingAlmacenajes = false;
+        this.almacenajes = res;
+        this.page = 0;
+      },
+      error: (err) => {
+        this.isLoadingAlmacenajes = false;
+        this.almacenajesError = err.error.error ?? err.error
+      }
+    })
   }
   get paginatedAlmacenajes(): any[] { if (!this.almacenajes || this.almacenajes.length === 0) return [];
     const start = this.page * this.pageSize; return this.almacenajes.slice(start, start + this.pageSize);
@@ -146,6 +157,46 @@ export class TipoAlmacenajeComponent {
     this.resizingColIndex = null;
   };
 
+  searchTerm: string = '';
+  search() {
+    const numsOnly = /^\d+$/;
+    const term = String(this.searchTerm).trim();
+
+    if (numsOnly.test(term)) {
+      this.isLoadingAlmacenajes = true;
+      this.http.get(`${environment.backendUrl}/api/mta/mta-filter/${this.entcod}/${term}`).subscribe({
+        next: (res) => {
+          this.isLoadingAlmacenajes = false;
+          this.almacenajes = res;
+          this.page = 0;
+        },
+        error: (err) => {
+          this.isLoadingAlmacenajes = false;
+          this.almacenajesError = err.error.error ?? err.error
+        }
+      })
+    } else {
+      this.isLoadingAlmacenajes = true;
+      this.http.get(`${environment.backendUrl}/api/mta/search-almacenaje/${this.entcod}/${term}`).subscribe({
+        next: (res) => {
+          this.isLoadingAlmacenajes = false;
+          this.almacenajes = res;
+          this.page = 0;
+        },
+        error: (err) => {
+          this.isLoadingAlmacenajes = false;
+          this.almacenajesError = err.error.error ?? err.error
+        }
+      })
+    }
+
+  }
+
+  limpiarSearch() {
+    this.limpiarMessages();
+    this.searchTerm = '';
+    this.fetchAlmacenajes();
+  }
 
   //misc
   limpiarMessages() {

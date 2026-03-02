@@ -17,13 +17,13 @@
                         <input 
                             type="text" 
                             class="search-bar"
-                            placeholder="Ejercicio" 
-                            
+                            placeholder="Almacenaje" 
+                            [(ngModel)]="searchTerm"
                         >
                     </div>
                     <div class="btns">
-                        <button class="search-btn" >Buscar</button>
-                        <button class="search-btn" >Limpiar</button>
+                        <button class="search-btn" (click)="search()">Buscar</button>
+                        <button class="search-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
