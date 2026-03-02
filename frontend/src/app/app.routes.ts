@@ -22,6 +22,8 @@ import { BolsaCreditoComponent } from './bolsa-credito/bolsa-credito.component';
 import { ConsultaBolsasComponent } from './consulta-bolsas/consulta-bolsas.component';
 import { ContratosComponent } from './contratos/contratos.component';
 import { MonitorContabilizacionComponent } from './monitor-contabilizacion/monitor-contabilizacion.component';
+import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
+import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -46,6 +48,8 @@ export const routes: Routes = [
     { path: 'Ccredito', component: ConsultaBolsasComponent},
     { path: 'contratos', component: ContratosComponent},
     { path: 'contabilizacion', component: MonitorContabilizacionComponent},
+    { path: 'almacenaje', component: TipoAlmacenajeComponent},
+    { path: 'unidades', component: TiposUnidadesComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 

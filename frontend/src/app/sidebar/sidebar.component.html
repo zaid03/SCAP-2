@@ -128,6 +128,21 @@
           </div>
         </div>
       </div>
+      <div class="menu" (click)="temp = !temp" tabindex="0">
+        <a class="choice">Tipos</a>
+        <div class="menu-content" [class.open]="temp">
+          <div class="menu-item">
+            <a class="" 
+              
+              (click)="navigateTo('almacenaje')"
+            >Tipos de almacenaje</a>
+            <a class="margin" 
+              
+              (click)="navigateTo('unidades')"
+            >tipos de unidades</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
