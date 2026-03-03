@@ -92,7 +92,7 @@
                         <div class="title-detail">
                             <h3>Detalles de tipo de almacenaje</h3>
                         </div>
-                        <button class="guardar-btn" >✔</button>
+                        <button class="guardar-btn" (click)="updateAlmacenaje()">✔</button>
                         <button class="close-btn-btn" (click)="closeDetails()">✖</button>
                     </div>
                     <h1 class="errorBtn">{{almacenajeDetailError}}</h1>
@@ -150,7 +150,7 @@
         <div class="title">
             <p>Añadir tipo de almacenaje</p>
         </div>
-        <button class="save-btn" >✔</button>
+        <button class="save-btn" (click)="confirmAdd(desc.value)">✔</button>
         <button class="close-btn-btn" (click)="closeAddAlmacenaje()">✖</button>
     </div>
     <h1 class="errorBtn">{{addAlmacenajeError}}</h1>

@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ComponentFactoryResolver, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -290,6 +290,27 @@ export class TipoAlmacenajeComponent {
     this.selectedAlmacenaje = [];
   }
 
+  updateAlmacenaje() {
+    this.limpiarMessages();
+    this.isUpdatingAlmacenaje = true;
+
+    const mtacod = this.selectedAlmacenaje.mtacod
+    const payload = {
+      "MTADES": this.selectedAlmacenaje.mtades
+    }
+
+    this.http.patch(`${environment.backendUrl}/api/mta/update-almacenaje/${this.entcod}/${mtacod}`, payload).subscribe({
+      next: (res) => {
+        this.isUpdatingAlmacenaje = false;
+        this.almacenajeDetailSuccess = 'tipo de almacenaje se ha actualizado correctamente';
+      },
+      error: (err) => {
+        this.isUpdatingAlmacenaje = false;
+        this.almacenajeDetailError = err.error.error ?? err.error
+      }
+    })
+  }
+
   showDeleteConfirm: boolean = false;
   isDeletingAlmacenaje: boolean = false;
   deleteMessageError: string = '';
@@ -304,7 +325,22 @@ export class TipoAlmacenajeComponent {
   }
 
   confirmDelete() {
+    this.limpiarMessages();
+
     const mtacod = this.selectedAlmacenaje.mtacod;
+    this.http.delete(`${environment.backendUrl}/api/mta/delete-almacenaje/${this.entcod}/${mtacod}`).subscribe({
+      next: (res) => {
+        this.isDeletingAlmacenaje = false;
+        this.fetchAlmacenajes();
+        this.closeDelete();
+        this.closeDetails();
+        this.almacenajesSuccess = 'El tipo de almacenamiento se ha eliminado correctamente';
+      },
+      error: (err) => {
+        this.isDeletingAlmacenaje = false;
+        this.deleteMessageError = err.error.error ?? err.error
+      }
+    })
   }
 
   addAlmacenajeGrid: boolean = false;
@@ -316,6 +352,29 @@ export class TipoAlmacenajeComponent {
 
   closeAddAlmacenaje() {
     this.addAlmacenajeGrid = false;
+  }
+
+  confirmAdd(desc: string) {
+    this.limpiarMessages();
+    this.isAddingAlmacenaje = true;
+
+    const payload = {
+      "ENT": this.entcod,
+      "MTADES": desc
+    }
+
+    this.http.post(`${environment.backendUrl}/api/mta/add-almacenaje`, payload).subscribe({
+      next: (res) => {
+        this.isAddingAlmacenaje = false;
+        this.fetchAlmacenajes();
+        this.closeAddAlmacenaje();
+        this.almacenajesSuccess = 'tipo de almacenaje se ha agregado exitosamente';
+      },
+      error: (err) => {
+        this.isAddingAlmacenaje = false;
+        this.addAlmacenajeError = err.error.error ?? err.error;
+      }
+    })
   }
 
   //misc
