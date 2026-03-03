@@ -34,6 +34,8 @@ public class Art {
     @Column(nullable = true)
     private String ARTDES;
 
+    private String AUNCOD;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
         @JoinColumn(name = "ENT", referencedColumnName = "ENT", insertable = false, updatable = false),
@@ -58,4 +60,7 @@ public class Art {
 
     public String getARTDES() {return ARTDES;}
     public void setARTDES(String ARTDES) {this.ARTDES = ARTDES;}
+
+    public String getAUNCOD() {return AUNCOD;}
+    public void setAUNCOD(String AUNCOD) {this.AUNCOD = AUNCOD;}
 }

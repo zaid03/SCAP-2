@@ -36,4 +36,7 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
 
     //searching in articulos for contratos by chars
     List<ArtAsuContratoProjection> findDistinctByENTAndAsuASUECOAndARTDESContaining(Integer ent, String conlot, String artdes);
+
+    //needed for deleting a tipo de unidades
+    int countByENTAndAUNCOD(Integer ent, String auncod);
 }
