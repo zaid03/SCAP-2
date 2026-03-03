@@ -307,6 +307,17 @@ export class TipoAlmacenajeComponent {
     const mtacod = this.selectedAlmacenaje.mtacod;
   }
 
+  addAlmacenajeGrid: boolean = false;
+  addAlmacenajeError: string = '';
+  isAddingAlmacenaje: boolean = false;
+  openAddAlmacenaje() {
+    this.addAlmacenajeGrid = true;
+  }
+
+  closeAddAlmacenaje() {
+    this.addAlmacenajeGrid = false;
+  }
+
   //misc
   limpiarMessages() {
     this.almacenajesSuccess = '';
@@ -314,5 +325,6 @@ export class TipoAlmacenajeComponent {
     this.almacenajeDetailError = '';
     this.almacenajeDetailSuccess = '';
     this.deleteMessageError = '';
+    this.addAlmacenajeError = '';
   }
 }

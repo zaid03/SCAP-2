@@ -22,3 +22,9 @@
 .delete-confirm-modal {top: 220px;}
 .articulos-delete-confirm-btn { margin-right: 10px;}
 /* detail grid */
+/* add grid */
+.coste-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 500px; width: 40%; min-height: 100px; z-index: 3000; display: flex; flex-direction: column; align-items: center; }
+.add-container {width: 100%; display: flex; gap: 10px; align-items: center;}
+.title{width: 49%;}
+.areaWidth {width: 80%; max-width: 85%;}
+/* add grid */

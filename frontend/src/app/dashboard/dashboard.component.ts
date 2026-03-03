@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit {
       return true;
     }
 
-    return !this.allowedMnucods.includes(code);
+    return this.allowedMnucods.includes(code);
   }
 
   navigateTo(code: string): void {

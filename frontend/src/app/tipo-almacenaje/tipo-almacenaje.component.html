@@ -34,7 +34,7 @@
                 <div class="menu-panel" *ngIf="showMenu">
                     <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
                     <button class="print-btn" (click)="pdfDownload()">Exportar a PDF</button>
-                    <button class="add-btn">Añadir</button>
+                    <button class="add-btn" (click)="openAddAlmacenaje()">Añadir</button>
                 
                 </div>
             </div>
@@ -142,4 +142,27 @@
     <h1 class="errorBtn">{{deleteMessageError}}</h1>
     <button class="articulos-delete-confirm-btn" (click)="confirmDelete()">-</button>
     <button class="articulos-cancel-confirm-btn" (click)="closeDelete()">✖</button>
+</div>
+
+<div class="modal-backdrop" *ngIf="addAlmacenajeGrid" (click)="closeAddAlmacenaje()"></div>
+<div class="coste-modal" *ngIf="addAlmacenajeGrid">
+    <div class="btns">
+        <div class="title">
+            <p>Añadir tipo de almacenaje</p>
+        </div>
+        <button class="save-btn" >✔</button>
+        <button class="close-btn-btn" (click)="closeAddAlmacenaje()">✖</button>
+    </div>
+    <h1 class="errorBtn">{{addAlmacenajeError}}</h1>
+    <div *ngIf="isAddingAlmacenaje" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <div class="add-container">
+        <p>Descripción*</p>
+        <textarea 
+            class="areaWidth" 
+            #desc
+        ></textarea>
+    </div>
 </div>
