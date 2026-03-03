@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.backend.sqlserver2.model.Mta;
 import com.example.backend.sqlserver2.model.MtaId;
+import com.example.backend.dto.AlmacenajeAddDto;
 
 @Repository
 public interface MtaRepository extends JpaRepository<Mta, MtaId> {
@@ -18,4 +19,7 @@ public interface MtaRepository extends JpaRepository<Mta, MtaId> {
 
     //to search in almacenajes
     List<Mta> findByENTAndMTADESContaining(Integer ent, String mtades);
+
+    //needed for adding almacenaje
+    List<AlmacenajeAddDto> findDtoByENT(Integer ent);
 }

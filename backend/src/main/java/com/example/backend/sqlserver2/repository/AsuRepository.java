@@ -32,4 +32,7 @@ public interface AsuRepository extends JpaRepository<Asu, AsuId> {
     @Modifying
     @Transactional
     int deleteByENTAndAFACODAndASUCOD(Integer ENT, String AFACOD, String ASUCOD);
+
+    //needed for deleting an almacenaje
+    int countByENTAndMTACOD(Integer ent, Integer mtacod);
 }
