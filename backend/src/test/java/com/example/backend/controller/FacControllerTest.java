@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.config.TestSecurityConfig;
+import com.example.backend.dto.FacWithTerProjection;
 import com.example.backend.config.TestExceptionHandler;
 import com.example.backend.sqlserver2.model.Fac;
 import com.example.backend.sqlserver2.model.Ter;
@@ -44,32 +45,25 @@ public class FacControllerTest {
     private TerRepository terRepository;
 
     @Test
-    void getFacturas_returns200WithDto() throws Exception {
-        Fac f = new Fac();
-        f.setENT(1);
-        f.setEJE("E1");
-        f.setFACNUM(123);
-       f.setTERCOD(1);
-        f.setCGECOD("C1");
-        f.setFACIMP(100.5);
+    void getFacturas_returns200WithProjection() throws Exception {
+        FacWithTerProjection projection = mock(FacWithTerProjection.class);
+        when(projection.getFACNUM()).thenReturn(123);
+        when(projection.getTERCOD()).thenReturn(1);
+        when(projection.getTer_TERNOM()).thenReturn("Cliente X");
+        when(projection.getFACIMP()).thenReturn(100.5);
+
         when(facRepository.findByENTAndEJEAndCGECODOrderByFACFREAsc(1, "E1", "C1"))
-             .thenReturn(List.of(f));
- 
-         Ter ter = new Ter();
-        ter.setTERCOD(1);
-         ter.setTERNOM("Cliente X");
-         ter.setTERNIF("NIFX");
-        when(terRepository.findByENTAndTERCOD(1, 1)).thenReturn(Optional.of(ter));
+            .thenReturn(List.of(projection));
 
         mockMvc.perform(get("/api/fac/1/E1/C1")
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].facnum").value(123))
-            .andExpect(jsonPath("$[0].tercod").value(1))
-            .andExpect(jsonPath("$[0].ternom").value("Cliente X"))
-            .andExpect(jsonPath("$[0].facimp").value(100.5));
+            .andExpect(jsonPath("$[0].FACNUM").value(123))
+            .andExpect(jsonPath("$[0].TERCOD").value(1))
+            .andExpect(jsonPath("$[0].Ter_TERNOM").value("Cliente X"))
+            .andExpect(jsonPath("$[0].FACIMP").value(100.5));
     }
 
     @Test
