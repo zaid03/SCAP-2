@@ -326,6 +326,7 @@ export class TipoAlmacenajeComponent {
 
   confirmDelete() {
     this.limpiarMessages();
+    this.isDeletingAlmacenaje = true;
 
     const mtacod = this.selectedAlmacenaje.mtacod;
     this.http.delete(`${environment.backendUrl}/api/mta/delete-almacenaje/${this.entcod}/${mtacod}`).subscribe({

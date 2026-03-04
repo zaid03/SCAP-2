@@ -140,8 +140,8 @@
         <p class="descDelete">{{selectedAlmacenaje.mtades}}</p>
     </div>
     <h1 class="errorBtn">{{deleteMessageError}}</h1>
-    <button class="articulos-delete-confirm-btn" (click)="confirmDelete()">-</button>
-    <button class="articulos-cancel-confirm-btn" (click)="closeDelete()">✖</button>
+    <button class="delete-btn" (click)="confirmDelete()">-</button>
+    <button class="save-btn margin" (click)="closeDelete()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addAlmacenajeGrid" (click)="closeAddAlmacenaje()"></div>
