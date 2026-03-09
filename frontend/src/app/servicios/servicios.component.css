@@ -6,22 +6,21 @@
 .search-form option { outline: none; font-weight: bold;}
 /* search */
 /* main table */
-.services-list,
-.personas-table,
-.almacen-table { width: 90%; }
-.services-table th:first-child,
-.services-table th:nth-child(3)  { width: 80px; }
-.services-table th:nth-child(4),
-.services-table th:nth-child(5),
-.services-table th:nth-child(6),
-.services-table th:nth-child(7) {width: 120px;}
-.services-table tbody td:nth-child(7),
-.services-table tbody td:nth-child(6),
-.services-table tbody td:nth-child(5) { text-align: center; }
-.custom-grid-modal .personas-table thead th:last-child { width: 80px;}
-.personas-table tbody td:last-child {display: flex; justify-content: center;}
-.custom-grid-modal .personas-table thead th:first-child {width: 220px;}
-.almacen-table thead th:first-child {width: 150px;}
+.main-list,
+.aT { width: 90%; }
+.align th:first-child,
+.align th:nth-child(3)  { width: 80px; }
+.align th:nth-child(4),
+.align th:nth-child(5),
+.align th:nth-child(6),
+.align th:nth-child(7) {width: 120px;}
+.align tbody td:nth-child(7),
+.align tbody td:nth-child(6),
+.align tbody td:nth-child(5) { text-align: center; }
+.custom-grid-modal .persona thead th:last-child { width: 80px;}
+.persona tbody td:last-child {display: flex; justify-content: center;}
+.custom-grid-modal .persona thead th:first-child {width: 220px;}
+.aT thead th:first-child {width: 150px;}
 /* main table */
 /* detail grid */
 .detail-container { display: flex; flex-wrap: wrap;}
@@ -39,17 +38,18 @@
 .long {width: 70%; max-width: 90%;}
 .special-long { width: 90%; max-width: 95%;}
 .short {width: 80px; max-width: 180px;}
-.services-table tbody td input[type="checkbox"],
+.main-table tbody td input[type="checkbox"],
 .chunk-three input[type="checkbox"],
 .checkboxes input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
 .name {margin-left: 5px; font-size: 16px;}
+.space-top {margin-top: 10px;}
 /* detail grid */
 /* detail grid's grids */
 .heighty { height: 50px !important;}
 .almacen-title { margin-top: 5px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;}
 /* detail grid's grids */
 /* add grid */
-.add-confirm-modal { position: fixed; top: 15%; left: 50%; width: 50%; }
+.add-confirm-modal { position: fixed; top: 15%; left: 50%; width: 60%; }
 .add-container { display: flex; flex-direction: column; gap: 10px;}
 .first-content,
 .second-content,
@@ -57,7 +57,7 @@
 .left-add,
 .left-special {width: 20%; text-align: left; display: flex; flex-direction: column; gap: 20px;}
 .right-add,
-.right-special {width: 80%; display: flex; flex-direction: column; gap: 10px;}
+.right-special {width: 80%; display: flex; flex-direction: column; gap: 20px;}
 .on-three {display: flex; gap: 10px; align-items: center;}
 .second-content {justify-content: center;}
 .checkboxes {display: flex; gap: 10px; align-items: center;}
@@ -71,7 +71,7 @@
 /* add grid */
 /* add new service grid */
 .custom-grid-modal .add-btn {margin: 5px;}
-.delete-btn { margin-left: 10px;}
+.custom-grid-modal .delete-btn { margin-left: 10px;}
 .delete-confirm-modal { display: flex; flex-direction: column; align-items: center; gap: 2px;}
 .persona-details {width: 90%; display: flex; justify-content: center; gap: 10px;}
 .delete-confirm-modal .btns {justify-content: center;}
@@ -82,7 +82,7 @@
 .proveedor-grid-modal .search-container {width: 100%;}
 .proveedor-grid-modal .search-holder {width: 100%;}
 .all-add-content {display: flex; flex-direction: column; align-items: center;}
-.proveedor-grid-modal .personas-table-select thead th:first-child {width: 190px;}
+.proveedor-grid-modal .pts thead th:first-child {width: 190px;}
 .proveedor-grid-modal .title {width: 60%;}
 .selected-row {background-color: rgba(28, 93, 140, 0.2);}
 /* add personas for a service */

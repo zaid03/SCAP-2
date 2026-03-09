@@ -3,9 +3,9 @@
   *ngIf="!sidebar.collapsed" 
   (click)="sidebar.collapsed = true">
 </div>
-<div class="entrega-page">    
+<div class="main-page">    
     <app-sidebar #sidebar></app-sidebar>
-    <div class="entrega-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Lugares de entrega</h2>  
@@ -22,8 +22,8 @@
                         >
                     </div>
                     <div class="btns">
-                        <button type="button" class="search-button" (click)="filterEntrega()">Buscar</button>
-                        <button type="button" class="search-btn" (click)="limpiarFiltro()">Limpiar</button>
+                        <button type="button" class="purple-btn" (click)="filterEntrega()">Buscar</button>
+                        <button type="button" class="purple-btn" (click)="limpiarFiltro()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -32,20 +32,20 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="downloadExcel()">Exportar a Excel</button>
-                    <button class="download-btn" (click)="exportPdf()">Exportar a PDF</button>
-                    <button class="download-btn" (click)="showAdd()">Añadir</button>
+                    <button class="purple-btn" (click)="downloadExcel()">Exportar a Excel</button>
+                    <button class="purple-btn" (click)="exportPdf()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="showAdd()">Añadir</button>
                 </div>
             </div>
         </div>
         <h1 class="successBtn">{{entregaSuccess}}</h1>
         <h1 class="errorBtn">{{entregasError}}</h1>
-        <div class="entrega-list">
+        <div class="main-list">
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="entrega-table">
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('lencod')">
@@ -81,15 +81,19 @@
                 <span>de {{ totalPages }}</span>
                 <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="selectedEntregas" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="selectedEntregas" (click)="closeDetailsSure()"></div>
             <div class="display">
                 <div class="modal" *ngIf="selectedEntregas">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles del lugar de entrega</h3>
                         </div>
-                        <button class="guardar-btn" (click)="updateEntrega(selectedEntregas.lencod, description.value, text.value)">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div>
                     <h1 class="errorBtn">{{detallesMessageError}}</h1>
                     <h1 class="successBtn">{{detallesMessageSuccess}}</h1>
@@ -100,15 +104,17 @@
                     <div class="detail-container">
                         <div class="chunk">
                             <div class="left center">
-                                <p>código</p>
+                                <p class="p-style">código</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedEntregas.lencod || '#'}}</h1>
-                                    <p>Descripción*</p>
+                                    <h1 class="h1-style">{{tempEntrega.lencod || '#'}}</h1>
+                                    <p class="p-style">Descripción*</p>
                                     <textarea 
-                                        class="tallText" 
-                                        [(ngModel)]="selectedEntregas.lendes"
+                                        class="textArea-style tallText" 
+                                        [(ngModel)]="tempEntrega.lendes"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                         #description
                                     ></textarea>
                                 </div>
@@ -116,19 +122,43 @@
                         </div>
                         <div class="chunk">
                             <div class="left">
-                                <p>Texto</p>
+                                <p class="p-style">Texto</p>
                             </div>
                             <div class="right">
                                 <textarea 
-                                    class="specialText" 
-                                    [(ngModel)]="selectedEntregas.lentxt"
+                                    class="textArea-style specialText" 
+                                    [(ngModel)]="tempEntrega.lentxt"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
                                     #text
                                 ></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="btns">
-                        <button class="delete-btn" (click)="openDeleteConfirm(selectedEntregas)">-</button>
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="!isUpdate" 
+	                        *ngIf="isUpdate" 
+                            (click)="isUpdateAllowed(selectedEntregas.lencod, description.value, text.value)"
+                        >Guardar</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="openDeleteConfirm(selectedEntregas)"
+                        >Borrar</button>
                     </div>
                 </div>
             </div>
@@ -147,18 +177,18 @@
         <span>borrando</span>
     </div>
     <h1 class="errorBtn">{{detallesMessageErrorDelete}}</h1>
-    <button class="articulos-delete-confirm-btn" (click)="confirmDelete()">-</button>
-    <button class="articulos-cancel-confirm-btn" (click)="closeDeleteConfirm()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">-</button>
+    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showAddGrid" (click)="hideAdd()"></div>
 <div class="entrega-modal" *ngIf="showAddGrid">
     <div class="btns">
         <div class="title">
-            <h1>Añadir un lugare de entrega</h1>
+            <h3 class="specific">Añadir un lugare de entrega</h3>
         </div>
-        <button class="save-btn" (click)="addEntrega(desc.value, texto.value)">✔</button>
-        <button class="close-btn-btn" (click)="hideAdd()">✖</button>
+        <button class="purple-btn" (click)="addEntrega(desc.value, texto.value)">✔</button>
+        <button class="red-btn" (click)="hideAdd()">✖</button>
     </div>
     <h1 class="errorBtn">{{errorAddEntrega}}</h1>
     <div *ngIf="isAdding" class="loading-message">
@@ -167,12 +197,12 @@
     </div>
     <div class="add-container">
         <div class="left-add">
-            <p>Descripción*</p>
-            <p>Texto</p>
+            <p class="p-style">Descripción*</p>
+            <p class="p-style">Texto</p>
         </div>
         <div class="right-add">
-            <textarea class="averageText" #desc></textarea>
-            <textarea class="averageText height" #texto></textarea>
+            <textarea class="textArea-style averageText" #desc></textarea>
+            <textarea class="textArea-style averageText height" #texto></textarea>
         </div>
     </div>
 </div>

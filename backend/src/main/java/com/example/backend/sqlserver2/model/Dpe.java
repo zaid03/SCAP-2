@@ -34,7 +34,6 @@ public class Dpe {
 
     private Integer DPERES;
 
-    //relationships
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({

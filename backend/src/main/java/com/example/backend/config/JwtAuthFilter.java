@@ -46,35 +46,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = req.getRequestURI();
-        System.out.println("JwtAuthFilter: Processing path=" + path + " method=" + req.getMethod());
 
-        // 1. Ignorer les requêtes OPTIONS (CORS preflight)
         if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
             res.setStatus(HttpServletResponse.SC_OK);
             chain.doFilter(req, res);
             return;
         }
 
-        // 2. Ignorer les fichiers statiques (Angular)
         if (isStaticResource(path)) {
-            System.out.println("JwtAuthFilter: Static resource, skipping auth for " + path);
             chain.doFilter(req, res);
             return;
         }
 
-        // 3. Ignorer les chemins publics de l'API
         if (isPublic(path)) {
-            System.out.println("JwtAuthFilter: Public path, skipping auth for " + path);
             chain.doFilter(req, res);
             return;
         }
-
-        // 4. Vérifier JWT pour les API protégées
-        System.out.println("JwtAuthFilter: Protected path, checking JWT for " + path);
 
         String auth = req.getHeader(HttpHeaders.AUTHORIZATION);
         if (auth == null || !auth.startsWith("Bearer ")) {
-            System.out.println("JwtAuthFilter: Missing or invalid Authorization header");
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -83,27 +73,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String user = jwt.validateAndGetSubject(token);
             if (user == null) {
-                System.out.println("JwtAuthFilter: Invalid token");
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-            System.out.println("JwtAuthFilter OK user=" + user + " path=" + path);
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(user, null, java.util.List.of());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(req, res);
         } catch (Exception e) {
-            System.out.println("JwtAuthFilter: Exception validating token: " + e.getMessage());
             SecurityContextHolder.clearContext();
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
-    /**
-     * Vérifie si le chemin correspond à une ressource statique
-     */
     private boolean isStaticResource(String path) {
-        // Racine ou index.html
         if (path.equals("/") || path.equals("/scap") || path.equals("/scap/") || 
             path.endsWith("/index.html")) {
             return true;

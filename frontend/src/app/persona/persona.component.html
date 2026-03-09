@@ -1,4 +1,4 @@
-<div class="persona-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
@@ -6,7 +6,7 @@
     >
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="persona-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Personas</h2>  
@@ -22,8 +22,8 @@
                         >
                     </div>
                     <div class="btns">
-                        <button class="search-btn" (click)="search()">Buscar</button>
-                        <button class="search-btn" (click)="limpiarSearch()">Limpiar</button>
+                        <button class="purple-btn" (click)="search()">Buscar</button>
+                        <button class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -32,20 +32,20 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
-                    <button class="print-btn" (click)="exportPdf()">Exportar a PDF</button>
-                    <button class="add-familia-btn" (click)="showAdd()">Añadir</button>
+                    <button class="purple-btn" (click)="excelDownload()">Exportar a Excel</button>
+                    <button class="purple-btn" (click)="exportPdf()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="showAdd()">Añadir</button>
                 </div>
             </div>
         </div>
-        <div class="personas-list">
+        <div class="main-list">
             <h1 class="successBtn">{{personasMessageSuccess}}</h1>
             <h1 class="errorBtn">{{personasMessageError}}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="personas-table">
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('percod')">
@@ -103,26 +103,36 @@
                 <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
                 <span>Página</span>
                 <input
-                type="number"
-                min="1"
-                [max]="totalPages"
-                [value]="page + 1"
-                (change)="goToPage($event)"
-                class="pagination-input"
+                    type="number"
+                    min="1"
+                    [max]="totalPages"
+                    [value]="page + 1"
+                    (change)="goToPage($event)"
+                    class="pagination-input"
                 />
                 <span>de {{ totalPages }}</span>
                 <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="selectedPersona" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="selectedPersona" (click)="closeDetailsSure()"></div>
             <div class="display">
                 <div class="modal" *ngIf="selectedPersona">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles de Persona</h3>
                         </div>
-                        <button class="save-btn" (click)="showCopiar(selectedPersona.percod)">✂️</button>
-                        <button class="save-btn" (click)="updatePersona(pernom.value, percoe.value, pertel.value, pertmo.value, percar.value, perobs.value)">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="showCopiar(selectedPersona.percod)"
+                        >✂️</button>
+                        
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div> 
                     <h1 class="successBtn">{{detailMessageSuccess}}</h1>
                     <h1 class="errorBtn">{{detailMessageError}}</h1>
@@ -134,34 +144,89 @@
                         <div class="above">
                             <div class="chunk-one">
                                 <div class="left">
-                                    <p>Código</p>
-                                    <p>Nombre</p>
-                                    <p>Correo Electrónico</p>
+                                    <p class="p-style">Código</p>
+                                    <p class="p-style">Nombre</p>
+                                    <p class="p-style">Correo Electrónico</p>
                                 </div>
                                 <div class="right">
-                                    <h1>{{selectedPersona.percod || '#'}}</h1>
-                                    <textarea class="long" [(ngModel)]="selectedPersona.pernom" #pernom></textarea>    
-                                    <textarea class="long" [(ngModel)]="selectedPersona.percoe" #percoe></textarea>
+                                    <h1 class="h1-style">{{tempPersonas.percod || '#'}}</h1>
+                                    <textarea 
+                                        class="textArea-style long" 
+                                        [(ngModel)]="tempPersonas.pernom" 
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        #pernom
+                                    ></textarea>    
+                                    <textarea 
+                                        class="textArea-style long" 
+                                        [(ngModel)]="tempPersonas.percoe" 
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        #percoe
+                                    ></textarea>
                                 </div>
                             </div>
                             <div class="chunk-two">
                                 <div class="left">
-                                    <p>Teléfono</p>
-                                    <p>Cargo</p>
-                                    <p>Observaciones</p>
+                                    <p class="p-style">Teléfono</p>
+                                    <p class="p-style">Cargo</p>
+                                    <p class="p-style">Observaciones</p>
                                 </div>
                                 <div class="right">
                                     <div class="on-two">
-                                        <textarea class="average" [(ngModel)]="selectedPersona.pertel" #pertel></textarea>
-                                        <p>Móvil</p>
-                                        <textarea class="average" [(ngModel)]="selectedPersona.pertmo" #pertmo></textarea>
+                                        <textarea 
+                                            class="textArea-style average" 
+                                            [(ngModel)]="tempPersonas.pertel"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            #pertel
+                                        ></textarea>
+                                        <p class="p-style">Móvil</p>
+                                        <textarea 
+                                            class="textArea-style average" 
+                                            [(ngModel)]="tempPersonas.pertmo" 
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            #pertmo
+                                        ></textarea>
                                     </div>
-                                    <textarea class="long" [(ngModel)]="selectedPersona.percar" #percar></textarea>
-                                    <textarea class="long height" [(ngModel)]="selectedPersona.perobs" #perobs></textarea>
+                                    <textarea 
+                                        class="textArea-style long" 
+                                        [(ngModel)]="tempPersonas.percar"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        #percar
+                                    ></textarea>
+                                    <textarea 
+                                        class="textArea-style long height" 
+                                        [(ngModel)]="tempPersonas.perobs"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        #perobs
+                                    ></textarea>
                                 </div>
                             </div>
                         </div>
                     </div> 
+                    <div class="btns space">
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            (click)="isUpdateAllowed(pernom.value, percoe.value, pertel.value, pertmo.value, percar.value, perobs.value)"
+                            [disabled]="!isUpdate" 
+	                        *ngIf="isUpdate" 
+                        >Gurdar</button>
+                    </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
                             <button
@@ -176,14 +241,14 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showSerivcesGrid">
-                        <button type="button" class="add-btn margin" (click)="showAddService()">+</button>
+                        <button type="button" class="purple-btn margin" (click)="showAddService()">+</button>
                         <h1 class="errorBtn">{{serviceErrorMessage}}</h1>
                         <h1 class="successBtn">{{serviceSuccessMessage}}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
                             <span>Cargando</span>
                         </div>
-                        <table class="servicesPersona-table">
+                        <table class="main-table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -195,7 +260,7 @@
                                 <tr *ngFor="let s of paginatedServices">
                                     <td>{{s.depcod}}</td>
                                     <td>{{s.depdes}}</td>
-                                    <td><button class="delete-btn" (click)="showDelete(s)">-</button></td>
+                                    <td><button class="red-btn" (click)="showDelete(s)">-</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -226,8 +291,8 @@
         <div class="title">
             <h3>Añadir un Persona</h3>
         </div>
-        <button class="add-btn" (click)="addPersona(code.value, name.value, email.value, phone.value, movil.value, trans.value, obs.value)">+</button>
-        <button class="cancel-btn" (click)="closeAddConfirm()">✖</button>
+        <button class="purple-btn" (click)="addPersona(code.value, name.value, email.value, phone.value, movil.value, trans.value, obs.value)">+</button>
+        <button class="red-btn" (click)="closeAddConfirm()">✖</button>
     </div>
     <h1 class="errorBtn">{{PersonaErrorMessage}}</h1>
     <div *ngIf="isAdding" class="loading-message">
@@ -236,26 +301,26 @@
     </div>
     <div class="add-container">
         <div class="left-add">
-            <p>Código*</p>
-            <p>Correo Electrónico</p>
-            <p>Teléfono</p>
-            <p>Cargo</p>
-            <p>Observaciones</p>
+            <p class="p-style">Código*</p>
+            <p class="p-style">Correo Electrónico</p>
+            <p class="p-style">Teléfono</p>
+            <p class="p-style">Cargo</p>
+            <p class="p-style">Observaciones</p>
         </div>
         <div class="right-add">
             <div class="on-two-add">
-                <textarea (input)="forceUppercase($event)" class="average-add" #code></textarea>
-                <p>Nombre*</p>
-                <textarea class="average-add" #name></textarea>
+                <textarea (input)="forceUppercase($event)" class="textArea-style average-add" #code></textarea>
+                <p class="p-style">Nombre*</p>
+                <textarea class="textArea-style average-add" #name></textarea>
             </div>
-            <textarea class="long-add" #email></textarea>
+            <textarea class="textArea-style long-add" #email></textarea>
             <div class="on-two-add">
-                <textarea class="average-add-second" #phone></textarea>
-                <p>Móvil</p>
-                <textarea class="average-add-second" #movil></textarea>
+                <textarea class="textArea-style average-add-second" #phone></textarea>
+                <p class="p-style">Móvil</p>
+                <textarea class="textArea-style average-add-second" #movil></textarea>
             </div>
-            <textarea class="long-add" #trans></textarea>
-            <textarea class="special-add-long" #obs></textarea>
+            <textarea class="textArea-style long-add" #trans></textarea>
+            <textarea class="textArea-style special-add-long" #obs></textarea>
         </div>
     </div>
 </div>
@@ -264,16 +329,16 @@
 <div class="delete-confirm-modal" *ngIf="showDeleteGrid">
     <h3>¿Seguro que quieres eliminar este servicio?</h3>
     <div class="delete-content" *ngIf="serviceToDelete">
-        <p>Código:</p>
-        <h1>{{serviceToDelete.depcod}}</h1>
+        <p class="p-style">Código:</p>
+        <h1 class="h1-style">{{serviceToDelete.depcod}}</h1>
     </div>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
     <h1 class="errorBtn">{{ErrorDelete}}</h1>
-    <button class="delete-btn" (click)="deleteService(serviceToDelete.depcod)">-</button>
-    <button class="save-btn" (click)="closeDelete()">✖</button>
+    <button class="red-btn" (click)="deleteService(serviceToDelete.depcod)">-</button>
+    <button class="purple-btn" (click)="closeDelete()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addService" (click)="closeAddService()"></div>
@@ -283,10 +348,10 @@
             <h3>Añadir un Servicio</h3>
         </div>
         <div class="count-selected">
-            <p>seleccionado {{count}} líneas</p>
+            <p class="p-style">seleccionado {{count}} líneas</p>
         </div>
-        <button class="save-btn" (click)="addServicePersona(linesSelected)">+</button>
-        <button class="delete-btn" (click)="closeAddService()">✖</button>
+        <button class="purple-btn" (click)="addServicePersona(linesSelected)">+</button>
+        <button class="red-btn" (click)="closeAddService()">✖</button>
     </div>
     <div class="title-menu">
         <div class="search-holder">
@@ -318,14 +383,14 @@
                     </select>
                 </div>
                 <div class="btns">
-                    <button class="search-btn" (click)="searchServices()">Buscar</button>
-                    <button class="search-btn" (click)="clearSearch()">Limpiar</button>
+                    <button class="purple-btn" (click)="searchServices()">Buscar</button>
+                    <button class="purple-btn" (click)="clearSearch()">Limpiar</button>
                 </div>
             </div>
         </div>
     </div>
     <h1 class="errorBtn">{{servicesAddError}}</h1>
-    <table class="services-table">
+    <table class="main-table">
         <thead>
             <tr>
                 <th>Código</th>
@@ -397,8 +462,8 @@
         <p class="sure-msg">{{gridMessag}}</p>        
     </div>
     <div class="btns alignment">
-        <button class="save-btn" (click)="showCopiarPersonas()">+</button>
-        <button class="delete-btn" (click)="closeCopiar()">✖</button>
+        <button class="purple-btn" (click)="showCopiarPersonas()">+</button>
+        <button class="red-btn" (click)="closeCopiar()">✖</button>
     </div>
 </div>
 
@@ -408,7 +473,7 @@
         <div class="title">
             <h3>Seleccione una persona</h3>
         </div>
-        <button class="delete-btn" (click)="closeShowCopiarPersonas()">✖</button>
+        <button class="red-btn" (click)="closeShowCopiarPersonas()">✖</button>
     </div>
     <div class="search-holder">
         <div class="search-container">
@@ -421,13 +486,13 @@
                 >
             </div>
             <div class="btns">
-                <button class="search-btn" (click)="searchCopy()">Buscar</button>
-                <button class="Limpiar-btn" (click)="limpiarSearcCopy()">Limpiar</button>
+                <button class="purple-btn" (click)="searchCopy()">Buscar</button>
+                <button class="purple-btn" (click)="limpiarSearcCopy()">Limpiar</button>
             </div>
         </div>
     </div>
     <h1 class="errorBtn">{{errorCopy}}</h1>
-    <table class="personas-table">
+    <table class="main-table">
         <thead>
             <tr>
                 <th>Código</th>
@@ -471,7 +536,7 @@
         <span>añadiendo</span>
     </div>
     <div class="btns alignment">
-        <button class="save-btn" [disabled]="isAvailable" [class.disabled]="isAvailable" (click)="copyPerfil()">+</button>
-        <button class="delete-btn" (click)="closecontinueAdCheckGrid()">✖</button>
+        <button class="purple-btn" [disabled]="isAvailable" [class.disabled]="isAvailable" (click)="copyPerfil()">+</button>
+        <button class="red-btn" (click)="closecontinueAdCheckGrid()">✖</button>
     </div>
 </div>

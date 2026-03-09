@@ -1,5 +1,5 @@
-<div class="table-container">
-  <table *ngIf="tableData.length > 0" class="styled-table">
+<div class="main-container">
+  <table *ngIf="tableData.length > 0" class="main-table">
     <thead>
       <tr>
         <th>Entidad</th>
@@ -14,7 +14,7 @@
         <td>{{ t.percod }}</td>
         <td>{{ t.entnom }}</td>
         <td>
-          <button (click)="selectRow(t)">Seleccionar</button>
+          <button class="purple-btn" (click)="selectRow(t)">Seleccionar</button>
         </td>
       </tr>
     </tbody>

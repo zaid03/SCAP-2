@@ -169,6 +169,7 @@ export class ProveedoreesComponent {
   showDetails(proveedor: any) {
     this.limpiarMessages();
     this.selectedProveedor = proveedor;
+    this.tempProveedor = proveedor;
     this.error = '';
     this.showContactPersons(this.selectedProveedor);
   }
@@ -182,6 +183,10 @@ export class ProveedoreesComponent {
     this.showContactPersonsGrid = false;
     this.showArticulosGrid = false;
     this.page = 0;
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   onSearchFormSubmit(event: Event) {
@@ -494,11 +499,41 @@ export class ProveedoreesComponent {
     URL.revokeObjectURL(url);
   }
 
+  tempProveedor: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.tempProveedor ? { ...this.tempProveedor } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempProveedor = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed() {
+    if (this.allowToUpdate) {
+      this.saveChanges();
+    } else {
+      return;
+    }
+  }
+
   messageSuccess: string = '';
   messageError: string = '';
   saveChanges() {
     this.isUpdating = true;
     this.limpiarMessages();
+
+    Object.assign(this.selectProveedor, this.tempProveedor);
+
     const payload ={
       TERWEB : this.selectedProveedor.terweb,
       TEROBS : this.selectedProveedor.terobs,
@@ -509,6 +544,7 @@ export class ProveedoreesComponent {
     this.http.put(`${environment.backendUrl}/api/ter/updateFields/${this.entcod}/${this.selectedProveedor.tercod}`, payload, { responseType: 'text' }
     ).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.messageSuccess = 'Proveedor actualizado correctamente';
         this.isUpdating = false;
       },
@@ -521,8 +557,8 @@ export class ProveedoreesComponent {
 
   onCheckboxGeneric(event: Event, field: string) {
     const checked = (event.target as HTMLInputElement).checked;
-    if (this.selectedProveedor && field in this.selectedProveedor) {
-      (this.selectedProveedor as any)[field] = checked ? 1 : 0;
+    if (this.tempProveedor && field in this.tempProveedor) {
+      (this.tempProveedor as any)[field] = checked ? 1 : 0;
     }
     if (this.articulos && field in this.articulos) {
       (this.articulos as any)[field] = checked ? 1 : 0;

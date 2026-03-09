@@ -255,9 +255,6 @@ public class ContabilizacionService {
         
         try {
             String sml = extractSmlFromSoap(soapResponse);
-            System.out.println("====== EXTRACTED SML ======");
-            System.out.println(sml);
-            System.out.println("====== END EXTRACTED SML ======");
             
             if (sml == null) {
                 dto.setExito(false);
@@ -269,9 +266,7 @@ public class ContabilizacionService {
             javax.xml.parsers.DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             org.w3c.dom.Document doc = dBuilder.parse(new java.io.ByteArrayInputStream(sml.getBytes()));
 
-            String exito = getTagValue(doc, "exito");
-            System.out.println("Exito value: " + exito);
-            
+            String exito = getTagValue(doc, "exito");            
             
             if ("-1".equals(exito)) {
                 dto.setExito(true);
@@ -329,7 +324,6 @@ public class ContabilizacionService {
         } catch (Exception e) {
             dto.setExito(false);
             dto.setMensaje("Error al procesar respuesta: " + e.getMessage());
-            e.printStackTrace();
         }
         
         return dto;

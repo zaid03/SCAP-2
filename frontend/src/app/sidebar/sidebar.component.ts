@@ -118,11 +118,11 @@ export class SidebarComponent implements OnInit {
       case 'credito-Cge':
         this.router.navigate(['credito-Cge']);
         break;
-      case 'familia':
-        this.router.navigate(['/familia'])
-        break;
       case 'panel':
         this.router.navigate(['/dashboard']);
+        break;
+      case 'familia':
+        this.router.navigate(['/familia'])
         break;
       case 'almacenaje':
         this.router.navigate(['/almacenaje']);

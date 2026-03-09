@@ -1,6 +1,6 @@
-<div class="table-container">
-  <div class="table-wrapper">
-    <table *ngIf="tableData.length > 0" class="styled-table">
+<div class="main-container">
+  <div class="main-wrapper">
+    <table *ngIf="tableData.length > 0" class="main-table">
       <thead>
         <tr>
           <th>Ejercicio</th>
@@ -11,7 +11,7 @@
         <tr *ngFor="let e of tableData">
           <td>{{ e.eje }}</td>
           <td>
-            <button (click)="selectRow(e)">Seleccionar</button>
+            <button class="purple-btn" (click)="selectRow(e)">Seleccionar</button>
           </td>
         </tr>
       </tbody>

@@ -74,19 +74,10 @@ public class SicalEntidadService {
         headers.add(HttpHeaders.CONTENT_TYPE, "text/xml; charset=utf-8");
         headers.add("SOAPAction", "");
 
-        System.out.println("=== SICAL REQUEST XML ===");
-        System.out.println(xml);
-        System.out.println("=== SICAL SOAP ENVELOPE ===");
-        System.out.println(soapEnvelope);
-
         HttpEntity<String> request = new HttpEntity<>(soapEnvelope, headers);
         RestTemplate restTemplate = new RestTemplate();
         String responseXml = restTemplate.postForObject(wsUrl, request, String.class);
-
-        System.out.println("=== SICAL RAW RESPONSE ===");
-        System.out.println(responseXml);
-        System.out.println("=== END RESPONSE ===");
-
+        
         if (responseXml == null) {
             throw new RuntimeException("Empty response from SICAL");
         }

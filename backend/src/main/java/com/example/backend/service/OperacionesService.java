@@ -8,8 +8,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,8 +27,6 @@ import com.example.sical.CryptoSical;
 
 @Service
 public class OperacionesService {
-
-    private static final Logger logger = LoggerFactory.getLogger(OperacionesService.class);
 
     @Value("${sical.ws.url}")
     private String wsUrl;
@@ -124,7 +120,6 @@ public class OperacionesService {
         String endpoint = (wsUrl != null && wsUrl.contains("?")) ? wsUrl.substring(0, wsUrl.indexOf("?")) : wsUrl;
         String responseXml = restTemplate.postForObject(endpoint, new HttpEntity<>(soapEnvelope, headers), String.class);
 
-        logger.debug("SICAL raw response for operaciones: {}", responseXml);
         return parseOperaciones(responseXml);
     }
 
@@ -148,8 +143,6 @@ public class OperacionesService {
                 .replace("&quot;", "\"")
                 .replace("&apos;", "'");
 
-        logger.debug("SICAL SML payload (operaciones): {}", sml);
-
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(false);
@@ -163,7 +156,6 @@ public class OperacionesService {
                     String desc = "";
                     NodeList descNodes = doc.getElementsByTagName("desc");
                     if (descNodes.getLength() > 0) desc = descNodes.item(0).getTextContent();
-                    logger.warn("SICAL returned error for operaciones: exito={} desc={}", exito, desc);
                     throw new Exception("SICAL error: " + desc);
                 }
             }
@@ -221,7 +213,6 @@ public class OperacionesService {
 
             return result;
         } catch (Exception ex) {
-            logger.error("Failed to parse SICAL operaciones SML. SML payload:\n{}\nException: {}", sml, ex.getMessage());
             throw ex;
         }
     }
@@ -357,7 +348,6 @@ public class OperacionesService {
         try {
             return Double.parseDouble(normalized);
         } catch (NumberFormatException ex) {
-            logger.warn("Unable to parse double from [{}]", value);
             return 0.0;
         }
     }
@@ -367,7 +357,6 @@ public class OperacionesService {
         try {
             return Long.parseLong(value.trim());
         } catch (NumberFormatException ex) {
-            logger.warn("Unable to parse long from [{}]", value);
             return null;
         }
     }
@@ -377,7 +366,6 @@ public class OperacionesService {
         try {
             return Integer.parseInt(value.trim());
         } catch (NumberFormatException ex) {
-            logger.warn("Unable to parse integer from [{}]", value);
             return null;
         }
     }
@@ -387,7 +375,6 @@ public class OperacionesService {
         try {
             return CryptoSical.decodeBase64(value);
         } catch (IllegalArgumentException ex) {
-            logger.warn("Failed to decode Base64 value [{}]: {}", value, ex.getMessage());
             return value;
         }
     }

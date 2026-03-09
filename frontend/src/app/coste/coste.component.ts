@@ -177,7 +177,7 @@ export class CosteComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.coste-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -319,11 +319,16 @@ export class CosteComponent {
 
   showDetails(coste: any) {
     this.selectedCoste = coste;
+    this.tempCoste = { ...coste };
   }
 
   closeDetails() {
     this.selectedCoste = null;
     this.emptyAllMessages();
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   filterDigits(event: Event) {
@@ -332,11 +337,39 @@ export class CosteComponent {
     this.selectedCoste.ccocod = textarea.value;
   }
 
+  tempCoste: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.selectedCoste ? { ...this.selectedCoste } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempCoste = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(ccocod: string, ccodes: string) {
+    if (this.allowToUpdate) {
+      this.updateEntrega(ccocod, ccodes);
+    } else {
+      return;
+    }
+  }
+
   isUpdating: boolean = false;
   updateEntrega(ccocod: string, ccodes: string) {
     this.emptyAllMessages();
     this.isUpdating = true;
 
+    Object.assign(this.selectedCoste, this.tempCoste);
     if (!ccodes) {
       this.detallesMessageError = 'descripción requerida'
       this.isUpdating = false;
@@ -348,6 +381,7 @@ export class CosteComponent {
 
     this.http.patch(`${environment.backendUrl}/api/cco/update-centro/${this.entcod}/${this.eje}/${ccocod}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.detallesMessageSuccess = 'Lugares de entrega actualizada exitosamente'
         this.isUpdating = false;
       },

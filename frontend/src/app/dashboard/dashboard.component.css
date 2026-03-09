@@ -46,7 +46,7 @@
 .on-wo { display: flex; gap: 10px;}
 .status { color: rgb(221, 66, 66)}  
 .right-params {width: 50%;}
-.services-btn {width: 30%; margin-top: 5px;}
+.services-fix {width: 30%; margin-top: 5px;}
 .checkboxes input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 16px; height: 25px; vertical-align: middle; outline: none; box-shadow: none; }
 .color-text {color: #38249b; font-weight: bold;}
 .version {display: flex; gap: 10px; justify-content: flex-end; }

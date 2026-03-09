@@ -1,11 +1,11 @@
-<div class="services-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
         (click)="sidebar.collapsed = true">
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="services-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Servicios</h2>  
@@ -38,8 +38,8 @@
                         </select>
                     </div>
                     <div class="btns Widthy">
-                        <button class="search-btn" (click)="search()">Buscar</button>
-                        <button class="search-btn" (click)="clearSearch()">Limpiar</button>
+                        <button class="purple-btn" (click)="search()">Buscar</button>
+                        <button class="purple-btn" (click)="clearSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -48,20 +48,20 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
-                    <button class="print-btn" (click)="exportPdf()">Exportar a PDF</button>
-                    <button class="add-familia-btn" (click)="launchAddService()">Añadir</button>
+                    <button class="purple-btn" (click)="excelDownload()">Exportar a Excel</button>
+                    <button class="purple-btn" (click)="exportPdf()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="launchAddService()">Añadir</button>
                 </div>
             </div>
         </div>
-        <div class="services-list">
+        <div class="main-list">
             <h1 class="successBtn">{{ servicesMessageSuccess }}</h1>
             <h1 class="errorBtn">{{ servicessMessageError }}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="services-table">
+            <table class="main-table align">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('depcod')">
@@ -150,15 +150,19 @@
                 <span>de {{ totalPages }}</span>
                 <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="selectedService" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="selectedService" (click)="closeDetailsSure()"></div>
             <div class="display" >
                 <div class="modal" *ngIf="selectedService">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles de Servicio</h3>
                         </div>
-                        <button class="save-btn" (click)="updateService(selectedService.depcod, des.value); updateServiceSecond(selectedService.depcod, d1c.value, d1d.value, d2c.value, d2d.value, d3c.value, d3d.value, dco.value, den.value)">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div>  
                     <h1 class="successBtn">{{ updateServiceSuccessMessage }}</h1>
                     <h1 class="errorBtn">{{ updateServiceErrorMessage }}</h1>
@@ -169,67 +173,81 @@
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="left">
-                                <p>Código</p>
-                                <p>Descripción</p>
-                                <p>Centro Gestor</p>
+                                <p class="p-style">Código</p>
+                                <p class="p-style">Descripción</p>
+                                <p class="p-style">Centro Gestor</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedService.depcod || '#'}}</h1>
-                                    <p>Centro de coste</p>  
-                                    <h1>{{selectedService.ccocod || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempServicio.depcod || '#'}}</h1>
+                                    <p class="p-style">Centro de coste</p>  
+                                    <h1 class="h1-style">{{tempServicio.ccocod || '#'}}</h1>
                                 </div>
                                 <textarea 
-                                    class="long" 
-                                    [(ngModel)]="selectedService.depdes"
+                                    class="textArea-style long" 
+                                    [(ngModel)]="tempServicio.depdes"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
                                     #des
                                 ></textarea>
                                 <div class="on-two">
-                                    <h1>{{selectedService.cgecod || '#'}}</h1>
-                                    <h1>{{selectedService.cgedes || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempServicio.cgecod || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempServicio.cgedes || '#'}}</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-two">
                             <div class="left">
-                                <p>Unidad tramitadora</p>
-                                <p>Órgano gestor</p>
-                                <p>Oficina contable</p>
+                                <p class="p-style">Unidad tramitadora</p>
+                                <p class="p-style">Órgano gestor</p>
+                                <p class="p-style">Oficina contable</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
                                     <textarea 
-                                        class="short"
-                                        [(ngModel)]="selectedService.depd1C"
+                                        class="textArea-style short"
+                                        [(ngModel)]="tempServicio.depd1C"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                         #d1c
                                     ></textarea>
                                     <textarea 
-                                        [(ngModel)]="selectedService.depd1D" 
-                                        class="long"
+                                        [(ngModel)]="tempServicio.depd1D" 
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        class="textArea-style long"
                                         #d1d
                                     ></textarea>
                                 </div>
                                 <div class="on-two">
                                     <textarea 
-                                        class="short"
-                                        [(ngModel)]="selectedService.depd2C"
+                                        class="textArea-style short"
+                                        [(ngModel)]="tempServicio.depd2C"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                         #d2c
                                     ></textarea>
                                     <textarea 
-                                        [(ngModel)]="selectedService.depd2D" 
-                                        class="long"
+                                        [(ngModel)]="tempServicio.depd2D" 
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        class="textArea-style long"
                                         #d2d
                                     ></textarea>
                                 </div>
                                 <div class="on-two">
                                     <textarea 
-                                        class="short"
-                                        [(ngModel)]="selectedService.depd3C"
+                                        class="textArea-style short"
+                                        [(ngModel)]="tempServicio.depd3C"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                         #d3c
                                     ></textarea>
                                     <textarea 
-                                        [(ngModel)]="selectedService.depd3D" 
-                                        class="long"
+                                        [(ngModel)]="tempServicio.depd3D" 
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
+                                        class="textArea-style long"
                                         #d3d
                                     ></textarea>
                                 </div>
@@ -240,39 +258,70 @@
                                 type="checkbox"
                                 [ngModel]="detailFlags.depalm"
                                 (ngModelChange)="toggleDetailFlag('depalm', $event)"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                             > <span class="name">Almacenar</span> <br>
                             <input
                                 type="checkbox"
                                 [ngModel]="detailFlags.depcom"
                                 (ngModelChange)="toggleDetailFlag('depcom', $event)"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                             > <span class="name">Comprar</span> <br>
                             <input
                                 type="checkbox"
                                 [ngModel]="detailFlags.depint"
                                 (ngModelChange)="toggleDetailFlag('depint', $event)"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                             > <span class="name">Contabilizar</span>
                         </div>
                     </div>
                     <div class="chunk-four">
                         <div class="first-det">
-                            <p>Datos de contacto</p>
+                            <p class="p-style">Datos de contacto</p>
                             <textarea 
-                                class="heighty long"
-                                [(ngModel)]="selectedService.depdco"
+                                class="textArea-style heighty long"
+                                [(ngModel)]="tempServicio.depdco"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                                 #dco
                             ></textarea>
                         </div>
                         <div class="second-det">
-                            <p>Datos de entrega</p>
+                            <p class="p-style">Datos de entrega</p>
                             <textarea 
-                                class="heighty long"
-                                [(ngModel)]="selectedService.depden"
+                                class="textArea-style heighty long"
+                                [(ngModel)]="tempServicio.depden"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                                 #den
                             ></textarea>
                         </div>
                     </div>
-                    <div class="btns">
-                        <button class="delete-btn">-</button>
+                    <div class="btns space">
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="!isUpdate" 
+	                        *ngIf="isUpdate" 
+                            (click)="isUpdateAllowed(selectedService.depcod, des.value); updateServiceSecond(selectedService.depcod, d1c.value, d1d.value, d2c.value, d2d.value, d3c.value, d3d.value, dco.value, den.value)"
+                        >Guardar</button>
+                        <button 
+                            class="red-btn"
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                        >Borrar</button>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
@@ -297,7 +346,7 @@
                     </div>
                     <div class="custom-grid-modal" [ngSwitch]="option">
                         <ng-container *ngSwitchCase="'personas'">
-                            <button class="add-btn" (click)="showAddPersonas()">+</button>
+                            <button class="purple-btn space-top" (click)="showAddPersonas()">+</button>
                             <h1 class="errorBtn">{{personasError}}</h1>
                             <h1 class="successBtn">{{personasSuccess}}</h1>
                             <div *ngIf="isLoading" class="loading-message">
@@ -308,8 +357,8 @@
                                 <div class="spinner"></div>
                                 <span>añadiendo</span>
                             </div>
-                            <div class="personas-list">
-                                <table class="personas-table">
+                            <div class="main-list">
+                                <table class="main-table persona">
                                     <thead>
                                         <tr>
                                             <th>Código Persona</th>
@@ -321,7 +370,7 @@
                                         <tr *ngFor="let p of paginatedPersonas">
                                             <td>{{ p.percod }}</td>
                                             <td>{{ p.pernom }}</td>
-                                            <td><button class="delete-btn" (click)="showDelete(p)">-</button></td>
+                                            <td><button class="red-btn" (click)="showDelete(p)">-</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -347,12 +396,12 @@
                                 <span>Cargando</span>
                             </div>
                             <div class="almacen-title" *ngIf="almacenArray">
-                                <p>Nombre</p>
-                                <h1>{{almacenArray.magnom}}</h1>  
+                                <p class="p-style">Nombre</p>
+                                <h1 class="h1-style">{{almacenArray.magnom}}</h1>  
                             </div>
                             <h1 class="errorBtn">{{almacenErro}}</h1>
-                            <div class="almacen-list">
-                                <table class="almacen-table">
+                            <div class="main-list">
+                                <table class="main-table aT">
                                     <thead>
                                         <tr>
                                             <th>Código Tipo</th>
@@ -381,8 +430,8 @@
         <div class="title">
             <h3>Añadir un servicio</h3>
         </div>
-        <button class="add-btn" (click)="addService(codigo.value, description.value, centroCoste.value, centroGestor.value, d1c_add.value, d1d_add.value, d2c_add.value, d2d_add.value, d3c_add.value, d3d_add.value, den_add.value, dco_add.value)">+</button>
-        <button class="close-btn-btn" (click)="closeAddConfirm()">✖</button>
+        <button class="purple-btn" (click)="addService(codigo.value, description.value, centroCoste.value, centroGestor.value, d1c_add.value, d1d_add.value, d2c_add.value, d2d_add.value, d3c_add.value, d3d_add.value, den_add.value, dco_add.value)">+</button>
+        <button class="red-btn" (click)="closeAddConfirm()">✖</button>
     </div>
     <h1 class="errorBtn">{{ addServiceErrorMessage }}</h1>
     <div *ngIf="isAdding" class="loading-message">
@@ -392,18 +441,18 @@
     <div class="add-container">
         <div class="first-content">
             <div class="left-add">
-                <p>Código*</p>
-                <p>Descripción*</p>
+                <p class="p-style">Código*</p>
+                <p class="p-style">Descripción*</p>
             </div>
             <div class="right-add">
                 <div class="on-three">
-                    <textarea class="short-add" (input)="setInputToLimit($event)" #codigo ></textarea>
-                    <p>Centro de Coste*</p>
-                    <textarea (input)="setInputToUpper($event)"  class="short-add" #centroCoste ></textarea>
-                    <p>Centro Gestor*</p>
-                    <textarea (input)="setInputToUpper($event)" class="short-add" #centroGestor></textarea>
+                    <textarea class="textArea-style short-add" (input)="setInputToLimit($event)" #codigo ></textarea>
+                    <p class="p-style">Centro de Coste*</p>
+                    <textarea (input)="setInputToUpper($event)"  class="textArea-style short-add" #centroCoste ></textarea>
+                    <p class="p-style">Centro Gestor*</p>
+                    <textarea (input)="setInputToUpper($event)" class="textArea-style short-add" #centroGestor></textarea>
                 </div>
-                <textarea class="long-add" #description></textarea>
+                <textarea class="textArea-style long-add" #description></textarea>
             </div>
         </div>
         <div class="second-content">
@@ -418,38 +467,38 @@
         </div>
         <div class="third-content">
             <div class="left-add">
-                <p>Unidad tramitadora</p>
-                <p>Órgano gestor</p>
-                <p>Oficina contable</p>
+                <p class="p-style">Unidad tramitadora</p>
+                <p class="p-style">Órgano gestor</p>
+                <p class="p-style">Oficina contable</p>
             </div>
             <div class="right-add">
                 <div class="on-two">
                     <textarea 
-                        class="short-add"
+                        class="textArea-style short-add"
                         #d1c_add
                     ></textarea>
                     <textarea 
-                        class="average-add"
+                        class="textArea-style average-add"
                         #d1d_add
                     ></textarea>
                 </div>
                 <div class="on-two">
                     <textarea 
-                        class="short-add"
+                        class="textArea-style short-add"
                         #d2c_add
                     ></textarea>
                     <textarea 
-                        class="average-add"
+                        class="textArea-style average-add"
                         #d2d_add
                     ></textarea>
                 </div>
                 <div class="on-two">
                     <textarea 
-                        class="short-add"
+                        class="textArea-style short-add"
                         #d3c_add
                     ></textarea>
                     <textarea 
-                        class="average-add"
+                        class="textArea-style average-add"
                         #d3d_add
                     ></textarea>
                 </div>
@@ -457,16 +506,16 @@
         </div>
         <div class="fourth-content">
             <div class="left-special">
-                <p>Datos de entrega</p>
-                <p>Datos de contacto</p>
+                <p class="p-style">Datos de entrega</p>
+                <p class="p-style">Datos de contacto</p>
             </div>
             <div class="right-special">
                 <textarea 
-                    class="long-add hei"
+                    class="textArea-style long-add hei"
                     #den_add
                 ></textarea>
                 <textarea 
-                    class="long-add hei"
+                    class="textArea-style long-add hei"
                     #dco_add
                 ></textarea>
             </div>
@@ -479,16 +528,16 @@
     <h3>¿Seguro que quieres eliminar este Persona?</h3>
     <h1 class="errorBtn">{{deleErr}}</h1>
     <div class="persona-details">
-        <p>Código:</p>
-        <p>{{personaTodelete.percod}}</p>
+        <p class="p-style">Código:</p>
+        <p class="p-style">{{personaTodelete.percod}}</p>
     </div>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
     <div class="btns">
-        <button class="delete-btn" (click)="confirmDelete(personaTodelete.percod)">-</button>
-        <button class="save-btn" (click)="closeDeleteConfirm()">✖</button>
+        <button class="red-btn" (click)="confirmDelete(personaTodelete.percod)">-</button>
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
     </div>
 </div>
 
@@ -499,10 +548,10 @@
             <h3>Selecciona las personas que deseas agregar</h3>
         </div>
         <div class="count-selected">
-            <p>seleccionado {{count}} líneas</p>
+            <p class="p-style">seleccionado {{count}} líneas</p>
         </div>
-        <button class="save-btn" (click)="addPersonasToService(linesSelected)">+</button>
-        <button class="close-btn-btn" (click)="closeAddPersonas()">✖</button>
+        <button class="purple-btn" (click)="addPersonasToService(linesSelected)">+</button>
+        <button class="red-btn" (click)="closeAddPersonas()">✖</button>
     </div>
     <div class="search-holder">
         <div class="search-container">
@@ -515,14 +564,14 @@
                 >
             </div>
             <div class="btns Widthy">
-                <button class="search-btn" (click)="searchCopy()">Buscar</button>
-                <button class="Limpiar-btn" (click)="limpiarSearcCopy()">Limpiar</button>
+                <button class="purple-btn" (click)="searchCopy()">Buscar</button>
+                <button class="red-btn" (click)="limpiarSearcCopy()">Limpiar</button>
             </div>
         </div>
     </div>
     <h1 class="errorBtn">{{errorCopy}}</h1>
     <div class="all-add-content">
-        <table class="personas-table-select">
+        <table class="main-table pts">
             <thead>
                 <tr>
                     <th>Código</th>

@@ -57,7 +57,6 @@ export class ConsultaBolsasComponent {
   isLoading: boolean = false;
   ngOnInit(): void {
     this.limpiarMessages();
-    this.isLoading = true;
     this.tableIsError = false;
 
     const ent = sessionStorage.getItem('Entidad');
@@ -100,6 +99,7 @@ export class ConsultaBolsasComponent {
   fetchBolsas() {
     this.fetchCancel$.next();
 
+    this.isLoading = true;
     this.http.get<any>(`${environment.backendUrl}/api/gbs/fetch-all/${this.entcod}/${this.eje}/${this.cge}`).subscribe({
       next: (response) => {
         this.creditos = Array.isArray(response) ? [...response] : [];
@@ -240,7 +240,7 @@ export class ConsultaBolsasComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.credito-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -416,7 +416,6 @@ export class ConsultaBolsasComponent {
     }
   }
 
-  cgeSearch: string = '';
   searchBolsas() {
     this.isLoading = true;
     this.fetchCancel$.next();
@@ -432,13 +431,12 @@ export class ConsultaBolsasComponent {
       upper = upper.slice(0, 4);
     }
     target.value = upper;
-    this.cgeSearch = upper;
+    this.cge = upper;
   }
 
   limpiarSearch() {
     this.limpiarMessages();
     this.fetchBolsas();
-    this.cgeSearch = '';
   }
   
   //main detail grid functions

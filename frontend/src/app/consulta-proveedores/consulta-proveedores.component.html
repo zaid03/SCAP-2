@@ -1,5 +1,5 @@
 
-<div class="proveedores-page">
+<div class="main-page">
     <app-sidebar #sidebar></app-sidebar>
     <div 
     class="sidebar-backdrop" 
@@ -7,7 +7,7 @@
     (click)="sidebar.collapsed = true"
     >
     </div>
-    <div class="proveedores-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Consulta de proveedores</h2>  
@@ -24,8 +24,8 @@
                             </label>
                         </div>
                         <div class="search-btns">
-                            <button type="button" class="search-button-proveedores" (click)="search()">Buscar</button>
-                            <button type="button" class="search-button-proveedores" (click)="clearSearch()">Limpiar</button>
+                            <button type="button" class="purple-btn" (click)="search()">Buscar</button>
+                            <button type="button" class="purple-btn" (click)="clearSearch()">Limpiar</button>
                         </div>
                     </form>
                 </div> 
@@ -40,13 +40,13 @@
                 </div>
             </div>
         </div>
-        <div class="proveedores-list">
+        <div class="main-list">
             <h1 class="errorBtn">{{error}}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="main-table">
+            <table class="main-table align">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('tercod')">
@@ -155,49 +155,49 @@
                         <div class="title-detail">
                             <h3>Detalles del Proveedor</h3>
                         </div>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button class="red-btn" (click)="closeDetails()">✖</button>
                     </div>
                     <h1 class="errorBtn">{{ messageError }}</h1>
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="left">
-                                <p>Nombre</p>
-                                <p>Alias</p>
-                                <p>Dirección</p>
+                                <p class="p-style">Nombre</p>
+                                <p class="p-style">Alias</p>
+                                <p class="p-style">Dirección</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.ternom || '#'}}</h1>
-                                <h1>{{selectedProveedor.terali || '#'}}</h1>
-                                <h1>{{selectedProveedor.terdom || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.ternom || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.terali || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.terdom || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-two">
                             <div class="left">
-                                <p>Código</p>
-                                <p>Provincia</p>
-                                <p>C.P</p>
+                                <p class="p-style">Código</p>
+                                <p class="p-style">Provincia</p>
+                                <p class="p-style">C.P</p>
                             </div>
                             <div class="right">
                                 <div class="on-three">
-                                    <h1>{{selectedProveedor.tercod || '#'}}</h1>
-                                    <p>NIF</p>
-                                    <h1>{{selectedProveedor.ternif || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedProveedor.tercod || '#'}}</h1>
+                                    <p class="p-style">NIF</p>
+                                    <h1 class="h1-style">{{selectedProveedor.ternif || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedProveedor.procod || '#'}}</h1>
-                                    <h1>{{selectedProveedor.terpob || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedProveedor.procod || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedProveedor.terpob || '#'}}</h1>
                                 </div>
-                                <h1>{{selectedProveedor.tercpo || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.tercpo || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-three">
                             <div class="left">
-                                <p>C.contable</p>
-                                <p>Bloqueado</p>
-                                <p>Teléfono</p>
+                                <p class="p-style">C.contable</p>
+                                <p class="p-style">Bloqueado</p>
+                                <p class="p-style">Teléfono</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.terayt || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.terayt || '#'}}</h1>
                                 <div class="bloq">
                                     <input type="checkbox"
                                         [checked]="selectedProveedor.terblo == 1"
@@ -205,19 +205,19 @@
                                         class="checkbox" 
                                     />
                                 </div>
-                                <h1>{{selectedProveedor.tertel || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.tertel || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-four">
                             <div class="left">
-                                <p class="margin">Fax</p>
-                                <p>Web</p>
-                                <p>Correo electrónico</p>
+                                <p class="p-style margin">Fax</p>
+                                <p class="p-style">Web</p>
+                                <p class="p-style">Correo electrónico</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.terfax || '#'}}</h1>
-                                <h1>{{selectedProveedor.terweb || '#'}}</h1>
-                                <h1>{{selectedProveedor.tercoe || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.terfax || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.terweb || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedProveedor.tercoe || '#'}}</h1>
                             </div>
                         </div>
                         <div class="acuerdo">
@@ -229,8 +229,8 @@
                                 Tiene acuerdo marco
                         </div>
                         <div class="observ">
-                            <p>Observaciones:</p>
-                            <h1 class="observation">{{selectedProveedor.terobs || '#'}}</h1>
+                            <p class="p-style">Observaciones:</p>
+                            <h1 class="h1-style">{{selectedProveedor.terobs || '#'}}</h1>
                         </div>
                     </div>
                     <div class="more-detail-container">
@@ -261,7 +261,7 @@
                             <div class="spinner"></div>
                             <span>Cargando</span>
                         </div>
-                        <table class="personas-contacto-table">
+                        <table class="main-table pct">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -323,7 +323,7 @@
                             <div class="spinner"></div>
                             <span>Cargando</span>
                         </div>
-                        <table class="articulo-table">
+                        <table class="main-table art">
                             <thead>
                                 <tr>
                                     <th>Familia</th>

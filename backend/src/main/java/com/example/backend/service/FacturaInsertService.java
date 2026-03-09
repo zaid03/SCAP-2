@@ -76,7 +76,6 @@ public class FacturaInsertService {
             facRepository.save(fac);
 
             List<Gbs> gbsRows = gbsRepository.findByENTAndEJEAndCGECOD(dto.ENT, dto.EJE, dto.CGECOD);
-            System.out.println("GBS rows found: " + gbsRows.size());
             for (Gbs gbs : gbsRows) {
                 Fde fde = new Fde();
                 fde.setENT(dto.ENT);

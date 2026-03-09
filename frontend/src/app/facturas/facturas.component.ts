@@ -214,7 +214,7 @@ export class FacturasComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.facturas-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -408,10 +408,17 @@ export class FacturasComponent {
 
   showDetails(factura: any) {
     this.limpiarMEssages();
+
     this.selectedFacturas = { ...factura };
+    this.tempFactura = { ...factura };
+
     if (this.selectedFacturas.facfre) {
       this.selectedFacturas.facfre = this.datePipe.transform(this.selectedFacturas.facfre, 'yyyy-MM-dd');
     }
+    if (this.tempFactura.facfre) {
+      this.tempFactura.facfre = this.datePipe.transform(this.tempFactura.facfre, 'yyyy-MM-dd');
+    }
+
     this.detailView = 'Albaranes';
     this.setAlbaranesOptio('albaranes', factura?.facnum);
   }
@@ -419,6 +426,10 @@ export class FacturasComponent {
   closeDetails() {
     this.selectedFacturas = null;
     this.limpiarMEssages();
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   public getPendingApply(f: any): number {
@@ -634,31 +645,59 @@ export class FacturasComponent {
     this.fetchFacturas();
   }
 
+  tempFactura: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.selectedFacturas ? { ...this.selectedFacturas } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempFactura = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed() {
+    if (this.allowToUpdate) {
+      this.updateFactura();
+    } else {
+      return;
+    }
+  }
+
   isUpdatingFactura: boolean = false;
   facturaDetailSuccess: string = '';
   facturaDetailError: string = '';
   updateFactura() {
     this.limpiarMEssages();
     this.isUpdatingFactura = true;
-    const backendDate = this.toBackendDate(this.selectedFacturas.facfre);
-    const facnum = this.selectedFacturas.facnum;
+    const backendDate = this.toBackendDate(this.tempFactura.facfre);
+    const facnum = this.tempFactura.facnum;
 
+    Object.assign(this.selectedFacturas, this.tempFactura);
+    
     const payload = {
-      "FACOBS": this.selectedFacturas.facobs,
-      "CONCTP": this.selectedFacturas.conctp,
-      "CONCPR": this.selectedFacturas.concpr, 
-      "CONCCR": this.selectedFacturas.conccr, 
+      "FACOBS": this.tempFactura.facobs,
+      "CONCTP": this.tempFactura.conctp,
+      "CONCPR": this.tempFactura.concpr, 
+      "CONCCR": this.tempFactura.conccr, 
       "FACFRE": backendDate,
-      "FACFPG": this.selectedFacturas.facfpg,
-      "FACOPG": this.selectedFacturas.facopg,
-      "FACTPG": this.selectedFacturas.factpg,
-      "FACOCT": this.selectedFacturas.facoct
+      "FACFPG": this.tempFactura.facfpg,
+      "FACOPG": this.tempFactura.facopg,
+      "FACTPG": this.tempFactura.factpg,
+      "FACOCT": this.tempFactura.facoct
     }
-
-    console.log(payload)
 
     this.http.patch(`${environment.backendUrl}/api/fac/update-factura/${this.entcod}/${this.eje}/${facnum}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.isUpdatingFactura = false;
         this.facturaDetailSuccess = 'factura actualizada exitosamente';
       },
@@ -943,7 +982,6 @@ export class FacturasComponent {
       "FACNUM": facnum
     }))
 
-    console.log(payload);
     this.http.patch(`${environment.backendUrl}/api/alb/add-albaranes`, payload).subscribe({
       next: (res) => {
         this.isAddingAlbaranes = false;
@@ -1085,7 +1123,6 @@ export class FacturasComponent {
       "estado": "E"
     }
 
-    console.log(payload);
     this.http.post<any>(`${environment.backendUrl}/api/facturas/consulta`, payload).subscribe({
       next: (res) => {
         this.isLoadingFactura = false;
@@ -1093,7 +1130,6 @@ export class FacturasComponent {
         this.pageFacturas = 0;
       },
       error: (err) => {
-        console.log(err)
         this.pageFacturas = 0;
         this.isLoadingFactura = false;
         this.facturasErrorMessage = err.error.error ?? err.error;

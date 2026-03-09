@@ -2,8 +2,8 @@
 .search-container {gap: 20px;}
 /* search */
 /* main-list and table */
-.coste-list { width: 50%; }
-.coste-table thead th:first-child { width: 20%;}
+.main-list { width: 50%; }
+.main-table thead th:first-child { width: 20%;}
 /* main-list and table */
 /* detail grid */
 .modal{ width: 65%;}
@@ -15,7 +15,7 @@
 .tallText { width: 450px; max-width: 625px;}
 .smallText { width: 50px; max-width: 80px;}
 .delete-confirm-modal {top: 220px;}
-.articulos-delete-confirm-btn { margin-right: 10px;}
+.space { margin-right: 10px;}
 /* detail grid */
 /* add grid */
 .coste-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 500px; min-height: 100px; z-index: 3000; display: flex; flex-direction: column; align-items: center; }

@@ -163,7 +163,7 @@ export class ContratosComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.contratos-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -454,6 +454,7 @@ export class ContratosComponent {
   openDetails(contrato: any) {
     this.limpiarMessages();
     this.selectedContrato = contrato;
+    this.tempContrato = contrato;
     const concod = this.selectedContrato.concod;
     this.showArticulos(concod);
   }
@@ -467,9 +468,43 @@ export class ContratosComponent {
     this.showArticulosGrid = false;
   }
 
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  tempContrato: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.tempContrato ? { ...this.tempContrato } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempContrato = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(numero: number, bloque: number, fecha_ini: string, fecha_fin: string, descripción: String) {
+    if (this.allowToUpdate) {
+      this.updateContrato(numero, bloque, fecha_ini, fecha_fin, descripción);
+    } else {
+      return;
+    }
+  }
+
   updateContrato(numero: number, bloque: number, fecha_ini: string, fecha_fin: string, descripción: String) {
     this.limpiarMessages();
     this.isUpdating = true;
+
+    Object.assign(this.selectedContrato, this.tempContrato);
 
     const payload = {
       "CONBLO": bloque,
@@ -480,6 +515,7 @@ export class ContratosComponent {
 
     this.http.patch(`${environment.backendUrl}/api/con/update-contrato/${this.entcod}/${this.eje}/${numero}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.isUpdating = false;
         this.updateContratoSuccess = 'contrato actualizado exitosamente';
       },
@@ -501,6 +537,7 @@ export class ContratosComponent {
 
   closeAdd() {
     this.showAddGrid = false;
+    this.proveedores = [];
   }
 
   showProveedorGrid: boolean = false;

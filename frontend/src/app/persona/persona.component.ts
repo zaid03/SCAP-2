@@ -143,7 +143,7 @@ export class PersonaComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.personas-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -350,6 +350,7 @@ export class PersonaComponent {
   showDetails(persona: any) {
     this.limpiarMessages();
     this.selectedPersona = persona;
+    this.tempPersonas = persona;
     this.showServices(persona);
   }
 
@@ -361,14 +362,44 @@ export class PersonaComponent {
     this.showSerivcesGrid = false;
   }
 
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  tempPersonas: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+      this.backupData = this.selectedPersona ? { ...this.selectedPersona } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempPersonas = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(pernom: string, percoe: string, pertel: string, pertmo: string, percar: string, perobs: string) {
+    if (this.allowToUpdate) {
+      this.updatePersona(pernom, percoe, pertel, pertmo, percar, perobs);
+    } else {
+      return;
+    }
+  }
+
   isUpdating: boolean = false;
   updatePersona(pernom: string, percoe: string, pertel: string, pertmo: string, percar: string, perobs: string) {
     this.isUpdating = true;
     this.limpiarMessages();
-    if(!pernom) {
-      this.detailMessageError = 'Nombre requerido'
-      return;
-    }
+    Object.assign(this.selectedPersona, this.tempPersonas);
+
+    if(!pernom) {this.detailMessageError = 'Nombre requerido'; return;}
 
     const payload = {
       "PERNOM" : pernom,
@@ -384,6 +415,7 @@ export class PersonaComponent {
       next: (res) => {
         this.detailMessageSuccess = 'La persona se ha actualizado correctamente';
         this.isUpdating = false;
+        this.updateSuccess();
       },
       error: (err) => {
         this.detailMessageError = err.error.error ?? err.error;

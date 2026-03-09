@@ -8,8 +8,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,8 +23,6 @@ import com.example.sical.CryptoSical;
 
 @Service
 public class PartidasService {
-    private static final Logger logger = LoggerFactory.getLogger(PartidasService.class);
-
     @Value("${sical.ws.url}")           
     private String wsUrl;
     
@@ -114,7 +110,6 @@ public class PartidasService {
       String endpoint = (wsUrl != null && wsUrl.contains("?")) ? wsUrl.substring(0, wsUrl.indexOf("?")) : wsUrl;
       String responseXml = restTemplate.postForObject(endpoint, request, String.class);
 
-      logger.debug("SICAL raw response for partidas: {}", responseXml);
       return parsePartidas(responseXml);
     }
 
@@ -138,8 +133,6 @@ public class PartidasService {
                 .replace("&quot;", "\"")
                 .replace("&apos;", "'");
 
-        logger.debug("SICAL SML payload (partidas): {}", sml);
-
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(false);
@@ -154,7 +147,6 @@ public class PartidasService {
                     String desc = "";
                     NodeList descNodes = doc.getElementsByTagName("desc");
                     if (descNodes.getLength() > 0) desc = descNodes.item(0).getTextContent();
-                    logger.warn("SICAL returned error for partidas: exito={} desc={}", exito, desc);
                     throw new Exception("SICAL error: " + desc);
                 }
             }
@@ -201,7 +193,6 @@ public class PartidasService {
             }
             return result;
         } catch (Exception ex) {
-            logger.error("Failed to parse SICAL partidas SML. SML payload:\n{}\nException: {}", sml, ex.getMessage());
             throw ex;
         }
     }
@@ -225,7 +216,6 @@ public class PartidasService {
       try {
         return CryptoSical.decodeBase64(value);
       } catch (IllegalArgumentException ex) {
-        logger.warn("failed to decode to base64 value [{}]: {}", value, ex.getMessage());
         return value;
       }
     }

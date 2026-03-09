@@ -12,14 +12,14 @@
 .successBtn { margin-top: 5px; }
 /* search container and inputs */
 /* table style */
-.facturas-table tbody td:nth-child(6),
-.facturas-table tbody td:nth-child(13),
-.detail-grid .albaranes-table tbody td:nth-child(4),
+.ft tbody td:nth-child(6),
+.ft tbody td:nth-child(13),
+.detail-grid .abl tbody td:nth-child(4),
 .app tbody td:nth-child(3),
 .desc tbody td:nth-child(5),
 .desc tbody td:nth-child(7) { text-align: right; }
-.facturas-table thead th:last-child {width: 75px;}
-.facturas-table thead th:nth-child(14) {width: 50px;}
+.ft thead th:last-child {width: 75px;}
+.ft thead th:nth-child(14) {width: 50px;}
 /* table style */
 /* main-detail grid */
 .detail-container { display: flex; flex-wrap: wrap; align-items: center; padding: 5px; gap: 10px; }
@@ -56,7 +56,7 @@
 /* main-detail grid */
 /* sub detail grids */
 .detail-grid { display: flex; flex-direction: column; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); padding: 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f9fafb; }
-.albaranes-table { width: 100%; }
+.abl { width: 100%; }
 .width-last tbody td:last-child,
 .app tbody td:last-child {display: flex; justify-content: center;}
 .width-last thead th:last-child,
@@ -83,6 +83,7 @@
 .factura-cargar .search-options-btns,
 .albaran-search-options .albaran-options-btns {display: flex; width: 6%; gap: 10px; justify-content: center;}
 .factura-cargar .search-options-btns {flex-direction: column;}
+.center {text-align: center;}
 /* cargar facturas */
 /* add albaranes grid */
 .albran-add .art-title {width: 28%;}

@@ -1,4 +1,4 @@
-<div class="proveedores-page">
+<div class="main-page">
     <app-sidebar #sidebar></app-sidebar>
     <div 
     class="sidebar-backdrop" 
@@ -6,7 +6,7 @@
     (click)="sidebar.collapsed = true"
     >
     </div>
-    <div class="proveedores-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Gestión de proveedores</h2>  
@@ -23,8 +23,8 @@
                             </label>
                         </div>
                         <div class="search-btns">
-                            <button type="button" class="search-button-proveedores" (click)="search()">Buscar</button>
-                            <button type="button" class="search-button-proveedores" (click)="clearSearch()">Limpiar</button>
+                            <button type="button" class="purple-btn" (click)="search()">Buscar</button>
+                            <button type="button" class="purple-btn" (click)="clearSearch()">Limpiar</button>
                         </div>
                     </form>
                 </div> 
@@ -40,13 +40,13 @@
                 </div>
             </div>
         </div>
-        <div class="proveedores-list">
+        <div class="main-list">
             <h1 class="errorBtn">{{error}}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="main-table">
+            <table class="main-table align">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('tercod')">
@@ -148,15 +148,19 @@
                 <span>de {{ totalPages }}</span>
                 <button class="pag-btn" (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="selectedProveedor" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="selectedProveedor" (click)="closeDetailsSure()"></div>
             <div class="display" >
                 <div class="modal" *ngIf="selectedProveedor">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles del Proveedor</h3>
                         </div>
-                        <button class="guardar-btn" (click)="saveChanges()">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div>
                     <h1 class="errorBtn">{{ messageError }}</h1>
                     <h1 class="successBtn">{{ messageSuccess }}</h1>
@@ -167,77 +171,109 @@
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="left">
-                                <p>Nombre</p>
-                                <p>Alias</p>
-                                <p>Dirección</p>
+                                <p class="p-style">Nombre</p>
+                                <p class="p-style">Alias</p>
+                                <p class="p-style">Dirección</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.ternom || '#'}}</h1>
-                                <h1>{{selectedProveedor.terali || '#'}}</h1>
-                                <h1>{{selectedProveedor.terdom || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.ternom || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.terali || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.terdom || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-two">
                             <div class="left">
-                                <p>Código</p>
-                                <p>Provincia</p>
-                                <p>C.P</p>
+                                <p class="p-style">Código</p>
+                                <p class="p-style">Provincia</p>
+                                <p class="p-style">C.P</p>
                             </div>
                             <div class="right">
                                 <div class="on-three">
-                                    <h1>{{selectedProveedor.tercod || '#'}}</h1>
-                                    <p>NIF</p>
-                                    <h1>{{selectedProveedor.ternif || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempProveedor.tercod || '#'}}</h1>
+                                    <p class="p-style">NIF</p>
+                                    <h1 class="h1-style">{{tempProveedor.ternif || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedProveedor.procod || '#'}}</h1>
-                                    <h1>{{selectedProveedor.terpob || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempProveedor.procod || '#'}}</h1>
+                                    <h1 class="h1-style">{{tempProveedor.terpob || '#'}}</h1>
                                 </div>
-                                <h1>{{selectedProveedor.tercpo || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.tercpo || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-three">
                             <div class="left">
-                                <p>C.contable</p>
-                                <p>Bloqueado</p>
-                                <p>Teléfono</p>
+                                <p class="p-style">C.contable</p>
+                                <p class="p-style">Bloqueado</p>
+                                <p class="p-style">Teléfono</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.terayt || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.terayt || '#'}}</h1>
                                 <div class="bloq">
                                     <input type="checkbox"
-                                        [checked]="selectedProveedor.terblo == 1"
+                                        [checked]="tempProveedor.terblo == 1"
                                         (change)="onCheckboxGeneric($event, 'terblo')"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                         class="checkbox" 
                                     />
                                 </div>
-                                <h1>{{selectedProveedor.tertel || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.tertel || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-four">
                             <div class="left">
-                                <p class="margin">Fax</p>
-                                <p>Web</p>
-                                <p>Correo electrónico</p>
+                                <p class="p-style">Fax</p>
+                                <p class="p-style">Web</p>
+                                <p class="p-style">Correo electrónico</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedProveedor.terfax || '#'}}</h1>
-                                <textarea class="largeArea" [(ngModel)]="selectedProveedor.terweb"></textarea>
-                                <h1>{{selectedProveedor.tercoe || '#'}}</h1>
+                                <h1 class="h1-style">{{tempProveedor.terfax || '#'}}</h1>
+                                <textarea 
+                                    class="largeArea" 
+                                    [(ngModel)]="tempProveedor.terweb"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                ></textarea>
+                                <h1 class="h1-style">{{tempProveedor.tercoe || '#'}}</h1>
                             </div>
                         </div>
                         <div class="acuerdo">
                             <input type="checkbox"
-                                [checked]="selectedProveedor.teracu == 1"
+                                [checked]="tempProveedor.teracu == 1"
                                 (change)="onCheckboxGeneric($event, 'teracu')"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
                                 class="checkbox" 
                             />
                                 Tiene acuerdo marco
                         </div>
                         <div class="observ">
-                            <p>Observaciones:</p>
-                            <textarea [(ngModel)]="selectedProveedor.terobs"></textarea>
+                            <p class="p-style">Observaciones:</p>
+                            <textarea 
+                                [(ngModel)]="tempProveedor.terobs"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
+                            ></textarea>
                         </div>
+                    </div>
+                    <div class="btns">
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="!isUpdate" 
+                            *ngIf="isUpdate" 
+                            (click)="isUpdateAllowed()"
+                        >Guardar</button>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
@@ -262,14 +298,14 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showContactPersonsGrid">
-                        <button class="add-btn" (click)="showPersonas()">+</button>
+                        <button class="purple-btn space" (click)="showPersonas()">+</button>
                         <h1 class="errorBtn">{{ personasContactoErrorMessage }}</h1>
                         <h1 class="successBtn">{{ personasContactoSuccessMessage }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
                             <span>Cargando</span>
                         </div>
-                        <table class="personas-contacto-table">
+                        <table class="main-table pct">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -298,8 +334,8 @@
                                         <input type="text" [(ngModel)]="c.tpeobs" #obs/>
                                     </td>
                                     <td>
-                                        <button class="delete-btn-personas" (click)="openDeletePersonas(c)">-</button>
-                                        <button class="save-btn-articulos" (click)="updatepersonas(c.tpecod, nom.value, telefon.value, movil.value, email.value, obs.value)">✔</button>
+                                        <button class="red-btn" (click)="openDeletePersonas(c)">-</button>
+                                        <button class="purple-btn" (click)="updatepersonas(c.tpecod, nom.value, telefon.value, movil.value, email.value, obs.value)">✔</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -331,14 +367,14 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showArticulosGrid">
-                        <button class="add-btn" (click)="showHello()">+</button>
+                        <button class="purple-btn space" (click)="showHello()">+</button>
                         <h1 class="errorBtn">{{ articuloError }}</h1>
                         <h1 class="successBtn">{{ articuloSuccessMessage }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
                             <span>Cargando</span>
                         </div>
-                        <table class="articulo-table">
+                        <table class="main-table art">
                             <thead>
                                 <tr>
                                     <th>Familia</th>
@@ -387,8 +423,8 @@
                                         <input type="number" [(ngModel)]="articulo.aprpre"/>
                                     </td>
                                     <td>
-                                        <button class="delete-btn-personas" (click)="openDeleteConfirm(articulo)">-</button>
-                                        <button class="save-btn-articulos" (click)="updatearticulos(articulo)">✔</button>
+                                        <button class="red-btn" (click)="openDeleteConfirm(articulo)">-</button>
+                                        <button class="purple-btn" (click)="updatearticulos(articulo)">✔</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -438,8 +474,8 @@
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
-    <button class="articulos-delete-confirm-btn" (click)="confirmDelete()">-</button>
-    <button class="articulos-cancel-confirm-btn" (click)="closeDeleteConfirm()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">-</button>
+    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showDeletePersona" (click)="closeDeleteConfirm()"></div>
@@ -447,16 +483,16 @@
     <h3>¿Seguro que quieres eliminar este Persona?</h3>
     <div *ngIf="personaToDelete">
         <div class="detailPersonnaDelete">
-            <h1 class="titleDelete">Nombre:</h1>
-            <h1 class="titleDelete">{{personaToDelete.tpenom}}</h1>
+            <h1 class="h1-style titleDelete">Nombre:</h1>
+            <h1 class="h1-style titleDelete">{{personaToDelete.tpenom}}</h1>
         </div>
     </div>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
-    <button class="articulos-delete-confirm-btn" (click)="confirmDeletePersona()">-</button>
-    <button class="articulos-cancel-confirm-btn" (click)="closeDeletePersonas()">✖</button>
+    <button class="red-btn" (click)="confirmDeletePersona()">-</button>
+    <button class="purple-btn" (click)="closeDeletePersonas()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showPersonasGrid" (click)="hidePersonas()"></div>
@@ -465,8 +501,8 @@
         <div class="title">
             <h3>Añadir persona</h3>
         </div>
-        <button class="save-btn" (click)="addPersonas(nombreadd.value, telefonoadd.value, moviladd.value, correoadd.value, observacionesadd.value)">✔</button>
-        <button class="close-btn-btn" (click)="hidePersonas()">✖</button>
+        <button class="purple-btn" (click)="addPersonas(nombreadd.value, telefonoadd.value, moviladd.value, correoadd.value, observacionesadd.value)">✔</button>
+        <button class="red-btn" (click)="hidePersonas()">✖</button>
     </div>
     <h1 class="errorBtn">{{personaContactoaddError}}</h1>
     <div *ngIf="isAdding" class="loading-message">
@@ -475,11 +511,11 @@
     </div>
     <div class="personas-add-container">
         <div class="left-persona">
-            <p>Nombre*</p>
-            <p>Télefono</p>
-            <p>Movil</p>
-            <p>Correo electrónico</p>
-            <p>Observaciones</p>
+            <p class="p-style">Nombre*</p>
+            <p class="p-style">Télefono</p>
+            <p class="p-style">Movil</p>
+            <p class="p-style">Correo electrónico</p>
+            <p class="p-style">Observaciones</p>
         </div>
         <div class="right-persona">
             <textarea #nombreadd></textarea>
@@ -497,7 +533,7 @@
         <div class="title">
             <h1>Añadir articulo</h1>
         </div>
-        <button class="close-btn-btn" (click)="hideHello()">✖</button>
+        <button class="red-btn" (click)="hideHello()">✖</button>
     </div>
     <h1 class="successBtn">{{ anadirmessage }}</h1>
     <h1 class="errorBtn">{{ anadirErrorMessage }}</h1>
@@ -521,7 +557,7 @@
             (keyup.enter)="onSearch()"
             />
         </div>
-        <table class="anadir-proveedores-table">
+        <table class="main-table">
             <thead>
                 <th>Familia</th>
                 <th>Subfamilia</th>
@@ -554,11 +590,11 @@
         <div class="title">
             <h1>Añadir proveedor</h1>
         </div>
-        <button class="proveedor-saving-btn" (click)="saveProveedorees()" [disabled]="isSaving || selectedProveediresFromResults.length === 0">
+        <button class="purple-btn" (click)="saveProveedorees()" [disabled]="isSaving || selectedProveediresFromResults.length === 0">
             <span *ngIf="!isSaving">✔</span>
             <span *ngIf="isSaving">Guardando...</span>
         </button>
-        <button class="close-btn-btn" (click)="closeProveedorModal()">×</button>
+        <button class="red-btn" (click)="closeProveedorModal()">×</button>
     </div>
     <h1 class="successBtn">{{ guardarMessageProveedor }}</h1>
     <div class="content-container-for-proveedor">
@@ -603,7 +639,7 @@
             </div>   
         </form>
         <h1 class="errorBtn">{{ anadirProveedorErrorMessage }}</h1>
-        <table class="proveedor-anadir-table-sw">
+        <table class="pat main-table">
             <thead>
                 <tr>
                     <th>Codigo</th>
@@ -642,7 +678,7 @@
     <div class="modal-actions">
         <div class="selection-summary" style="display:flex;gap:8px;align-items:center;">
             <span>Seleccionados: {{ selectedProveediresFromResults.length }}</span>
-            <button class="proveedor-cancel-btn" (click)="clearSelectedProveedores()" [disabled]="selectedProveediresFromResults.length === 0">Limpiar</button>
+            <button class="red-btn" (click)="clearSelectedProveedores()" [disabled]="selectedProveediresFromResults.length === 0">Limpiar</button>
         </div>
     </div>
 </div>

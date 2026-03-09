@@ -219,7 +219,7 @@ export class CreditoComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.credito-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -400,11 +400,14 @@ export class CreditoComponent {
 
   //main detail grid functions
   selectedBolsas: any = null;
-  showDetails(factura: any) {
+  showDetails(bolsa: any) {
     this.limpiarMessages();
     this.guardarisSuccess = false;
-    this.selectedBolsas = { ...factura };
-    if (this.selectedBolsas.gbsimp !== undefined && this.selectedBolsas.gbsimp !== null) {
+
+    this.selectedBolsas = { ...bolsa };
+    this.tempBolsa = {...bolsa};
+
+    if ((this.selectedBolsas.gbsimp !== undefined && this.selectedBolsas.gbsimp !== null) || (this.tempBolsa.gbsimp !== undefined && this.tempBolsa.gbsimp !== null)) {
       let num = parseFloat(
         String(this.selectedBolsas.gbsimp)
           .replace(/\s/g, '')
@@ -412,13 +415,22 @@ export class CreditoComponent {
           .replace(',', '.')
           .replace(/[^\d.-]/g, '')
       );
-      if (!isNaN(num)) {
+      let numB = parseFloat(
+        String(this.tempBolsa.gbsimp)
+          .replace(/\s/g, '')
+          .replace(/\./g, '')
+          .replace(',', '.')
+          .replace(/[^\d.-]/g, '')
+      );
+      if ((!isNaN(num)) || (!isNaN(num))) {
         this.selectedBolsas.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        this.tempBolsa.gbsimp = numB.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
       }
     }
-    const org = factura?.gbsorg ?? '';
-    const fun = factura?.gbsfun ?? '';
-    const eco = factura?.gbseco ?? '';
+
+    const org = bolsa?.gbsorg ?? '';
+    const fun = bolsa?.gbsfun ?? '';
+    const eco = bolsa?.gbseco ?? '';
     this.bolsaCombo = `${org} - ${fun} - ${eco}`;
   }
 
@@ -435,6 +447,10 @@ export class CreditoComponent {
   closeDetails() {
     this.limpiarMessages();
     this.selectedBolsas = null;
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   public getkCGECIC(cgecic: any): string {
@@ -475,15 +491,42 @@ export class CreditoComponent {
   }
 
   formatGbsimp() {
-    if (!this.selectedBolsas || this.selectedBolsas.gbsimp === undefined || this.selectedBolsas.gbsimp === null) return;
-    let value = String(this.selectedBolsas.gbsimp)
+    if (!this.tempBolsa || this.tempBolsa.gbsimp === undefined || this.tempBolsa.gbsimp === null) return;
+    let value = String(this.tempBolsa.gbsimp)
       .replace(/\s/g, '')
       .replace(/\./g, '')     
       .replace(',', '.')       
       .replace(/[^\d.-]/g, '');
     let num = parseFloat(value);
     if (!isNaN(num)) {
-      this.selectedBolsas.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+      this.tempBolsa.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+    }
+  }
+
+  tempBolsa: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+      this.backupData = this.selectedBolsas ? { ...this.selectedBolsas } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempBolsa = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(gbsimp: any, getkAcPeCo:any, gbsref: any) {
+    if (this.allowToUpdate) {
+      this.updateBolsa(gbsimp, getkAcPeCo, gbsref);
+    } else {
+      return;
     }
   }
 
@@ -494,6 +537,8 @@ export class CreditoComponent {
 
     let cleanValue = gbsimp.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
     let parsedValue = parseFloat(cleanValue);
+
+    Object.assign(this.selectedBolsas, this.tempBolsa);
 
     if ( parsedValue > getkAcPeCo) {
       this.guardarMesage = 'HA SOBREPASADO EL DISPONIBLE DE LA REFERENCIA';
@@ -512,6 +557,7 @@ export class CreditoComponent {
     this.http.patch<void>(`${environment.backendUrl}/api/gbs/${this.entcod}/${this.eje}/${this.cge}/${gbsref}`, payload)
     .subscribe({
       next: () => {
+        this.updateSuccess();
         this.guardarMesageSuccess = 'Bolsa actualizada correctamente';
         this.isUpdating = false;
       },

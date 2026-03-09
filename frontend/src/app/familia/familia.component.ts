@@ -305,7 +305,7 @@ export class FamiliaComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.familia-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -346,15 +346,21 @@ export class FamiliaComponent {
     this.limpiarMessages();
     this.subfamilias = [];
     this.selectedFamilias = familia;
+    this.tempFamilia = familia;
     this.SubfamiliaGrid(this.selectedFamilias.afacod);
   }
 
   closeDetails() {
     this.selectedFamilias = null;
     this.subfamilias = [];
+    this.tempFamilia = [];
     this.showSubfamiliasGrid = false;
     this.activeDetailTab = null;
     this.limpiarMessages();
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   afacodError:string = '';
@@ -411,6 +417,33 @@ export class FamiliaComponent {
     }
   }
 
+  tempFamilia: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.selectedFamilias ? { ...this.selectedFamilias } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempFamilia = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(afacod: string, afades: string) {
+    if (this.allowToUpdate) {
+      this.updateFamilia(afacod, afades);
+    } else {
+      return;
+    }
+  }
+
   familiaErrorMessage:string = '';
   familiaSucessMessage: string = '';
   isUpdating: boolean = false;
@@ -422,8 +455,11 @@ export class FamiliaComponent {
       "AFADES" : afades
     }
 
+    Object.assign(this.selectedFamilias, this.tempFamilia);
+
     this.http.patch<any>(`${environment.backendUrl}/api/afa/update-familia/${this.entcod}/${afacod}`, payload).subscribe({
       next: (response) => {
+        this.updateSuccess();
         this.familiaSucessMessage = 'Familia actualizada con éxito';
         this.isUpdating = false;
         this.fetchFamilias();

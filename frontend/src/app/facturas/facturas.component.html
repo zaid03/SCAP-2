@@ -1,4 +1,4 @@
-<div class="facturas-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
@@ -6,7 +6,7 @@
     >
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="facturas-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Gestión de facturas</h2>  
@@ -72,8 +72,8 @@
                         </div>
                     </div>
                     <div class="btns">
-                        <button type="button" class="search-button" (click)="filterFacturas()">Buscar</button>
-                        <button type="button" class="search-btn" (click)="forgetAll()">Limpiar</button>
+                        <button type="button" class="purple-btn" (click)="filterFacturas()">Buscar</button>
+                        <button type="button" class="purple-btn" (click)="forgetAll()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -82,20 +82,20 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="DownloadPDF()">Exportar a PDF</button>
-                    <button class="download-btn" (click)="DownloadCSV()">Exportar a CSV</button>
-                    <button class="download-btn" (click)="openFacturaAdd()">Cargar facturas</button>
+                    <button class="purple-btn" (click)="DownloadPDF()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="DownloadCSV()">Exportar a CSV</button>
+                    <button class="purple-btn" (click)="openFacturaAdd()">Cargar facturas</button>
                 </div>
             </div>
         </div>
         <h1 class="successBtn">{{ estadoMessage }}</h1>
         <h1 class="errorBtn">{{ filterFacturaMessage }}</h1>
-        <div class="facturas-list">
+        <div class="main-list">
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="facturas-table">
+            <table class="main-table ft">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('facnum')">
@@ -209,15 +209,19 @@
                 <span>de {{ totalPages }}</span>
                 <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="selectedFacturas" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="selectedFacturas" (click)="closeDetailsSure()"></div>
             <div class="display" >
                 <div class="modal" *ngIf="selectedFacturas">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles del Factura</h3>
                         </div>
-                        <button class="guardar-btn" (click)="updateFactura()">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div>
                     <div *ngIf="isUpdatingFactura" class="loading-message">
                         <div class="spinner"></div>
@@ -228,136 +232,176 @@
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="left">
-                                <p>Núm. Reg.</p>
-                                <p>Núm.Factura:</p>
-                                <p>R.C.F:</p>
+                                <p class="p-style">Núm. Reg.</p>
+                                <p class="p-style">Núm.Factura:</p>
+                                <p class="p-style">R.C.F:</p>
                             </div>
                             <div class="right gap">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facnum || '#'}}</h1>
-                                    <p>F.Contable</p>
-                                    <h1>{{selectedFacturas.facfco | date:'dd-MM-yyyy'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facnum || '#'}}</h1>
+                                    <p class="p-style">F.Contable</p>
+                                    <h1 class="h1-style">{{selectedFacturas.facfco | date:'dd-MM-yyyy'}}</h1>
                                 </div>
-                                <h1>{{selectedFacturas.facdoc || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.facdoc || '#'}}</h1>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facfac || '#'}}</h1>
-                                    <h1>{{selectedFacturas.facann || '#'}}</h1>
-                                    <h1>{{selectedFacturas.factdc || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facfac || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facann || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.factdc || '#'}}</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-two">
                             <div class="left">
-                                <p>Proveedor:</p>
-                                <p>NIF</p>
-                                <p>Fecha Factura</p>
+                                <p class="p-style">Proveedor:</p>
+                                <p class="p-style">NIF</p>
+                                <p class="p-style">Fecha Factura</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.tercod || '#'}}</h1>
-                                    <h1>{{selectedFacturas.ter_TERNOM || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.tercod || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.ter_TERNOM || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.ter_TERNIF || '#'}}</h1>
-                                    <p>C.Gestor</p>
-                                    <h1>{{selectedFacturas.cgecod || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.ter_TERNIF || '#'}}</h1>
+                                    <p class="p-style">C.Gestor</p>
+                                    <h1 class="h1-style">{{selectedFacturas.cgecod || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facdat | date:'dd-MM-yyyy'}}</h1>
-                                    <p>F.Registro</p>
+                                    <h1 class="h1-style">{{selectedFacturas.facdat | date:'dd-MM-yyyy'}}</h1>
+                                    <p class="p-style">F.Registro</p>
                                     <input
                                         type="date"
-                                        class="input-style" 
-                                        [(ngModel)]="selectedFacturas.facfre"
+                                        class="textArea-style input-style" 
+                                        [(ngModel)]="tempFactura.facfre"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     />
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-three special-chunk">
                             <div class="left special-needs gap">
-                                <p>Tipo de contrato</p>
-                                <p>Criterio de puntuación</p>
-                                <p>Procedimiento de contacto</p>
+                                <p class="p-style">Tipo de contrato</p>
+                                <p class="p-style">Criterio de puntuación</p>
+                                <p class="p-style">Procedimiento de contacto</p>
                             </div>
                             <div class="right gap">
                                 <textarea 
-                                    class="averageSecond" 
-                                    [(ngModel)]="selectedFacturas.conctp"
+                                    class="textArea-style averageSecond" 
+                                    [(ngModel)]="tempFactura.conctp"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
                                 ></textarea>
                                 <textarea 
-                                    class="averageSecond" 
-                                    [(ngModel)]="selectedFacturas.concpr"
+                                    class="textArea-style averageSecond" 
+                                    [(ngModel)]="tempFactura.concpr"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
                                 ></textarea>
                                 <textarea 
-                                    class="averageSecond" 
-                                    [(ngModel)]="selectedFacturas.conccr"
+                                    class="textArea-style averageSecond" 
+                                    [(ngModel)]="tempFactura.conccr"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
                                 ></textarea>
                             </div>
                         </div>
                         <div class="chunk-four">
                             <div class="left">
-                                <p>Forma de pago</p>
-                                <p>Ordinal de pago</p>     
+                                <p class="p-style">Forma de pago</p>
+                                <p class="p-style">Ordinal de pago</p>     
                             </div>
                             <div class="right">
                                 <div class="on-two">
                                     <textarea 
-                                        class="pagoSmallWidth" 
-                                        [(ngModel)]="selectedFacturas.facfpg"
+                                        class="textArea-style pagoSmallWidth" 
+                                        [(ngModel)]="tempFactura.facfpg"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     ></textarea>
-                                    <p>Tipo de pago</p>
+                                    <p class="p-style">Tipo de pago</p>
                                     <textarea 
-                                        class="pagoSmallWidth pagoFix" 
-                                        [(ngModel)]="selectedFacturas.factpg"
+                                        class="textArea-style pagoSmallWidth pagoFix" 
+                                        [(ngModel)]="tempFactura.factpg"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     ></textarea>
                                 </div>
                                 <div class="on-two">
                                     <textarea 
-                                        class="pagoSmallWidth " 
-                                        [(ngModel)]="selectedFacturas.facopg"
+                                        class="textArea-style pagoSmallWidth" 
+                                        [(ngModel)]="tempFactura.facopg"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     ></textarea>
-                                    <p>Cuenta Tercero</p>
+                                    <p class="p-style">Cuenta Tercero</p>
                                     <textarea 
-                                        class="pagoSmallWidth" 
-                                        [(ngModel)]="selectedFacturas.facoct"
+                                        class="textArea-style pagoSmallWidth" 
+                                        [(ngModel)]="tempFactura.facoct"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     ></textarea>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-five">
                             <div class="left moreGap">
-                                <p>Des.Fact/ADO:</p>
-                                <p>ADO</p>
+                                <p class="p-style">Des.Fact/ADO:</p>
+                                <p class="p-style">ADO</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedFacturas.factxt || '#'}}</h1>
-                                <h1>{{selectedFacturas.facado || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.factxt || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.facado || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-six">
                             <div class="left gap">
-                                <p>Total Factura</p>
-                                <p>Apl.diferencias</p>
-                                <p>Descuentos</p>
+                                <p class="p-style">Total Factura</p>
+                                <p class="p-style">Apl.diferencias</p>
+                                <p class="p-style">Descuentos</p>
                             </div>
                             <div class="right gap">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas?.facimp ? (selectedFacturas.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
-                                    <p>Aplicado</p>
-                                    <h1>{{selectedFacturas?.faciec ? (selectedFacturas.faciec | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas?.facimp ? (selectedFacturas.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p class="p-style">Aplicado</p>
+                                    <h1 class="h1-style">{{selectedFacturas?.faciec ? (selectedFacturas.faciec | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas?.facidi ? (selectedFacturas.facidi | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
-                                    <p>Pte.Apli</p>
-                                    <h1>{{getPendingApply(selectedFacturas) ? (getPendingApply(selectedFacturas) | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas?.facidi ? (selectedFacturas.facidi | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p class="p-style">Pte.Apli</p>
+                                    <h1 class="h1-style">{{getPendingApply(selectedFacturas) ? (getPendingApply(selectedFacturas) | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                                 </div>
-                                <h1>{{selectedFacturas?.facdto ? (selectedFacturas.facdto | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas?.facdto ? (selectedFacturas.facdto | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                             </div>
                         </div>
                         <div class="observ">
-                            <p>Observaciones:</p>
-                            <textarea [(ngModel)]="selectedFacturas.facobs"></textarea>
+                            <p class="p-style">Observaciones:</p>
+                            <textarea 
+                                class="textArea-style"
+                                [(ngModel)]="tempFactura.facobs"
+                                [disabled]="!isUpdate"
+                                (input)="allowToUpdate = true"
+                            ></textarea>
                         </div>
+                    </div>
+                    <div class="btns">
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="!isUpdate" 
+	                        *ngIf="isUpdate"
+                            (click)="isUpdateAllowed()"
+                        >Guardar</button>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
@@ -418,7 +462,7 @@
                                 <ng-container [ngSwitch]="albaranesOptio">
                                     <ng-container *ngSwitchCase="'albaranes'">
                                         <div class="albaranes-btns">
-                                            <button class="save-btn" (click)="openAlbaranesAdd()">+</button>
+                                            <button class="purple-btn" (click)="openAlbaranesAdd()">+</button>
                                         </div>
                                         <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
                                         <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
@@ -427,7 +471,7 @@
                                             <span>Cargando</span>
                                         </div>
                                         <div class="detail-card">
-                                            <table class="albaranes-table width-last">
+                                            <table class="main-table abl width-last">
                                                 <thead>
                                                     <tr>
                                                         <th>Número albarán</th>
@@ -450,7 +494,7 @@
                                                         <td>{{ a.solsub }}</td>
                                                         <td>{{ a.albobs }}</td>
                                                         <td>
-                                                            <button class="delete-btn" (click)="showDeleteAlbaran(a)">-</button>
+                                                            <button class="red-btn" (click)="showDeleteAlbaran(a)">-</button>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -483,7 +527,7 @@
                                             <span>actualizando</span>
                                         </div>
                                         <div class="detail-card">
-                                            <table class="albaranes-table app">
+                                            <table class="main-table app">
                                                 <thead>
                                                     <tr>
                                                         <th><strong>Referencia</strong></th>
@@ -500,13 +544,13 @@
                                                         <td>{{ a.FDEIMP | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</td>
                                                         <td>
                                                             <textarea 
-                                                                class="applicacionesTextarea" 
+                                                                class="textArea-style applicacionesTextarea" 
                                                                 [(ngModel)]="a.FDEDIF"
                                                                 (blur)="formatapplicaciones(a)"
                                                             ></textarea>
                                                         </td>
                                                         <td>
-                                                            <button class="save-btn" (click)="updateApplicaciones(a)">✔</button>
+                                                            <button class="purple-btn" (click)="updateApplicaciones(a)">✔</button>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -535,7 +579,7 @@
                                             <span>Cargando</span>
                                         </div>
                                         <div class="detail-card">
-                                            <table class="albaranes-table desc">
+                                            <table class="main-table desc">
                                                 <thead>
                                                     <tr>
                                                         <th>Área</th>
@@ -598,14 +642,14 @@
         <div class="title">
             <h1 class="art-title">Cargar facturas</h1>
         </div>
-        <button class="save-btn" (click)="addingFacturas()">+</button>
-        <button class="delete-btn" (click)="closeFacturaAdd()">✖</button>
+        <button class="purple-btn" (click)="addingFacturas()">+</button>
+        <button class="red-btn" (click)="closeFacturaAdd()">✖</button>
     </div>
     <div class="search-option-container">
         <div class="chunk-one-search">
             <div class="left-search">
-                <p>Nif Proveedor</p>
-                <p>N° Factura</p>
+                <p class="p-style">Nif Proveedor</p>
+                <p class="p-style">N° Factura</p>
             </div>
             <div class="right-search">
                 <input 
@@ -624,7 +668,7 @@
         </div>
         <div class="chunk-one-search">
             <div class="left-search alignTitleSearch">
-                <p>Fecha entrada RCF</p>
+                <p class="p-style">Fecha entrada RCF</p>
             </div>
             <div class="right-search">
                 <input 
@@ -641,7 +685,7 @@
         </div>
         <div class="chunk-one-search">
             <div class="left-search alignTitleSearch">
-                <p>Fecha factura</p>
+                <p class="p-style">Fecha factura</p>
             </div>
             <div class="right-search">
                 <input 
@@ -657,8 +701,8 @@
             </div>
         </div>
         <div class="search-options-btns">
-            <button class="download-btn" (click)="searchFacturas()">Buscar</button>
-            <button class="download-btn" (click)="clearSearch()">Limpiar</button>
+            <button class="purple-btn" (click)="searchFacturas()">Buscar</button>
+            <button class="purple-btn" (click)="clearSearch()">Limpiar</button>
         </div>
     </div>
     <h1 class="errorBtn">{{facturasErrorMessage}}</h1>
@@ -671,7 +715,7 @@
         <div class="spinner"></div>
         <span>añadiendo</span>
     </div>
-    <table class="D-table">
+    <table class="main-table">
         <thead>
             <tr>
                 <th>Tipo</th>
@@ -704,7 +748,7 @@
             </tr>
         </tbody>
     </table>
-    <p class="selected" *ngIf="caughtFacturas.length > 0">{{caughtFacturas.length}} Facturas seleccionados</p>
+    <p class="p-style center" *ngIf="caughtFacturas.length > 0">{{caughtFacturas.length}} Facturas seleccionados</p>
     <div class="pagination-controls alignment">
         <button (click)="prevPageFacturas()" [disabled]="pageFacturas === 0">Anterior</button>
         <span>Página</span>
@@ -727,16 +771,16 @@
         <div class="title">
             <h1 class="art-title">añadir albaranes</h1>
         </div>
-        <button class="save-btn" (click)="adingAlbaranes()">+</button>
-        <button class="delete-btn" (click)="closeAlbaranesAdd()">✖</button>
+        <button class="purple-btn" (click)="adingAlbaranes()">+</button>
+        <button class="red-btn" (click)="closeAlbaranesAdd()">✖</button>
     </div>
     <div class="albaran-search-options">
         <div class="proveedor-info">
-            <p>Código proveedor</p>
-            <h1>{{tercod}}</h1>
+            <p class="p-style">Código proveedor</p>
+            <h1 class="h1-style">{{tercod}}</h1>
         </div>
         <div class="search-chunk">
-            <p>Desde</p>
+            <p class="p-style">Desde</p>
             <input 
                 type="date"
                 [(ngModel)]="albaranesDesde" 
@@ -744,7 +788,7 @@
             />
         </div>
         <div class="search-chunk">
-            <p>Hasta</p>
+            <p class="p-style">Hasta</p>
             <input 
                 type="date"
                 [(ngModel)]="albaranesHasta" 
@@ -752,8 +796,8 @@
             />
         </div>
         <div class="albaran-options-btns">
-            <button class="download-btn" (click)="searchAlbaranes()">Buscar</button>
-            <button class="download-btn" (click)="limpiarSearch()">Limpiar</button>
+            <button class="purple-btn" (click)="searchAlbaranes()">Buscar</button>
+            <button class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
         </div>
     </div>
     <h1 class="errorBtn">{{albaranesError}}</h1>
@@ -765,7 +809,7 @@
         <div class="spinner"></div>
         <span>añadiendo</span>
     </div>
-    <table class="albaranes-table">
+    <table class="main-table">
         <thead>
             <tr>
                 <th>Referencia proveïdor</th>
@@ -793,7 +837,7 @@
             </tr>
         </tbody>
     </table>
-    <p class="selected" *ngIf="caughtAlbranaes.length > 0">{{caughtAlbranaes.length}} Albaranes seleccionados</p>
+    <p class="p-style center" *ngIf="caughtAlbranaes.length > 0">{{caughtAlbranaes.length}} Albaranes seleccionados</p>
     <div class="pagination-controls alignment">
         <button (click)="prevPageAlbaranesAdd()" [disabled]="pageAlbaranesAdd === 0">Anterior</button>
         <span>Página</span>
@@ -818,9 +862,9 @@
             <div class="spinner"></div>
             <span>borrando</span>
         </div>
-        <p class="delete-info">Número albarán: {{albaranToDelete.albnun}}</p>
+        <p class="p-style">Número albarán: {{albaranToDelete.albnun}}</p>
     </div>
     <h1 class="errorBtn">{{dalbaranesDeleteMessage}}</h1>
-    <button class="delete-btn" (click)="quitarAlbaran()">-</button>
-    <button class="save-btn margin" (click)="closeDeleteAlbaran()">✖</button>
+    <button class="red-btn" (click)="quitarAlbaran()">-</button>
+    <button class="purple-btn margin" (click)="closeDeleteAlbaran()">✖</button>
 </div>

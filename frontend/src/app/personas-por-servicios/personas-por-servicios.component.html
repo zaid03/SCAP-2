@@ -1,4 +1,4 @@
-<div class="personasServices-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
@@ -6,7 +6,7 @@
     >
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="personasServices-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Consulta de personas por servicios</h2>  
@@ -45,8 +45,8 @@
                         </select>
                     </div>
                     <div class="btns Widthy">
-                        <button class="search-btn" (click)="search()">Buscar</button>
-                        <button class="save-btn" (click)="limpiarSearch()">Limpiar</button>
+                        <button class="purple-btn" (click)="search()">Buscar</button>
+                        <button class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -55,20 +55,19 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
-                    <button class="print-btn" (click)="toPrint()">Exportar a PDF</button>
-                    <!-- <button class="add-familia-btn">Añadir</button> -->
+                    <button class="purple-btn" (click)="excelDownload()">Exportar a Excel</button>
+                    <button class="purple-btn" (click)="toPrint()">Exportar a PDF</button>
                 </div>
             </div>
         </div>
-        <div class="personasServices-list">
+        <div class="main-list">
             <h1 class="successBtn">{{ personasServicesSuccess }}</h1>
             <h1 class="errorBtn">{{ personasServicesError }}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="personasServices-table">
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('percod')">

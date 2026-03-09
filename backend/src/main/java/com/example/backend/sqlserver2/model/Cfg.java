@@ -23,7 +23,6 @@ public class Cfg {
     private String CFGOPG;
 
     private String CFGTPG;
-    //getters and setters
 
     public Integer getENT() {return ENT;}
     public void setENT(Integer ENT) {this.ENT = ENT;}

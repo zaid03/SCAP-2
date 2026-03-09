@@ -1,11 +1,11 @@
-<div class="credito-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
         (click)="sidebar.collapsed = true">
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="credito-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Consulta bolsa de crédito</h2>  
@@ -17,13 +17,13 @@
                             type="text" 
                             class="search-bar"
                             placeholder="Centro gestor" 
-                            [(ngModel)]="cgeSearch"
+                            [(ngModel)]="cge"
                             (input)="setInputToUpper($event)"
                         >
                     </div>
                     <div class="btns">
-                        <button class="search-btn" (click)="searchBolsas()">Buscar</button>
-                        <button class="search-btn" (click)="limpiarSearch()">Limpiar</button>
+                        <button class="purple-btn" (click)="searchBolsas()">Buscar</button>
+                        <button class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -32,30 +32,30 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="DownloadPDF()">Exportar a PDF</button>
-                    <button class="download-btn" (click)="DownloadCSV()">Exportar a CSV</button>
+                    <button class="red-btn" (click)="DownloadPDF()">Exportar a PDF</button>
+                    <button class="red-btn" (click)="DownloadCSV()">Exportar a CSV</button>
                 </div>
             </div>
         </div>
         <div class="centro-info">
             <div class="centro-content widthSmall">
-                <p>C.Gestor</p>
-                <h1>{{cge}}</h1>
+                <p class="p-style">C.Gestor</p>
+                <h1 class="h1-style">{{cge}}</h1>
             </div>
             <div class="centro-content widthSmall">
-                <p>Orgánica</p>
-                <h1>{{organigrama}}</h1>
+                <p class="p-style">Orgánica</p>
+                <h1 class="h1-style">{{organigrama}}</h1>
             </div>
             <div class="centro-content widthSmall">
-                <p>Programa</p>
-                <h1>{{programa}}</h1>
+                <p class="p-style">Programa</p>
+                <h1 class="h1-style">{{programa}}</h1>
             </div>
             <div class="centro-content bigWidth">
-                <p>Descripción</p>
-                <h1>{{description}}</h1>
+                <p class="p-style">Descripción</p>
+                <h1 class="h1-style">{{description}}</h1>
             </div>
             <div class="centro-content bigWidth">
-                <p>Estado contable</p>
+                <p class="p-style">Estado contable</p>
                 <div class="rad-content">
                     <div class="rad">
                         <input 
@@ -84,13 +84,13 @@
                 </div>
             </div>
         </div>
-        <div class="credito-list">
+        <div class="main-list">
             <h1 class="errorBtn">{{ tableMessage }}</h1>
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="credito-table">
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th 
@@ -210,127 +210,126 @@
                         <div class="title-detail">
                             <h3>Detalles de Bolsa</h3>
                         </div>
-                        <!-- <button class="save-btn">✔</button> -->
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button class="red-btn" (click)="closeDetails()">✖</button>
                     </div>
                     <h1 class="successBtn">{{ guardarMesageSuccess }}</h1>
                     <h1 class="errorBtn">{{ guardarMesage }}</h1>
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="detail-title">
-                                <p>Contabilidad</p>
+                                <p class="p-style">Contabilidad</p>
                             </div>
                             <div class="detail-chunk-container">
                                 <div class="left">
-                                    <p>Centro Gestor</p>
-                                    <p>Applicación</p>
-                                    <p>Operación</p>
-                                    <p>Referencia</p>
-                                    <p>Importe Op</p>
+                                    <p class="p-style">Centro Gestor</p>
+                                    <p class="p-style">Applicación</p>
+                                    <p class="p-style">Operación</p>
+                                    <p class="p-style">Referencia</p>
+                                    <p class="p-style">Importe Op</p>
                                 </div>
                                 <div class="right">
                                     <div class="on-two">
-                                        <h1>{{selectedBolsas.cgecod || '#'}}</h1>
-                                        <h1>{{selectedBolsas.cgedes || '#'}}</h1>
+                                        <h1 class="h1-style">{{selectedBolsas.cgecod || '#'}}</h1>
+                                        <h1 class="h1-style">{{selectedBolsas.cgedes || '#'}}</h1>
                                     </div>
                                     <div class="on-two">
-                                        <h1>{{bolsaCombo || '#'}}</h1>
-                                        <h1>{{selectedBolsas?.partidas?.[0]?.desc || '#'}}</h1>
+                                        <h1 class="h1-style">{{bolsaCombo || '#'}}</h1>
+                                        <h1 class="h1-style">{{selectedBolsas?.partidas?.[0]?.desc || '#'}}</h1>
                                     </div>
-                                    <h1>{{selectedBolsas.gbsope || '#'}}</h1>
-                                    <h1>{{selectedBolsas.gbsref || '#'}}</h1>
-                                    <h1>{{selectedBolsas?.limporte || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedBolsas.gbsope || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedBolsas.gbsref || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedBolsas?.limporte || '#'}}</h1>
                                 </div>
                             </div>  
                         </div>
                         <div class="chunk-two">
                             <div class="detail-title">
-                                <p>Bolsa</p>
-                                <span class="boll">{{ getkCGECIC(selectedBolsas.cgecic) || '#'}}</span>
+                                <p class="p-style">Bolsa</p>
+                                <span class="p-style">{{ getkCGECIC(selectedBolsas.cgecic) || '#'}}</span>
                             </div>
                             <div class="detail-chunk-container">
                                 <div class="left special">
-                                    <p>Fecha bolsa</p>
+                                    <p class="p-style">Fecha bolsa</p>
                                 </div>
                                 <div class="right">
                                     <div class="on-two">
-                                        <h1>{{selectedBolsas?.gbsfop ? (selectedBolsas.gbsfop | date:'dd/MM/yyyy') : '#'}}</h1>
-                                        <p>Suplemento 413</p>
-                                        <h1>{{selectedBolsas?.gbs413? (selectedBolsas.gbs413) : '#'}}</h1>
+                                        <h1 class="h1-style">{{selectedBolsas?.gbsfop ? (selectedBolsas.gbsfop | date:'dd/MM/yyyy') : '#'}}</h1>
+                                        <p class="p-style">Suplemento 413</p>
+                                        <h1 class="h1-style">{{selectedBolsas?.gbs413? (selectedBolsas.gbs413) : '#'}}</h1>
                                     </div>
                                 </div>
                             </div>
                             <div class="conta-first">
                                 <div class="conta-one">
-                                    <p>Importe bolsa</p>
-                                    <h1>{{selectedBolsas.gbsimp | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</h1>
+                                    <p class="p-style">Importe bolsa</p>
+                                    <h1 class="h1-style">{{selectedBolsas.gbsimp | currency:'EUR':'symbol':'1.2-2':'es-ES' }}</h1>
                                 </div>
                                 <div class="conta-sign">
                                     <span class="plus">+</span>
                                 </div>
                                 <div class="conta-two">
-                                    <p>Importe bolsa gestion</p>
-                                    <h1 class="fix">{{selectedBolsas.gbsibg | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Importe bolsa gestion</p>
+                                    <h1 class="h1-style fix">{{selectedBolsas.gbsibg | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                                 <div class="conta-sign">
                                     <span class="minus">-</span>
                                 </div>
                                 <div class="conta-three">
-                                    <p>Usado bolsa</p>
-                                    <h1 class="fix">{{selectedBolsas.gbsius | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Usado bolsa</p>
+                                    <h1 class="h1-style fix">{{selectedBolsas.gbsius | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                                 <div class="conta-sign">
                                     <span class="equal">=</span>
                                 </div>
                                 <div class="conta-four">
-                                    <p>Disponible bolsa</p>
-                                    <h1 class="fix">{{getKBoldis(selectedBolsas.gbsimp, selectedBolsas.gbsibg, selectedBolsas.gbsius) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Disponible bolsa</p>
+                                    <h1 class="h1-style fix">{{getKBoldis(selectedBolsas.gbsimp, selectedBolsas.gbsibg, selectedBolsas.gbsius) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                             </div>
                             <div class="conta-second">
                                 <div class="conta-one">
-                                    <p>Saldo op.</p>
-                                    <h1>{{selectedBolsas?.saldo | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Saldo op.</p>
+                                    <h1 class="h1-style">{{selectedBolsas?.saldo | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                                 <div class="conta-sign">
                                     <span class="minus">-</span>
                                 </div>
                                 <div class="conta-two">
-                                    <p>Pte. conta SCAP</p>
-                                    <h1>{{getkAcPeCo(selectedBolsas.gbsiut, selectedBolsas.gbsict) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Pte. conta SCAP</p>
+                                    <h1 class="h1-style">{{getkAcPeCo(selectedBolsas.gbsiut, selectedBolsas.gbsict) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                                 <div class="conta-sign">
                                     <span class="equal">=</span>
                                 </div>
                                 <div class="conta-three">
-                                    <p>Disponible</p>
-                                    <h1>{{getkdispon(selectedBolsas.saldo, getkAcPeCo(selectedBolsas?.gbsiut, selectedBolsas?.gbsict)) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                    <p class="p-style">Disponible</p>
+                                    <h1 class="h1-style">{{getkdispon(selectedBolsas.saldo, getkAcPeCo(selectedBolsas?.gbsiut, selectedBolsas?.gbsict)) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="acumolados">
                         <div class="detail-title">
-                            <p>Acumulados</p>
+                            <p class="p-style">Acumulados</p>
                         </div>
                         <div class="detail-acumolados-container">
                             <div class="conta-one">
-                                <p>Gastado Total</p>
-                                <h1>{{selectedBolsas.gbsiut | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                <p class="p-style">Gastado Total</p>
+                                <h1 class="h1-style">{{selectedBolsas.gbsiut | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                             </div>
                             <div class="conta-sign">
                                 <span class="minus">-</span>
                             </div>
                             <div class="conta-two">
-                                <p>Contabilizaado Total</p>
-                                <h1>{{selectedBolsas.gbsict | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                <p class="p-style">Contabilizaado Total</p>
+                                <h1 class="h1-style">{{selectedBolsas.gbsict | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                             </div>
                             <div class="conta-sign">
                                 <span class="equal">=</span>
                             </div>
                             <div class="conta-three">
-                                <p>Pte. Contabilizar SCAP</p>
-                                <h1>{{getkAcPeCo(selectedBolsas.gbsiut, selectedBolsas.gbsict) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
+                                <p class="p-style">Pte. Contabilizar SCAP</p>
+                                <h1 class="h1-style">{{getkAcPeCo(selectedBolsas.gbsiut, selectedBolsas.gbsict) | currency:'EUR':'symbol':'1.2-2':'es-ES'}}</h1>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-<div class="facturas-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
@@ -6,7 +6,7 @@
     >
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="facturas-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Monitor de contabilización</h2>  
@@ -58,8 +58,8 @@
                         </div>
                     </div>
                     <div class="btns">
-                        <button type="button" class="search-button" (click)="search()">Buscar</button>
-                        <button type="button" class="search-btn" (click)="limpiarSearch()">Limpiar</button>
+                        <button type="button" class="purple-btn" (click)="search()">Buscar</button>
+                        <button type="button" class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -68,8 +68,8 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="DownloadPDF()">Exportar a PDF</button>
-                    <button class="download-btn" (click)="DownloadCSV()">Exportar a CSV</button>
+                    <button class="purple-btn" (click)="DownloadPDF()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="DownloadCSV()">Exportar a CSV</button>
                 </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
             </div>
             <div class="cont-btn">
                 <button 
-                    class="save-btn"
+                    class="purple-btn"
                     (click)="contabilizar()"
                     [disabled]="estadogc === null || estadogc > 0"
                 >
@@ -94,7 +94,7 @@
                 </button>
             </div>
         </div>
-        <p class="selected" *ngIf="caughtFacturas.length > 0">{{caughtFacturas.length}} Facturas seleccionados</p>
+        <p class="p-style" *ngIf="caughtFacturas.length > 0">{{caughtFacturas.length}} Facturas seleccionados</p>
         <h1 class="successBtn">{{filterfacturaSuccess}}</h1>
         <h1 class="errorBtn">{{filterFacturaMessage}}</h1>
         <div *ngIf="contabilizarResults.length > 0" class="results-container">
@@ -104,7 +104,7 @@
                 <span>Factura {{ result.facnum }}: {{ result.message }}</span>
             </div>
         </div>
-        <div class="facturas-list">
+        <div class="main-list">
             <div *ngIf="isContabilizando" class="loading-message">
                 <div class="spinner"></div>
                 <span>Contabilizando</span>
@@ -113,7 +113,7 @@
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="facturas-table">
+            <table class="main-table ft">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('facnum')">
@@ -233,8 +233,7 @@
                         <div class="title-detail">
                             <h3>Detalles del Factura</h3>
                         </div>
-                        <button class="guardar-btn" >✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button class="red-btn" (click)="closeDetails()">✖</button>
                     </div>
                     <div *ngIf="isUpdatingFactura" class="loading-message">
                         <div class="spinner"></div>
@@ -245,110 +244,110 @@
                     <div class="detail-container">
                         <div class="chunk-one">
                             <div class="left">
-                                <p>Núm. Reg.</p>
-                                <p>Núm.Factura:</p>
-                                <p>R.C.F:</p>
+                                <p class="p-style">Núm. Reg.</p>
+                                <p class="p-style">Núm.Factura:</p>
+                                <p class="p-style">R.C.F:</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facnum || '#'}}</h1>
-                                    <p>F.Contable</p>
-                                    <h1>{{selectedFacturas.facfco | date:'dd-MM-yyyy'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facnum || '#'}}</h1>
+                                    <p class="p-style">F.Contable</p>
+                                    <h1 class="h1-style">{{selectedFacturas.facfco | date:'dd-MM-yyyy'}}</h1>
                                 </div>
-                                <h1>{{selectedFacturas.facdoc || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.facdoc || '#'}}</h1>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facfac || '#'}}</h1>
-                                    <h1>{{selectedFacturas.facann || '#'}}</h1>
-                                    <h1>{{selectedFacturas.factdc || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facfac || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facann || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.factdc || '#'}}</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-two">
                             <div class="left">
-                                <p>Proveedor:</p>
-                                <p>NIF</p>
-                                <p>Fecha Factura</p>
+                                <p class="p-style">Proveedor:</p>
+                                <p class="p-style">NIF</p>
+                                <p class="p-style">Fecha Factura</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.tercod || '#'}}</h1>
-                                    <h1>{{selectedFacturas.ter_TERNOM || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.tercod || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.ter_TERNOM || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.ter_TERNIF || '#'}}</h1>
-                                    <p>C.Gestor</p>
-                                    <h1>{{selectedFacturas.cgecod || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.ter_TERNIF || '#'}}</h1>
+                                    <p class="p-style">C.Gestor</p>
+                                    <h1 class="h1-style">{{selectedFacturas.cgecod || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facdat | date:'dd-MM-yyyy'}}</h1>
-                                    <p>F.Registro</p>
-                                    <h1>{{selectedFacturas.facfre| date:'dd-MM-yyyy'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facdat | date:'dd-MM-yyyy'}}</h1>
+                                    <p class="p-style">F.Registro</p>
+                                    <h1 class="h1-style">{{selectedFacturas.facfre| date:'dd-MM-yyyy'}}</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-three special-chunk">
                             <div class="left special-needs gap">
-                                <p>Tipo de contrato</p>
-                                <p>Criterio de puntuación</p>
-                                <p>Procedimiento de contacto</p>
+                                <p class="p-style">Tipo de contrato</p>
+                                <p class="p-style">Criterio de puntuación</p>
+                                <p class="p-style">Procedimiento de contacto</p>
                             </div>
                             <div class="right moreGap">
-                                <h1>{{selectedFacturas.conctp || '#'}}</h1>
-                                <h1>{{selectedFacturas.concpr || '#'}}</h1>
-                                <h1>{{selectedFacturas.conccr || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.conctp || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.concpr || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.conccr || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-four">
                             <div class="left">
-                                <p>Forma de pago</p>
-                                <p>Ordinal de pago</p>     
+                                <p class="p-style">Forma de pago</p>
+                                <p class="p-style">Ordinal de pago</p>     
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facfpg}}</h1>
-                                    <p class="pagoFix">Tipo de pago</p>
-                                    <h1 class="pagoFix">{{selectedFacturas.factpg || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facfpg}}</h1>
+                                    <p class="p-style pagoFix">Tipo de pago</p>
+                                    <h1 class="h1-style pagoFix">{{selectedFacturas.factpg || '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas.facopg || '#'}}</h1>
-                                    <p>Cuenta Tercero</p>
-                                    <h1>{{selectedFacturas.facoct || '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas.facopg || '#'}}</h1>
+                                    <p class="p-style">Cuenta Tercero</p>
+                                    <h1 class="h1-style">{{selectedFacturas.facoct || '#'}}</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="chunk-five">
                             <div class="left moreGap">
-                                <p>Des.Fact/ADO:</p>
-                                <p>ADO</p>
+                                <p class="p-style">Des.Fact/ADO:</p>
+                                <p class="p-style">ADO</p>
                             </div>
                             <div class="right">
-                                <h1>{{selectedFacturas.factxt || '#'}}</h1>
-                                <h1>{{selectedFacturas.facado || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.factxt || '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas.facado || '#'}}</h1>
                             </div>
                         </div>
                         <div class="chunk-six">
                             <div class="left gap">
-                                <p>Total Factura</p>
-                                <p>Apl.diferencias</p>
-                                <p>Descuentos</p>
+                                <p class="p-style">Total Factura</p>
+                                <p class="p-style">Apl.diferencias</p>
+                                <p class="p-style">Descuentos</p>
                             </div>
                             <div class="right gap">
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas?.facimp ? (selectedFacturas.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
-                                    <p>Aplicado</p>
-                                    <h1>{{selectedFacturas?.faciec ? (selectedFacturas.faciec | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas?.facimp ? (selectedFacturas.facimp | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p class="p-style">Aplicado</p>
+                                    <h1 class="h1-style">{{selectedFacturas?.faciec ? (selectedFacturas.faciec | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                                 </div>
                                 <div class="on-two">
-                                    <h1>{{selectedFacturas?.facidi ? (selectedFacturas.facidi | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
-                                    <p>Pte.Apli</p>
-                                    <h1>{{getPendingApply(selectedFacturas) ? (getPendingApply(selectedFacturas) | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <h1 class="h1-style">{{selectedFacturas?.facidi ? (selectedFacturas.facidi | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                    <p class="p-style">Pte.Apli</p>
+                                    <h1 class="h1-style">{{getPendingApply(selectedFacturas) ? (getPendingApply(selectedFacturas) | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                                 </div>
-                                <h1>{{selectedFacturas?.facdto ? (selectedFacturas.facdto | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
+                                <h1 class="h1-style">{{selectedFacturas?.facdto ? (selectedFacturas.facdto | currency:'EUR':'symbol':'1.2-2':'es-ES') : '#'}}</h1>
                             </div>
                         </div>
                         <div class="observ">
-                            <p>Observaciones:</p>
-                            <h1>{{selectedFacturas.facobs || '#'}}</h1>
+                            <p class="p-style">Observaciones:</p>
+                            <h1 class="h1-style">{{selectedFacturas.facobs || '#'}}</h1>
                         </div>
                     </div>
                     <div class="more-detail-container">
@@ -409,13 +408,10 @@
                             <div class="detail-switch-second-content">
                                 <ng-container [ngSwitch]="albaranesOptio">
                                     <ng-container *ngSwitchCase="'albaranes'">
-                                        <div class="albaranes-btns">
-                                            <button class="save-btn" >+</button>
-                                        </div>
                                         <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
                                         <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
                                         <div class="detail-card">
-                                            <table class="albaranes-table width-last">
+                                            <table class="main-table alb width-last">
                                                 <thead>
                                                     <tr>
                                                         <th>Número albarán</th>
@@ -463,7 +459,7 @@
                                             <span>Cargando</span>
                                         </div>
                                         <div class="detail-card">
-                                            <table class="albaranes-table app">
+                                            <table class="main-table app">
                                                 <thead>
                                                     <tr>
                                                         <th><strong>Referencia</strong></th>
@@ -507,7 +503,7 @@
                                             <span>Cargando</span>
                                         </div>
                                         <div class="detail-card">
-                                            <table class="albaranes-table desc">
+                                            <table class="main-table desc">
                                                 <thead>
                                                     <tr>
                                                         <th>Área</th>

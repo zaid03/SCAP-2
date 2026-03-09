@@ -47,7 +47,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Ignorer complètement la sécurité pour les ressources statiques
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
@@ -90,7 +89,6 @@ public class SecurityConfig {
             .httpBasic(h -> h.disable())
             .formLogin(f -> f.disable());
 
-        System.out.println("Security filter chain configured with JWT.");
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

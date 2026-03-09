@@ -87,13 +87,6 @@ public class SicalService {
             "</par>"+
           "</e>";
 
-      System.out.println("=== USERNAME SENT: " + username);
-      System.out.println("=== PASSWORD (plain): " + password);
-      System.out.println("=== PASSWORD (SHA1): " + CryptoSical.encodeSha1Base64(password));
-      System.out.println("=== XML BEING SENT ===");
-      System.out.println(xml);
-      System.out.println("=== END XML ===");
-
       String soapEnvelope =
           "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
           "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:impl=\"http://desa-sical-ws:8080/services/Ci\">" +
@@ -114,10 +107,6 @@ public class SicalService {
 
       RestTemplate restTemplate = new RestTemplate();
       String responseXml = restTemplate.postForObject(wsUrl, request, String.class);
-
-      System.out.println("=== SICAL RAW RESPONSE ===");
-      System.out.println(responseXml);
-      System.out.println("=== END RESPONSE ===");
 
       return parseTerceros(responseXml);
   }

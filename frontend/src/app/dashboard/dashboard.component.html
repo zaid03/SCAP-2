@@ -12,7 +12,7 @@
             <p>{{ perfil }}</p>
           </div>
         </div>
-        <button class="deconn" (click)="logout()">Desconectarse</button>
+        <button class="purple-btn deconn" (click)="logout()">Desconectarse</button>
       </div>
 
       <div class="drop-down-menu">
@@ -114,23 +114,22 @@
           <a class="choice">Artículos</a>
           <div class="menu-content" [class.open]="articulos">
             <div class="menu-item">
-              <a class="acAFA" 
+              <a class="acAFA margin" 
                 [class.disabled]="isDisabled('acAFA')"
                 (click)="navigateTo('familia')"
               >Familias y subfamilias</a>
             </div>
           </div>
         </div>
+
         <div class="menu" (click)="temp = !temp" tabindex="0">
           <a class="choice">Tipos</a>
           <div class="menu-content" [class.open]="temp">
             <div class="menu-item">
               <a class="" 
-                
                 (click)="navigateTo('almacenaje')"
               >Tipos de almacenaje</a>
               <a class="margin" 
-                
                 (click)="navigateTo('unidades')"
               >tipos de unidades</a>
             </div>
@@ -167,7 +166,7 @@
             <p>{{eje}}</p>
             <div class="on-wo">
               <p>{{cge}}</p>
-              <button class="cge-btn" (click)="goToCge()">Cambiar Centro Gestor</button>
+              <button class="purple-btn" (click)="goToCge()">Cambiar Centro Gestor</button>
             </div>
           </div>
         </div>
@@ -189,7 +188,7 @@
               (click)="$event.preventDefault()"
             ><span class="color-text"> Contable</span><br>
           </div>
-          <div class="services-btn" (click)="launchAddCentroGestor()">Ver Servicios de la Persona</div>
+          <div class="purple-btn services-fix" (click)="launchAddCentroGestor()">Ver Servicios de la Persona</div>
         </div>
       </div>
     <p class="status">{{centroGestorStatus}}</p>

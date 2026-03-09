@@ -17,7 +17,7 @@
           <p>{{ perfil }}</p>
         </div>
       </div>
-      <button (click)="logout()">Desconectarse</button>
+      <button class="purple-btn" (click)="logout()">Desconectarse</button>
     </div>
 
     <a class="choice" (click)="navigateTo('panel')">Panel Principal</a>
@@ -118,26 +118,25 @@
       </div>
 
       <div class="menu" (click)="articulos = !articulos" tabindex="0">
-        <a class="choice">Artícilos</a>
+        <a class="choice">Artículos</a>
         <div class="menu-content" [class.open]="articulos">
           <div class="menu-item">
-            <a class="acAFA margin" 
+            <a class="acAFA" 
               [class.disabled]="isDisabled('acAFA')"
               (click)="navigateTo('familia')"
             >Familias y subfamilias</a>
           </div>
         </div>
       </div>
+
       <div class="menu" (click)="temp = !temp" tabindex="0">
         <a class="choice">Tipos</a>
         <div class="menu-content" [class.open]="temp">
           <div class="menu-item">
             <a class="" 
-              
               (click)="navigateTo('almacenaje')"
             >Tipos de almacenaje</a>
             <a class="margin" 
-              
               (click)="navigateTo('unidades')"
             >tipos de unidades</a>
           </div>

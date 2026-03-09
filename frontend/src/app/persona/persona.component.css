@@ -1,10 +1,10 @@
 /* search */
 .search-container {gap: 10px;}
 /* search */
-.personas-table thead th:first-child {width: 110px;}
-.personas-table thead th:nth-child(2),
-.personas-table thead th:nth-child(3),
-.personas-table thead th:last-child {min-width: 200px;}
+.main-table thead th:first-child {width: 110px;}
+.main-table thead th:nth-child(2),
+.main-table thead th:nth-child(3),
+.main-table thead th:last-child {min-width: 200px;}
 /* search */
 /* detail grid */
 .detail-cotainer {display: flex; flex-direction: column; flex-wrap: wrap; gap: 10px;}
@@ -14,17 +14,17 @@
 .left,
 .right {display: flex; flex-direction: column; }
 .left {width: 25%; gap: 20px;}
-.right {width: 75%; gap: 16px;}
+.right {width: 75%; gap: 20px;}
 .on-two {display: flex; align-items: center; gap: 10px;}
 .average {width: 165px; max-width: 180px;}
 .long { width: 400px; max-width: 430px;}
 .height {height: 50px !important;}
 /* detail grid */
 /* services grid in detail */
-.servicesPersona-table { width: 90%;}
-.servicesPersona-table thead th:first-child,
-.servicesPersona-table thead th:last-child {width: 20%;}
-.servicesPersona-table tbody td:last-child {text-align: center;}
+.custom-grid-modal .main-table { width: 90%;}
+.custom-grid-modal .main-table thead th:first-child,
+.custom-grid-modal .main-table thead th:last-child {width: 20%;}
+.custom-grid-modal .main-table tbody td:last-child {text-align: center;}
 .margin { margin-top: 10px;}
 /* services grid in detail */
 /* add persona grid */  
@@ -43,10 +43,11 @@
 /* delete grid */
 .delete-confirm-modal {top: 35%;}
 .delete-content { display: flex; width: 99%; justify-content: center; gap: 10px; align-items: center; font-size: 19px; margin-bottom: 10px;}
-.delete-confirm-modal .save-btn { margin-left: 10px;}
+.delete-confirm-modal .red-btn { margin-right: 10px;}
 /* delete grid */
 /* add service grid */
 .proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 95%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 4000; display: flex; flex-direction: column; gap: 12px;}
+.proveedor-grid-modal .title {width: 70%;}
 .proveedor-grid-modal .search-holder,
 .placement .search-holder {width: 100%;}
 .proveedor-grid-modal .search-container,
@@ -57,10 +58,10 @@
 .search-form select { padding: 4px 6px; border-radius: 20px; border: 1px solid #bbb; font-size: 15px; transition: border 0.2s, box-shadow 0.2s; outline: none; box-shadow: 0 1px 4px rgba(56,36,155,0.04); }
 .search-form option { outline: none; font-weight: bold;}
 .fixing-pag {display: flex; justify-content: center;}
-.services-table tbody td:nth-child(7), 
-.services-table tbody td:nth-child(6),
-.services-table tbody td:nth-child(5) { text-align: center; }
-.services-table tbody td input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
+.proveedor-grid-modal .main-table tbody td:nth-child(7), 
+.proveedor-grid-modal .main-table tbody td:nth-child(6),
+.proveedor-grid-modal .main-table tbody td:nth-child(5) { text-align: center; }
+.proveedor-grid-modal .main-table tbody td input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
 .selected-row {background-color: rgba(28, 93, 140, 0.2);}
 /* add service grid */
 /* copiar grids */
@@ -70,7 +71,7 @@
 .placementCopy {width: 45%; }
 .placement {top: 35%;}
 .placementCopy .search-form {width: 50% !important;}
-.placementCopy .personas-table {margin-top: 10px;}
+.placementCopy .main-table {margin-top: 10px;}
 .pag {width: 100%; display: flex; justify-content: center;}
 .save-btn.disabled {background-color: #ccc; cursor: not-allowed; color: #e5e7eb;}
 /* copiar grids */

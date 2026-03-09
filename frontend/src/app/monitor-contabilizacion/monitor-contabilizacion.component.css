@@ -15,8 +15,8 @@
 .successBtn { margin-top: 5px; }
 /* search container and inputs */
 /* table style */
-.facturas-table tbody td:nth-child(6),
-.detail-grid .albaranes-table tbody td:nth-child(4),
+.ft tbody td:nth-child(6),
+.detail-grid .alb tbody td:nth-child(4),
 .app tbody td:nth-child(3),
 .desc tbody td:nth-child(5),
 .desc tbody td:nth-child(7) { text-align: right; }
@@ -55,7 +55,7 @@
 /* main-detail grid */
 /* sub detail grids */
 .detail-grid { display: flex; flex-direction: column; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); padding: 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f9fafb; }
-.albaranes-table { width: 100%; }
+.alb { width: 100%; }
 .alignment {justify-content: center;}
 .albaranes-btns {display: flex; justify-content: center; align-items: center; justify-content: center;}
 /* sub detail grids */

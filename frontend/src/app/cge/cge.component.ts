@@ -129,14 +129,14 @@ export class CgeComponent {
   }
 
   setCgecic(value: number): void {
-    if (!this.selectedCentroGestor) {
+    if (!this.tempCentroGestor) {
       return;
     }
-    this.selectedCentroGestor.cgecic = value;
+    this.tempCentroGestor.cgecic = value;
   }
 
   isCgecic(value: number): boolean {
-    return (this.selectedCentroGestor?.cgecic ?? null) === value;
+    return (this.tempCentroGestor?.cgecic ?? null) === value;
   }
 
   SearchDownMessageError: string = '';
@@ -264,7 +264,7 @@ export class CgeComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.centroGestor-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -373,9 +373,12 @@ export class CgeComponent {
   selectedCentroGestor: any = null;
   centroGestorSuccessMessage: String = '';
   centroGestorErrorMessage: string = '';
+  tempCentroGestor: any = {};
   showDetails(centroGestor: any) {
     this.limpiarMessages();
     this.selectedCentroGestor = centroGestor;
+    this.tempCentroGestor = { ...centroGestor };
+    this.isUpdate = false;
   }
 
   closeDetails() {
@@ -383,16 +386,47 @@ export class CgeComponent {
     this.limpiarMessages();
   }
 
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.selectedCentroGestor ? { ...this.selectedCentroGestor } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempCentroGestor = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(cge: string, des: string, org: string, fun: string, dat: string) {
+    if (this.allowToUpdate) {
+      this.updateCentroGestor(cge, des, org, fun, dat);
+    } else {
+      return;
+    }
+  }
+
   isUpdating: boolean = false;
   updateCentroGestor(cge: string, des: string, org: string, fun: string, dat: string) {
     this.isUpdating = true;
     this.limpiarMessages();
+    Object.assign(this.selectedCentroGestor, this.tempCentroGestor);
     const payload = {
       cgedes: des,
       cgeorg: org,
       cgefun: fun,
       cgedat: dat,
-      cgecic: this.selectedCentroGestor.cgecic
+      cgecic: this.tempCentroGestor.cgecic
     }
 
     if (!org || !fun) {
@@ -402,6 +436,7 @@ export class CgeComponent {
 
     this.http.patch<any>(`${environment.backendUrl}/api/cge/update-cge/${this.entcod}/${this.eje}/${cge}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.centroGestorSuccessMessage = 'Centro gestor actualizado con éxito';
         this.isUpdating = false;
       }, 
@@ -416,8 +451,8 @@ export class CgeComponent {
   allowOnlyDigits(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
     target.value = target.value.replace(/[^0-9]/g, '');
-    if (this.selectedCentroGestor) {
-      this.selectedCentroGestor.cgefun = target.value;
+    if (this.tempCentroGestor) {
+      this.tempCentroGestor.cgefun = target.value;
     }
   }
 
@@ -492,12 +527,14 @@ export class CgeComponent {
   isAdding: boolean = false;
   AddCentroGestor(cod: string, org: string, fun: string, des: string,  dat: string) {
     this.limpiarMessages();
-    this.isAdding = true;
 
     if (!cod || !des) {
       this.centroGestorAddError = 'Se requieren codigo y descripción'
       return;
     }
+    
+    this.isAdding = true;
+
     const payload = {
       "ent" : this.entcod,
       "eje" : this.eje,

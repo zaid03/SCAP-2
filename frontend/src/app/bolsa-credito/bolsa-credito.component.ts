@@ -242,7 +242,7 @@ export class BolsaCreditoComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.credito-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -445,25 +445,32 @@ export class BolsaCreditoComponent {
 
   //main detail grid functions
   selectedBolsas: any = null;
-  showDetails(factura: any) {
+  showDetails(bolsa: any) {
     this.limpiarMessages();
     this.guardarisSuccess = false;
-    this.selectedBolsas = { ...factura };
-    if (this.selectedBolsas.gbsimp !== undefined && this.selectedBolsas.gbsimp !== null) {
+
+    this.selectedBolsas = { ...bolsa };
+    this.tempBolsa = { ...bolsa };
+
+    if ((this.selectedBolsas.gbsimp !== undefined && this.selectedBolsas.gbsimp !== null) || (this.tempBolsa.gbsimp !== undefined && this.tempBolsa.gbsimp !== null)) {
       let num = this.parseMoney(this.selectedBolsas.gbsimp);
-      if (!isNaN(num)) {
+      let numB = this.parseMoney(this.tempBolsa.gbsimp);
+      if ((!isNaN(num)) || (!isNaN(numB))) {
         this.selectedBolsas.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        this.tempBolsa.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
       }
     }
-    if (this.selectedBolsas.gbsibg !== undefined && this.selectedBolsas.gbsibg !== null) {
+    if ((this.selectedBolsas.gbsibg !== undefined && this.selectedBolsas.gbsibg !== null) || (this.tempBolsa.gbsibg !== undefined && this.tempBolsa.gbsibg !== null)) {
       let num = this.parseMoney(this.selectedBolsas.gbsibg);
-      if (!isNaN(num)) {
+      let numB = this.parseMoney(this.tempBolsa.gbsibg);
+      if ((!isNaN(num)) || (!isNaN(numB))) {
         this.selectedBolsas.gbsibg = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+        this.tempBolsa.gbsibg = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
       }
     }
-    const org = factura?.gbsorg ?? '';
-    const fun = factura?.gbsfun ?? '';
-    const eco = factura?.gbseco ?? '';
+    const org = bolsa?.gbsorg ?? '';
+    const fun = bolsa?.gbsfun ?? '';
+    const eco = bolsa?.gbseco ?? '';
     this.bolsaCombo = `${org} - ${fun} - ${eco}`;
   }
 
@@ -480,6 +487,10 @@ export class BolsaCreditoComponent {
   closeDetails() {
     this.limpiarMessages();
     this.selectedBolsas = null;
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
   }
 
   public getkCGECIC(cgecic: any): string {
@@ -531,32 +542,61 @@ export class BolsaCreditoComponent {
   }
 
   formatGbsimp() {
-    if (!this.selectedBolsas || this.selectedBolsas.gbsimp === undefined || this.selectedBolsas.gbsimp === null) return;
-    let value = String(this.selectedBolsas.gbsimp)
+    if (!this.tempBolsa || this.tempBolsa.gbsimp === undefined || this.tempBolsa.gbsimp === null) return;
+    let valueB = String(this.tempBolsa.gbsimp)
       .replace(/\s/g, '')
       .replace(/\./g, '')     
       .replace(',', '.')       
       .replace(/[^\d.-]/g, '');
-    let num = parseFloat(value);
-    if (!isNaN(num)) {
-      this.selectedBolsas.gbsimp = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+    let numB = parseFloat(valueB);
+    if (!isNaN(numB)) {
+      this.tempBolsa.gbsimp = numB.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
     }
   }
   formateGbsibg() {
-    if (!this.selectedBolsas || this.selectedBolsas.gbsibg === undefined || this.selectedBolsas.gbsibg === null) return;
-    let value = String(this.selectedBolsas.gbsibg)
+    if (!this.tempBolsa || this.tempBolsa.gbsibg === undefined || this.tempBolsa.gbsibg === null) return;
+    let valueB = String(this.tempBolsa.gbsibg)
       .replace(/\s/g, '')
       .replace(/\./g, '')     
       .replace(',', '.')       
       .replace(/[^\d.-]/g, '');
-    let num = parseFloat(value);
-    if (!isNaN(num)) {
-      this.selectedBolsas.gbsibg = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+    let numB = parseFloat(valueB);
+    if (!isNaN(numB)) {
+      this.tempBolsa.gbsibg = numB.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
     }
   }
 
   cleaningCurrency(value: any) {
     return this.parseMoney(value);
+  }
+
+  tempBolsa: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.tempBolsa ? { ...this.tempBolsa } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempBolsa = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed(gbsimp: any, getkAcPeCo:any, gbsref: any, gbsibg: string) {
+    this.limpiarMessages();
+    if (this.allowToUpdate) {
+      this.updateGbsimp(gbsimp, getkAcPeCo, gbsref);
+      this.updateGbsibg(gbsibg);
+    } else {
+      return;
+    }
   }
 
   isUpdating: boolean = false;
@@ -567,7 +607,7 @@ export class BolsaCreditoComponent {
   updateGbsimp(gbsimp: any, getkAcPeCo:any, gbsref: any) {
     if(this.gbsimpTouched) {
       this.isUpdating = true;
-      this.limpiarMessages();
+      Object.assign(this.selectedBolsas, this.tempBolsa);
 
       const parsedValue = this.cleaningCurrency(gbsimp);
       if ( parsedValue > getkAcPeCo) {
@@ -576,6 +616,7 @@ export class BolsaCreditoComponent {
         return;
       }
 
+    
       const today = new Date();
       const payload = {
         GBSIMP: parsedValue,
@@ -587,6 +628,7 @@ export class BolsaCreditoComponent {
       this.http.patch<void>(`${environment.backendUrl}/api/gbs/${this.entcod}/${this.eje}/${this.cge}/${gbsref}`, payload)
       .subscribe({
         next: () => {
+          this.updateSuccess();
           this.guardarMesageSuccess = 'Bolsa actualizada correctamente';
           this.isUpdating = false;
         },
@@ -604,11 +646,11 @@ export class BolsaCreditoComponent {
   gbsIbg() {
     this.gbsibgTouched = true;
   }
-
   updateGbsibg(gbsibg: string) {
     if(this.gbsibgTouched) {
       this.isUpdating = true;
-      this.limpiarMessages();
+
+      Object.assign(this.selectedBolsas, this.tempBolsa);
 
       const parsedValue = this.cleaningCurrency(gbsibg);
       const referencia = this.selectedBolsas.gbsref;
@@ -619,6 +661,7 @@ export class BolsaCreditoComponent {
 
       this.http.patch(`${environment.backendUrl}/api/gbs/update-gbsibg/${this.entcod}/${this.eje}/${this.cge}/${referencia}`, payload).subscribe({
         next: (res) => {
+          this.updateSuccess();
           this.guardarMesageSuccess = 'Bolsa actualizada correctamente';
           this.isUpdating = false;
         },
