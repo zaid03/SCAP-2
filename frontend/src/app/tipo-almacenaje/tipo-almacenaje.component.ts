@@ -143,7 +143,7 @@ export class TipoAlmacenajeComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.ejercicio-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -281,6 +281,7 @@ export class TipoAlmacenajeComponent {
   openDetail(p: any) {
     this.limpiarMessages();
     this.selectedAlmacenaje = p;
+    this.tempAlmacenaje = {...p}
     this.almacenajeDetail = true;
   }
 
@@ -290,9 +291,43 @@ export class TipoAlmacenajeComponent {
     this.selectedAlmacenaje = [];
   }
 
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  tempAlmacenaje: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+    this.backupData = this.selectedAlmacenaje ? { ...this.selectedAlmacenaje } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempAlmacenaje = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed() {
+    if (this.allowToUpdate) {
+      this.updateAlmacenaje();
+    } else {
+      return;
+    }
+  }
+
   updateAlmacenaje() {
     this.limpiarMessages();
     this.isUpdatingAlmacenaje = true;
+
+    Object.assign(this.selectedAlmacenaje, this.tempAlmacenaje);
 
     const mtacod = this.selectedAlmacenaje.mtacod
     const payload = {
@@ -301,6 +336,7 @@ export class TipoAlmacenajeComponent {
 
     this.http.patch(`${environment.backendUrl}/api/mta/update-almacenaje/${this.entcod}/${mtacod}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.isUpdatingAlmacenaje = false;
         this.almacenajeDetailSuccess = 'tipo de almacenaje se ha actualizado correctamente';
       },

@@ -1,4 +1,4 @@
-<div class="almacenaje-page">
+<div class="main-page">
     <div 
         class="sidebar-backdrop" 
         *ngIf="!sidebar.collapsed" 
@@ -6,7 +6,7 @@
     >
     </div>
     <app-sidebar #sidebar></app-sidebar>
-    <div class="almacenaje-container" [class.blurred]="!sidebar.collapsed">
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
                 <h2 class="margin-title">Mantenimiento de tipos de almacenaje</h2>  
@@ -22,8 +22,8 @@
                         >
                     </div>
                     <div class="btns">
-                        <button class="search-btn" (click)="search()">Buscar</button>
-                        <button class="search-btn" (click)="limpiarSearch()">Limpiar</button>
+                        <button class="purple-btn" (click)="search()">Buscar</button>
+                        <button class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -32,21 +32,21 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="download-btn" (click)="excelDownload()">Exportar a Excel</button>
-                    <button class="print-btn" (click)="pdfDownload()">Exportar a PDF</button>
-                    <button class="add-btn" (click)="openAddAlmacenaje()">Añadir</button>
+                    <button class="purple-btn" (click)="excelDownload()">Exportar a Excel</button>
+                    <button class="purple-btn" (click)="pdfDownload()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="openAddAlmacenaje()">Añadir</button>
                 
                 </div>
             </div>
         </div>
-        <div class="services-list">
+        <div class="main-list">
             <h1 class="successBtn">{{almacenajesSuccess}}</h1>
             <h1 class="errorBtn">{{almacenajesError}}</h1>
              <div *ngIf="isLoadingAlmacenajes" class="loading-message">
                 <div class="spinner"></div>
                 <span>Cargando</span>
             </div>
-            <table class="ejercicio-table">
+            <table class="main-table">
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('mtacod')">
@@ -85,15 +85,19 @@
                 <span>de {{ totalPages }}</span>
                 <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
             </div>
-            <div class="modal-backdrop" *ngIf="almacenajeDetail" (click)="closeDetails()"></div>
+            <div class="modal-backdrop" *ngIf="almacenajeDetail" (click)="closeDetailsSure()"></div>
             <div class="display">
                 <div class="modal" *ngIf="almacenajeDetail">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles de tipo de almacenaje</h3>
                         </div>
-                        <button class="guardar-btn" (click)="updateAlmacenaje()">✔</button>
-                        <button class="close-btn-btn" (click)="closeDetails()">✖</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="closeDetails()"
+                        >✖</button>
                     </div>
                     <h1 class="errorBtn">{{almacenajeDetailError}}</h1>
                     <h1 class="successBtn">{{almacenajeDetailSuccess}}</h1>
@@ -104,22 +108,46 @@
                     <div class="detail-container">
                         <div class="chunk">
                             <div class="left center">
-                                <p>código</p>
+                                <p class="p-style">código</p>
                             </div>
                             <div class="right">
                                 <div class="on-two">
-                                    <h1>{{selectedAlmacenaje.mtacod || '#'}}</h1>
-                                    <p>Descripción*</p>
+                                    <h1 class="h1-style">{{tempAlmacenaje.mtacod || '#'}}</h1>
+                                    <p class="p-style">Descripción*</p>
                                     <textarea 
-                                        class="tallText" 
-                                        [(ngModel)]="selectedAlmacenaje.mtades"
+                                        class="textArea-style tallText" 
+                                        [(ngModel)]="tempAlmacenaje.mtades"
+                                        [disabled]="!isUpdate"
+                                        (input)="allowToUpdate = true"
                                     ></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="btns">
-                        <button class="delete-btn" (click)="openDelete()">-</button>
+                        <button 
+                            class="red-btn" 
+                            *ngIf="isUpdate" 
+                            (click)="cancelar()"
+                        >Cancelar</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+                            *ngIf="!isUpdate" 
+                            (click)="modificar()"
+                        >Modificar</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="!isUpdate" 
+	                        *ngIf="isUpdate" 
+                            (click)="isUpdateAllowed()"
+                        >Guardar</button>
+                        <button 
+                            class="red-btn"
+                            disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="openDelete()"
+                        >Borrar</button>
                     </div>
                 </div>
             </div>
@@ -137,21 +165,21 @@
         </div>
     </div>
     <div class="items-to-delete">
-        <p class="descDelete">{{selectedAlmacenaje.mtades}}</p>
+        <p>{{selectedAlmacenaje.mtades}}</p>
     </div>
     <h1 class="errorBtn">{{deleteMessageError}}</h1>
-    <button class="delete-btn" (click)="confirmDelete()">-</button>
-    <button class="save-btn margin" (click)="closeDelete()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">-</button>
+    <button class="purple-btn margin" (click)="closeDelete()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addAlmacenajeGrid" (click)="closeAddAlmacenaje()"></div>
 <div class="coste-modal" *ngIf="addAlmacenajeGrid">
     <div class="btns">
         <div class="title">
-            <p>Añadir tipo de almacenaje</p>
+            <h3>Añadir tipo de almacenaje</h3>
         </div>
-        <button class="save-btn" (click)="confirmAdd(desc.value)">✔</button>
-        <button class="close-btn-btn" (click)="closeAddAlmacenaje()">✖</button>
+        <button class="purple-btn" (click)="confirmAdd(desc.value)">✔</button>
+        <button class="red-btn" (click)="closeAddAlmacenaje()">✖</button>
     </div>
     <h1 class="errorBtn">{{addAlmacenajeError}}</h1>
     <div *ngIf="isAddingAlmacenaje" class="loading-message">
@@ -159,9 +187,9 @@
         <span>añadiendo</span>
     </div>
     <div class="add-container">
-        <p>Descripción*</p>
+        <p class="p-style">Descripción*</p>
         <textarea 
-            class="areaWidth" 
+            class="textArea-style areaWidth" 
             #desc
         ></textarea>
     </div>

@@ -280,7 +280,7 @@ export class TiposUnidadesComponent {
   openDetail(p: any) {
     this.limpiarMessages();
     this.selectedUnidad = p;
-    this.tempUnidad = p;
+    this.tempUnidad = {...p};
     this.unidadDetail = true;
   }
 
@@ -315,7 +315,6 @@ export class TiposUnidadesComponent {
 
   allowToUpdate: boolean = false;
   isUpdateAllowed() {
-    console.log(this.allowToUpdate)
     if (this.allowToUpdate) {
       this.updateUnidad();
     } else {
