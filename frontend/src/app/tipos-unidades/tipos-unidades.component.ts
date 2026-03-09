@@ -143,7 +143,7 @@ export class TiposUnidadesComponent {
 
   onResizeMove = (event: MouseEvent) => {
     if (this.resizingColIndex === null) return;
-    const table = document.querySelector('.ejercicio-table') as HTMLTableElement;
+    const table = document.querySelector('.main-table') as HTMLTableElement;
     if (!table) return;
     const th = table.querySelectorAll('th')[this.resizingColIndex] as HTMLElement;
     if (!th) return;
@@ -280,6 +280,7 @@ export class TiposUnidadesComponent {
   openDetail(p: any) {
     this.limpiarMessages();
     this.selectedUnidad = p;
+    this.tempUnidad = p;
     this.unidadDetail = true;
   }
 
@@ -289,9 +290,44 @@ export class TiposUnidadesComponent {
     this.selectedUnidad = [];
   }
 
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  tempUnidad: any = {};
+  isUpdate: boolean = false;
+  backupData: any = [];
+  modificar() {
+    this.isUpdate = true;
+      this.backupData = this.selectedUnidad ? { ...this.selectedUnidad } : {};
+  }
+
+  cancelar() {
+    this.isUpdate = false;
+    this.tempUnidad = { ...this.backupData };
+  }
+
+  updateSuccess() {
+    this.isUpdate = false;
+    this.allowToUpdate = false;
+  }
+
+
+  allowToUpdate: boolean = false;
+  isUpdateAllowed() {
+    console.log(this.allowToUpdate)
+    if (this.allowToUpdate) {
+      this.updateUnidad();
+    } else {
+      return;
+    }
+  }
+
   updateUnidad() {
     this.limpiarMessages();
     this.isUpdatingUnidad = true;
+
+    Object.assign(this.selectedUnidad, this.tempUnidad);
 
     const auncod = this.selectedUnidad.auncod
     const aundes = this.selectedUnidad.aundes
@@ -303,6 +339,7 @@ export class TiposUnidadesComponent {
 
     this.http.patch(`${environment.backendUrl}/api/aun/update-unidad/${this.entcod}/${auncod}`, payload).subscribe({
       next: (res) => {
+        this.updateSuccess();
         this.isUpdatingUnidad = false;
         this.unidadDetailSuccess = 'tipo de almacenaje se ha actualizado correctamente';
       },

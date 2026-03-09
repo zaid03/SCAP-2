@@ -7,8 +7,8 @@
 .search-container .btns {width: 25%;}
 /* search */
 /* main table */
-.services-list {width: 50%;}
-.services-list thead th:first-child { width: 25%; }
+.main-list {width: 50%;}
+.main-list thead th:first-child { width: 25%; }
 /* main table */
 /* detail grid */
 .modal{ width: 65%;}
