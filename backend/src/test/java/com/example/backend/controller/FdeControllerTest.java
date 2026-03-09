@@ -4,6 +4,7 @@ import com.example.backend.config.TestSecurityConfig;
 import com.example.backend.config.TestExceptionHandler;
 import com.example.backend.sqlserver2.model.Fde;
 import com.example.backend.sqlserver2.repository.FdeRepository;
+import com.example.backend.sqlserver2.repository.FacRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +19,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,6 +36,9 @@ public class FdeControllerTest {
 
     @MockitoBean
     private FdeRepository fdeRepository;
+
+    @MockitoBean
+    private FacRepository facRepository;
 
     @Test
     void getFde_returnsListWhenFound() throws Exception {

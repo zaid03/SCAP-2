@@ -132,7 +132,6 @@ public class AfaControllerTest {
         verify(afaRepository).save(cap.capture());
         assertEquals("new", cap.getValue().getAFADES());
 
-        // missing field -> bad request
         Map<String,Object> bad = Map.of();
         mockMvc.perform(patch("/api/afa/update-familia/1/AF1")
                 .contentType(MediaType.APPLICATION_JSON)

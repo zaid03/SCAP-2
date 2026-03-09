@@ -48,7 +48,6 @@ public class PuaControllerTest {
     @Test
     void shouldReturnOkWithResults() throws Exception {
         Pua p = new Pua();
-        // set some fields if needed (optional)
         when(puaRepository.findByUSUCODAndAPLCOD("user1", 7)).thenReturn(List.of(p));
 
         mockMvc.perform(get("/api/pua/filter/user1")

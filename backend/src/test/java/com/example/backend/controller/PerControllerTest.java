@@ -125,7 +125,7 @@ public class PerControllerTest {
 
     @Test
     void shouldInsertPersona_returns400WhenMissingFields() throws Exception {
-        Map<String,Object> payload = Map.of("PERCOD", "P1"); // missing PERNOM
+        Map<String,Object> payload = Map.of("PERCOD", "P1"); 
 
         mockMvc.perform(post("/api/Per/Insert-persona")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -179,7 +179,7 @@ public class PerControllerTest {
 
     @Test
     void shouldUpdatePersona_returns400WhenMissingFields() throws Exception {
-        Map<String,Object> payload = Map.of("PERCOD", "P2"); // missing PERNOM
+        Map<String,Object> payload = Map.of("PERCOD", "P2"); 
 
         mockMvc.perform(patch("/api/Per/update-persona")
                 .contentType(MediaType.APPLICATION_JSON)

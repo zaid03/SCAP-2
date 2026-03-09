@@ -4,6 +4,9 @@ import com.example.backend.config.TestSecurityConfig;
 import com.example.backend.config.TestExceptionHandler;
 import com.example.backend.sqlserver2.model.Alb;
 import com.example.backend.sqlserver2.repository.AlbRepository;
+import com.example.backend.sqlserver2.repository.FacRepository;
+import com.example.backend.sqlserver2.repository.AdeRepository;
+import com.example.backend.sqlserver2.repository.FdeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,7 +16,6 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.List;
 
@@ -35,6 +37,15 @@ public class AlbControllerTest {
 
     @MockitoBean
     private AlbRepository albRepository;
+
+    @MockitoBean
+    private FacRepository facRepository;
+
+    @MockitoBean
+    private AdeRepository adeRepository;
+
+    @MockitoBean
+    private FdeRepository fdeRepository;
 
     @Test
     void getAlbaranesByFactura_returns200WithList() throws Exception {

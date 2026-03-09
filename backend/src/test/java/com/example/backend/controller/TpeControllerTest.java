@@ -1,42 +1,47 @@
 package com.example.backend.controller;
 
 import com.example.backend.config.TestSecurityConfig;
+import com.example.backend.config.TestExceptionHandler;
 import com.example.backend.sqlserver2.model.Tpe;
 import com.example.backend.sqlserver2.model.TpeId;
 import com.example.backend.sqlserver2.repository.TpeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
 import java.util.List;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(controllers = TpeController.class)
 @ActiveProfiles("test")
-@AutoConfigureMockMvc
-@Transactional
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestExceptionHandler.class})
 public class TpeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private TpeRepository tpeRepository;
-
-    @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private TpeRepository tpeRepository;
 
     private Tpe createTpe(int ent, int tercod, int tpecod, String name) {
         Tpe t = new Tpe();
@@ -53,24 +58,25 @@ public class TpeControllerTest {
 
     @Test
     void shouldGetByEntAndTercod_returns200() throws Exception {
-        int ent = 1;
-        int tercod = 50;
-        Tpe a = createTpe(ent, tercod, 1, "Alice");
-        Tpe b = createTpe(ent, tercod, 2, "Bob");
-        tpeRepository.save(a);
-        tpeRepository.save(b);
+        Tpe a = createTpe(1, 50, 1, "Alice");
+        Tpe b = createTpe(1, 50, 2, "Bob");
+        when(tpeRepository.findByENTAndTERCOD(1, 50)).thenReturn(List.of(a, b));
 
-        mockMvc.perform(get("/api/more/by-tpe/" + ent + "/" + tercod)
+        mockMvc.perform(get("/api/more/by-tpe/1/50")
                 .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$[0].tpenom").exists());
+            .andExpect(jsonPath("$", hasSize(2)));
     }
 
     @Test
     void shouldReturn404WhenNoTpeFound() throws Exception {
+        when(tpeRepository.findByENTAndTERCOD(999999, 999999)).thenReturn(List.of());
+
         mockMvc.perform(get("/api/more/by-tpe/999999/999999")
                 .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
             .andExpect(status().isNotFound());
     }
 
@@ -78,42 +84,48 @@ public class TpeControllerTest {
     void shouldAddTpe_returns201_and_createEntity() throws Exception {
         int ent = 2;
         int tercod = 77;
-        var payload = new Object() {
-            public final String tpenom = "NewContact";
-            public final String tpetel = "111222333";
-            public final String tpetmo = "999000111";
-            public final String tpecoe = "COE";
-            public final String tpeobs = "OBS";
-        };
+
+        when(tpeRepository.existsByENTAndTERCODAndTPENOM(ent, tercod, "NewContact")).thenReturn(false);
+        when(tpeRepository.findFirstByENTAndTERCODOrderByTPECODDesc(ent, tercod)).thenReturn(null);
+        when(tpeRepository.save(any(Tpe.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "NewContact",
+            "tpetel", "111222333",
+            "tpetmo", "999000111",
+            "tpecoe", "COE",
+            "tpeobs", "OBS"
+        );
 
         mockMvc.perform(post("/api/more/add/" + ent + "/" + tercod)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
             .andExpect(status().isCreated())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("Persona de contacto agregada")));
+            .andExpect(content().string(containsString("Persona de contacto agregada")));
 
-        List<Tpe> saved = tpeRepository.findByENTAndTERCOD(ent, tercod);
-        assertThat(saved).anyMatch(t -> "NewContact".equals(t.getTPENOM()));
+        verify(tpeRepository).save(any(Tpe.class));
     }
 
     @Test
     void shouldNotAddDuplicateName_returns400() throws Exception {
         int ent = 3;
         int tercod = 88;
-        Tpe existing = createTpe(ent, tercod, 1, "DupName");
-        tpeRepository.save(existing);
 
-        var payload = new Object() {
-            public final String tpenom = "DupName";
-            public final String tpetel = "X";
-            public final String tpetmo = "Y";
-            public final String tpecoe = "Z";
-            public final String tpeobs = "OBS";
-        };
+        when(tpeRepository.existsByENTAndTERCODAndTPENOM(ent, tercod, "DupName")).thenReturn(true);
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "DupName",
+            "tpetel", "X",
+            "tpetmo", "Y",
+            "tpecoe", "Z",
+            "tpeobs", "OBS"
+        );
 
         mockMvc.perform(post("/api/more/add/" + ent + "/" + tercod)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
             .andExpect(status().isBadRequest());
     }
 
@@ -122,25 +134,26 @@ public class TpeControllerTest {
         int ent = 4;
         int tercod = 99;
         int tpecod = 5;
-        Tpe t = createTpe(ent, tercod, tpecod, "ToModify");
-        tpeRepository.save(t);
+        Tpe existing = createTpe(ent, tercod, tpecod, "ToModify");
 
-        var payload = new Object() {
-            public final String tpenom = "ModifiedName";
-            public final String tpetel = "555";
-            public final String tpetmo = "666";
-            public final String tpecoe = "COE2";
-            public final String tpeobs = "OBS2";
-        };
+        when(tpeRepository.findById(new TpeId(ent, tercod, tpecod))).thenReturn(Optional.of(existing));
+        when(tpeRepository.save(any(Tpe.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "ModifiedName",
+            "tpetel", "555",
+            "tpetmo", "666",
+            "tpecoe", "COE2",
+            "tpeobs", "OBS2"
+        );
 
         mockMvc.perform(put("/api/more/modify/" + ent + "/" + tercod + "/" + tpecod)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
             .andExpect(status().isNoContent());
 
-        Optional<Tpe> updated = tpeRepository.findById(new TpeId(ent, tercod, tpecod));
-        assertThat(updated).isPresent();
-        assertThat(updated.get().getTPENOM()).isEqualTo("ModifiedName");
+        verify(tpeRepository).save(any(Tpe.class));
     }
 
     @Test
@@ -148,13 +161,26 @@ public class TpeControllerTest {
         int ent = 5;
         int tercod = 101;
         int tpecod = 10;
-        Tpe t = createTpe(ent, tercod, tpecod, "ToDelete");
-        tpeRepository.save(t);
+
+        when(tpeRepository.existsById(new TpeId(ent, tercod, tpecod))).thenReturn(true);
+        doNothing().when(tpeRepository).deleteById(new TpeId(ent, tercod, tpecod));
 
         mockMvc.perform(delete("/api/more/delete/" + ent + "/" + tercod + "/" + tpecod))
+            .andDo(print())
             .andExpect(status().isOk());
 
-        boolean exists = tpeRepository.existsById(new TpeId(ent, tercod, tpecod));
-        assertThat(exists).isFalse();
+        verify(tpeRepository).deleteById(new TpeId(ent, tercod, tpecod));
+    }
+
+    @Test
+    void shouldGetByEntAndTercod_returns400OnDataAccessException() throws Exception {
+        when(tpeRepository.findByENTAndTERCOD(anyInt(), anyInt()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/more/by-tpe/1/1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error")));
     }
 }

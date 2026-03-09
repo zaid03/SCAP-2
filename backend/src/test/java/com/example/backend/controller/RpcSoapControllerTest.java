@@ -94,7 +94,7 @@ public class RpcSoapControllerTest {
 
         Map<String, String> passed = captor.getValue();
         assertThat(passed.get("p1"), equalTo("one"));
-        assertThat(passed.get("p2"), equalTo("2")); // numeric converted to string
+        assertThat(passed.get("p2"), equalTo("2")); 
     }
 
     @Test

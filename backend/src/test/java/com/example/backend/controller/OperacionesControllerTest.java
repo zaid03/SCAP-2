@@ -80,6 +80,6 @@ public class OperacionesControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$", hasSize(0)));
+            .andExpect(jsonPath("$.error").value("sical fail"));
     }
 }

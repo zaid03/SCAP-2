@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.shortCentroContrato;
 import com.example.backend.config.TestSecurityConfig;
 import com.example.backend.config.TestExceptionHandler;
 import com.example.backend.dto.CentroGestorLogin;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 
 @WebMvcTest(controllers = CgeController.class)
 @ActiveProfiles("test")
@@ -189,7 +191,7 @@ public class CgeControllerTest {
 
     @Test
     void updateCentro_returnsBadRequestOnMissingFields() throws Exception {
-        Map<String, Object> payload = Map.of("cgedes", "X"); // missing fields
+        Map<String, Object> payload = Map.of("cgedes", "X");
 
         mockMvc.perform(patch("/api/cge/update-cge/1/E1/G1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -238,7 +240,7 @@ public class CgeControllerTest {
             "ent", 1, "eje", "E1", "cgecod", "G1", "cgedes", "Desc",
             "cgeorg", "Org", "cgefun", "Fun", "cgedat", "Dat", "cgecic", 1
         );
-        when(cgeRepository.findByENTAndEJEAndCGECOD(1, "E1", "G1")).thenReturn(List.of());
+        doReturn(List.of()).when(cgeRepository).findByENTAndEJEAndCGECOD(anyInt(), anyString(), anyString());
 
         mockMvc.perform(post("/api/cge/Insert-familia")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -250,19 +252,37 @@ public class CgeControllerTest {
     }
 
     @Test
-    void addCentroGestor_returnsConflictWhenExists() throws Exception {
+    void addCentroGestor_returnsBadRequestOnMissingFields() throws Exception {
         Map<String, Object> payload = Map.of(
-            "ent", 1, "eje", "E1", "cgecod", "G1", "cgedes", "Desc",
-            "cgeorg", "Org", "cgefun", "Fun", "cgedat", "Dat", "cgecic", 1
+            "ent", 1, "eje", "E1", "cgecod", "G1"
         );
-        when(cgeRepository.findByENTAndEJEAndCGECOD(1, "E1", "G1")).thenReturn(List.of(new Cge()));
 
         mockMvc.perform(post("/api/cge/Insert-familia")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
-            .andExpect(status().isConflict())
-            .andExpect(content().string(containsString("Sin resultado")));
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+
+        verify(cgeRepository, never()).save(Mockito.<Cge>any());
+    }
+
+    @Test
+    void addCentroGestor_returnsBadRequestOnDataAccessException() throws Exception {
+        Map<String, Object> payload = Map.of(
+            "ent", 1, "eje", "E1", "cgecod", "G1", "cgedes", "Desc",
+            "cgeorg", "Org", "cgefun", "Fun", "cgedat", "Dat", "cgecic", 1
+        );
+        doReturn(List.of()).when(cgeRepository).findByENTAndEJEAndCGECOD(anyInt(), anyString(), anyString());
+        when(cgeRepository.save(Mockito.<Cge>any()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(post("/api/cge/Insert-familia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error:")));
     }
 
     @Test

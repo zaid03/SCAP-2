@@ -44,7 +44,6 @@ public class SicalEntidadControllerTest {
 
     @Test
     void shouldReturnListWhenServiceProvidesEntidades() throws Exception {
-        // return a simple object via cast to avoid depending on Entidad constructor
         @SuppressWarnings("unchecked")
         List<Object> dummy = (List<Object>)(List<?>) List.of(Map.of("codigo", 1, "nombre", "Entidad A"));
         when(sicalEntidadService.getEntidades()).thenReturn((List) dummy);

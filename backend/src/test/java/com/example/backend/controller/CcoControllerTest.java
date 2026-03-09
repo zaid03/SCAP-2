@@ -102,7 +102,7 @@ public class CcoControllerTest {
 
     @Test
     void insertCentro_returnsBadRequestWhenMissingFields() throws Exception {
-        Map<String,Object> payload = Map.of("ENT", 1, "EJE", "E1", "CCOCOD", "CC1"); // missing CCODES
+        Map<String,Object> payload = Map.of("ENT", 1, "EJE", "E1", "CCOCOD", "CC1"); 
 
         mockMvc.perform(post("/api/cco/Insert-centro")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +146,7 @@ public class CcoControllerTest {
 
     @Test
     void updateCentro_returnsBadRequestWhenMissingFields() throws Exception {
-        Map<String,Object> payload = Map.of(); // missing CCODES
+        Map<String,Object> payload = Map.of(); 
 
         mockMvc.perform(patch("/api/cco/update-centro/1/E1/CC1")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -137,8 +137,7 @@ public class AsuControllerTest {
         ArgumentCaptor<Asu> cap = ArgumentCaptor.forClass(Asu.class);
         verify(asuRepository).save(cap.capture());
         assertEquals("new", cap.getValue().getASUDES());
-
-        // missing fields -> bad request
+        
         Map<String,Object> bad = Map.of("ASUDES", "x");
         mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -128,7 +128,7 @@ public class DepControllerTest {
 
     @Test
     void updateCentro_returns400WhenMissingFields() throws Exception {
-        Map<String,Object> payload = Map.of("depdes", "x", "depalm", 1); // missing depcom & depint
+        Map<String,Object> payload = Map.of("depdes", "x", "depalm", 1); 
 
         mockMvc.perform(patch("/api/dep/update-service/1/E1/D1")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -51,7 +51,7 @@ public class MatControllerTest {
         mag2.setDEPCOD("D1");
         Mat mat2 = new Mat();
         mat2.setMag(mag2);
-        mat2.setMta(mta); // duplicate Mta should be deduped
+        mat2.setMta(mta); 
 
         when(matRepository.findByENT(1)).thenReturn(List.of(mat1, mat2));
 
@@ -68,7 +68,6 @@ public class MatControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenNoMatchingRecords() throws Exception {
-        // repository returns some records but none match depcod
         Mag mag = new Mag();
         mag.setDEPCOD("X");
         Mat m = new Mat();
