@@ -38,6 +38,9 @@ public class AlbController {
     @Autowired
     private FdeRepository fdeRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //fetch albaranes for facturas
     @GetMapping("/albaranes/{ent}/{eje}/{facnum}")
     public ResponseEntity<?> getAlbaranesByFactura(
@@ -50,7 +53,7 @@ public class AlbController {
             
             if(albaranes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             List<AlbResumeDto> result = albaranes.stream()
@@ -68,7 +71,7 @@ public class AlbController {
             return ResponseEntity.ok(result);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -83,12 +86,12 @@ public class AlbController {
         try {
             List<albFacturaDto> albaranes = albRepository.findAlbFactura(ent, tercod, 0, eje, cgecod);
             if (albaranes.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(albaranes);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -104,12 +107,12 @@ public class AlbController {
         try {
             List<albFacturaDto> albaranes = albRepository.findAlbFacturaGreaterThanEqual(ent, tercod, 0, albdat, eje, cgecod);
             if (albaranes.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(albaranes);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -124,12 +127,12 @@ public class AlbController {
         try {
             List<albFacturaDto> albaranes = albRepository.findAlbFacturaLessThanEqual(ent, tercod, 0, albdat, eje, cgecod);
             if (albaranes.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(albaranes);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -187,15 +190,15 @@ public class AlbController {
 
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //quitar albaranes
-    public record quitar(Integer ENT, String EJE, Integer ALBNUM, Integer FACNUM, Double FACIEC) {}
+    public record Quitar(Integer ENT, String EJE, Integer ALBNUM, Integer FACNUM, Double FACIEC) {}
     @PatchMapping("/quitar-albaranes")
     public ResponseEntity<?> quitarAlbaranes(
-        @RequestBody quitar payload
+        @RequestBody Quitar payload
     ) {
         try {
             if (payload == null || payload.ENT() == null || payload.ALBNUM() == null) {
@@ -240,7 +243,7 @@ public class AlbController {
 
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

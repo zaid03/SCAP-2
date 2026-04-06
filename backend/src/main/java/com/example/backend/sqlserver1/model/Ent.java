@@ -14,7 +14,17 @@ public class Ent {
     @Column(name = "ENTNIF", nullable = false)
     private String ENTNIF;
 
-    public Ent() {}
+    /**
+     * No-argument constructor required by JPA/Hibernate ORM framework.
+     * <p>
+     * This constructor is used by the ORM framework when loading entities from the database.
+     * Applications should NOT explicitly call this constructor; instead, use entity managers
+     * to load or create instances.
+     * </p>
+     */
+    public Ent() {
+        // Left intentionally empty - JPA requires a no-arg constructor
+    }
 
     public int getENTCOD() {return ENTCOD;}
     public void setENTCOD(int ENTCOD) {this.ENTCOD = ENTCOD;}

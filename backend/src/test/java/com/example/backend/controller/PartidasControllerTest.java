@@ -35,7 +35,7 @@ public class PartidasControllerTest {
     @Test
     void shouldReturnPartidasWithParams() throws Exception {
         Partida p = new Partida();
-        when(partidasService.getPartidas("cenges1", "alias1", "org1", "fun1", "eco1", "cte1", "pam1", "user1"))
+        when(partidasService.getPartidas(any(PartidasService.SearchCriteria.class)))
             .thenReturn(List.of(p));
 
         mockMvc.perform(get("/api/sical/partidas")
@@ -52,12 +52,12 @@ public class PartidasControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
 
-        verify(partidasService).getPartidas("cenges1", "alias1", "org1", "fun1", "eco1", "cte1", "pam1", "user1");
+        verify(partidasService).getPartidas(any(PartidasService.SearchCriteria.class));
     }
 
     @Test
     void shouldReturnInternalServerErrorWithEmptyListOnException() throws Exception {
-        when(partidasService.getPartidas(any(), any(), any(), any(), any(), any(), any(), any()))
+        when(partidasService.getPartidas(any(PartidasService.SearchCriteria.class)))
             .thenThrow(new RuntimeException("sical fail"));
 
         mockMvc.perform(get("/api/sical/partidas")

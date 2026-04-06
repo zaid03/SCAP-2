@@ -18,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.example.backend.dto.Tercero;
+import com.example.backend.exception.XmlParsingException;
 import com.example.sical.CryptoSical;
 
 import java.util.regex.Pattern;
@@ -48,8 +49,9 @@ public class SicalService {
     @Value("${sical.eje}")
     private String eje;
 
-    public List<Tercero> getTerceros(String nif, String nom, String apell) throws Exception {
-      CryptoSical.SecurityFields sec = CryptoSical.calculateSecurityFields(publicKey);
+    public List<Tercero> getTerceros(String nif, String nom, String apell) throws XmlParsingException {
+      try {
+            CryptoSical.SecurityFields sec = CryptoSical.calculateSecurityFields(publicKey);
 
       String fecha = sec.created;
       String nonce = sec.nonce;
@@ -109,92 +111,152 @@ public class SicalService {
       String responseXml = restTemplate.postForObject(wsUrl, request, String.class);
 
       return parseTerceros(responseXml);
+      } catch (XmlParsingException ex) {
+            throw ex;
+      } catch (Exception ex) {
+            throw new XmlParsingException("Error retrieving terceros: " + ex.getMessage(), ex);
+      }
   }
 
-    private List<Tercero> parseTerceros(String xml) throws Exception {
+    private List<Tercero> parseTerceros(String xml) throws XmlParsingException {
         List<Tercero> result = new ArrayList<>();
+        
+        try {
+            String sml = extractAndUnescapeXmlContent(xml);
+            Document doc = parseXmlDocument(sml);
+            NodeList tercerosNodes = doc.getElementsByTagName("tercero");
 
-        String inner = null;
-        int start = xml != null ? xml.indexOf("<servicioReturn") : -1;
-        if (start >= 0) {
-            int gt = xml.indexOf(">", start);
-            int end = xml.indexOf("</servicioReturn>", gt);
-            if (gt >= 0 && end >= 0) {
-                inner = xml.substring(gt + 1, end);
+            for (int i = 0; i < tercerosNodes.getLength(); i++) {
+                Tercero t = parseTerceroFromElement((Element) tercerosNodes.item(i));
+                result.add(t);
             }
-        }
-        if (inner == null) {
-            inner = xml == null ? "" : xml;
-        }
-
-        String sml = inner
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&quot;", "\"")
-                .replace("&apos;", "'");
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(false);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(new ByteArrayInputStream(sml.getBytes(StandardCharsets.UTF_8)));
-
-        NodeList tercerosNodes = doc.getElementsByTagName("tercero");
-
-        for (int i = 0; i < tercerosNodes.getLength(); i++) {
-            Element e = (Element) tercerosNodes.item(i);
-            Tercero t = new Tercero();
-
-            NodeList detterNodes = e.getElementsByTagName("detter");
-            if (detterNodes.getLength() > 0) {
-                String detter = detterNodes.item(0).getTextContent();
-                String[] parts = detter.split(Pattern.quote("-@-"), -1);
-
-                t.setIdenTercero(unescapePart(parts, 0));          
-                t.setNIFtercero(unescapePart(parts, 1));         
-                t.setTipoDocumento(unescapePart(parts, 2));      
-                t.setAlias(unescapePart(parts, 3));            
-                t.setNomTercero(unescapePart(parts, 4));         
-                t.setDomicilio(unescapePart(parts, 5));          
-                t.setPoblacion(unescapePart(parts, 6));           
-                t.setCodigoPostal(unescapePart(parts, 7));        
-                t.setProvincia(unescapePart(parts, 8));          
-                t.setTelefono(unescapePart(parts, 9));          
-                t.setFax(unescapePart(parts, 10));               
-                t.setTipoTercero(unescapePart(parts, 11));        
-                t.setObservaciones(unescapePart(parts, 18));    
-                t.setEmbargado(unescapePart(parts, 19));         
-                t.setEmail(unescapePart(parts, 20));             
-                t.setNombreCompleto(unescapePart(parts, 21));    
-                t.setApellido1(unescapePart(parts, 22));         
-                t.setApellido2(unescapePart(parts, 23));       
-
-                if ((t.getApellTercero() == null || t.getApellTercero().isEmpty())) {
-                    String a1 = t.getApellido1();
-                    String a2 = t.getApellido2();
-                    if ((a1 != null && !a1.isEmpty()) || (a2 != null && !a2.isEmpty())) {
-                        String combined = ((a1 == null ? "" : a1) + " " + (a2 == null ? "" : a2)).trim();
-                        t.setApellTercero(combined);
-                    } else if (t.getNombreCompleto() != null && !t.getNombreCompleto().isEmpty()) {
-                        String[] nm = t.getNombreCompleto().trim().split("\\s+");
-                        if (nm.length > 1) {
-                            t.setApellTercero(nm[nm.length - 1]);
-                            t.setNomTercero(String.join(" ", Arrays.copyOfRange(nm, 0, nm.length - 1)));
-                        } else {
-                            t.setNomTercero(t.getNombreCompleto());
-                        }
-                    }
-                }
-
-            } else {
-                t.setIdenTercero(getTagValue(e, "idenTercero"));
-                t.setNIFtercero(getTagValue(e, "NIFtercero"));
-                t.setNomTercero(getTagValue(e, "nomTercero"));
-                t.setApellTercero(getTagValue(e, "apellTercero"));
-            }
-            result.add(t);
+        } catch (XmlParsingException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new XmlParsingException("Error parsing terceros from XML response", ex);
         }
 
         return result;
+    }
+
+    private String extractAndUnescapeXmlContent(String xml) {
+        String inner = extractSoapContent(xml);
+        return unescapeXmlEntities(inner);
+    }
+
+    private String extractSoapContent(String xml) {
+        if (xml == null) return "";
+        
+        int start = xml.indexOf("<servicioReturn");
+        if (start < 0) return xml;
+        
+        int gt = xml.indexOf(">", start);
+        int end = xml.indexOf("</servicioReturn>", gt);
+        
+        if (gt >= 0 && end >= 0) {
+            return xml.substring(gt + 1, end);
+        }
+        return xml;
+    }
+
+    private String unescapeXmlEntities(String content) {
+        if (content == null || content.isEmpty()) return "";
+        
+        return content
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&apos;", "'");
+    }
+
+    private Document parseXmlDocument(String sml) throws com.example.backend.exception.XmlParsingException {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(false);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            return builder.parse(new ByteArrayInputStream(sml.getBytes(StandardCharsets.UTF_8)));
+        } catch (javax.xml.parsers.ParserConfigurationException | org.xml.sax.SAXException | java.io.IOException ex) {
+            throw new com.example.backend.exception.XmlParsingException("Failed to parse XML document", ex);
+        }
+    }
+
+    private Tercero parseTerceroFromElement(Element e) {
+        Tercero t = new Tercero();
+        
+        NodeList detterNodes = e.getElementsByTagName("detter");
+        if (detterNodes.getLength() > 0) {
+            populateTerceroFromDetter(t, detterNodes.item(0).getTextContent());
+            deriveMissingApellido(t);
+        } else {
+            populateTerceroFromTags(t, e);
+        }
+        
+        return t;
+    }
+
+    private void populateTerceroFromDetter(Tercero t, String detter) {
+        String[] parts = detter.split(Pattern.quote("-@-"), -1);
+
+        t.setIdenTercero(unescapePart(parts, 0));
+        t.setNIFtercero(unescapePart(parts, 1));
+        t.setTipoDocumento(unescapePart(parts, 2));
+        t.setAlias(unescapePart(parts, 3));
+        t.setNomTercero(unescapePart(parts, 4));
+        t.setDomicilio(unescapePart(parts, 5));
+        t.setPoblacion(unescapePart(parts, 6));
+        t.setCodigoPostal(unescapePart(parts, 7));
+        t.setProvincia(unescapePart(parts, 8));
+        t.setTelefono(unescapePart(parts, 9));
+        t.setFax(unescapePart(parts, 10));
+        t.setTipoTercero(unescapePart(parts, 11));
+        t.setObservaciones(unescapePart(parts, 18));
+        t.setEmbargado(unescapePart(parts, 19));
+        t.setEmail(unescapePart(parts, 20));
+        t.setNombreCompleto(unescapePart(parts, 21));
+        t.setApellido1(unescapePart(parts, 22));
+        t.setApellido2(unescapePart(parts, 23));
+    }
+
+    private void populateTerceroFromTags(Tercero t, Element e) {
+        t.setIdenTercero(getTagValue(e, "idenTercero"));
+        t.setNIFtercero(getTagValue(e, "NIFtercero"));
+        t.setNomTercero(getTagValue(e, "nomTercero"));
+        t.setApellTercero(getTagValue(e, "apellTercero"));
+    }
+
+    private void deriveMissingApellido(Tercero t) {
+        if (t.getApellTercero() != null && !t.getApellTercero().isEmpty()) {
+            return;
+        }
+
+        String a1 = t.getApellido1();
+        String a2 = t.getApellido2();
+
+        if ((a1 != null && !a1.isEmpty()) || (a2 != null && !a2.isEmpty())) {
+            String combined = ((a1 == null ? "" : a1) + " " + (a2 == null ? "" : a2)).trim();
+            t.setApellTercero(combined);
+            return;
+        }
+
+        if (t.getNombreCompleto() != null && !t.getNombreCompleto().isEmpty()) {
+            parseNombreCompleto(t);
+        }
+    }
+
+    private void parseNombreCompleto(Tercero t) {
+        String[] nm = t.getNombreCompleto().trim().split("\\s+");
+        if (nm.length > 1) {
+            t.setApellTercero(nm[nm.length - 1]);
+            t.setNomTercero(String.join(" ", Arrays.copyOfRange(nm, 0, nm.length - 1)));
+        } else {
+            t.setNomTercero(t.getNombreCompleto());
+        }
     }
 
    private String getTagValue(Element parent, String tag) {

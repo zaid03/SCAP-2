@@ -55,6 +55,16 @@ public class CcoControllerTest {
     }
 
     @Test
+    void fetchAll_returns404WhenEmpty() throws Exception {
+        when(ccoRepository.findByENTAndEJE(1, "E1")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/cco/fetch-all/1/E1"))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
     void filterBy_returns404WhenEmpty() throws Exception {
         when(ccoRepository.findByENTAndEJEAndCCOCOD(1, "E1", "X")).thenReturn(List.of());
 
@@ -72,7 +82,7 @@ public class CcoControllerTest {
         mockMvc.perform(get("/api/cco/filter-by/1/E1/X"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -84,6 +94,27 @@ public class CcoControllerTest {
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void filterByDes_returns404WhenEmpty() throws Exception {
+        when(ccoRepository.findByENTAndEJEAndCCODESContaining(1, "E1", "X")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/cco/filter-by-des/1/E1/X"))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void filterByDes_returns400OnDataAccessException() throws Exception {
+        when(ccoRepository.findByENTAndEJEAndCCODESContaining(anyInt(), anyString(), anyString()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/cco/filter-by-des/1/E1/X"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -123,6 +154,20 @@ public class CcoControllerTest {
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(content().string(containsString("Sin resultado")));
+    }
+
+    @Test
+    void insertCentro_returns400OnDataAccessException() throws Exception {
+        Map<String,Object> payload = Map.of("ENT", 1, "EJE", "E1", "CCOCOD", "CC1", "CCODES", "Desc");
+        when(ccoRepository.findByENTAndEJEAndCCOCOD(1, "E1", "CC1")).thenReturn(List.of());
+        when(ccoRepository.save(any())).thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        mockMvc.perform(post("/api/cco/Insert-centro")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -172,6 +217,23 @@ public class CcoControllerTest {
     }
 
     @Test
+    void updateCentro_returns400OnDataAccessException() throws Exception {
+        CcoId id = new CcoId(1, "E1", "CC1");
+        Cco existing = new Cco();
+        when(ccoRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(ccoRepository.save(any())).thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        Map<String,Object> payload = Map.of("CCODES", "new");
+
+        mockMvc.perform(patch("/api/cco/update-centro/1/E1/CC1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
     void deleteCoste_returnsConflictWhenHasDeps() throws Exception {
         when(ccoRepository.existsById(new CcoId(1, "E1", "CC1"))).thenReturn(true);
         when(depRepository.countByENTAndEJEAndCCOCOD(1, "E1", "CC1")).thenReturn(1L);
@@ -207,6 +269,19 @@ public class CcoControllerTest {
     }
 
     @Test
+    void deleteCoste_returns400OnDataAccessException() throws Exception {
+        CcoId id = new CcoId(1, "E1", "CC1");
+        when(ccoRepository.existsById(id)).thenReturn(true);
+        when(depRepository.countByENTAndEJEAndCCOCOD(1, "E1", "CC1")).thenReturn(0L);
+        doThrow(new DataAccessResourceFailureException("DB error")).when(ccoRepository).deleteById(id);
+
+        mockMvc.perform(delete("/api/cco/delete-coste/1/E1/CC1"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
     void endpoints_return400OnDataAccessException() throws Exception {
         when(ccoRepository.findByENTAndEJE(anyInt(), anyString()))
             .thenThrow(new DataAccessResourceFailureException("boom"));
@@ -214,6 +289,6 @@ public class CcoControllerTest {
         mockMvc.perform(get("/api/cco/fetch-all/1/E1"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 }

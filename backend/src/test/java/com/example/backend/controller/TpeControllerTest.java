@@ -130,6 +130,72 @@ public class TpeControllerTest {
     }
 
     @Test
+    void shouldNotAddTpe_returns400WhenNullTpenom() throws Exception {
+        int ent = 2;
+        int tercod = 77;
+
+        mockMvc.perform(post("/api/more/add/" + ent + "/" + tercod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"tpetel\": \"111\"}"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Nombre requerido.")));
+    }
+
+    @Test
+    void shouldAddTpe_returns201_whenLastTpeIsNull() throws Exception {
+        int ent = 2;
+        int tercod = 77;
+
+        when(tpeRepository.existsByENTAndTERCODAndTPENOM(ent, tercod, "FirstContact")).thenReturn(false);
+        when(tpeRepository.findFirstByENTAndTERCODOrderByTPECODDesc(ent, tercod)).thenReturn(null);
+        when(tpeRepository.save(any(Tpe.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "FirstContact",
+            "tpetel", "111222333",
+            "tpetmo", "999000111",
+            "tpecoe", "COE",
+            "tpeobs", "OBS"
+        );
+
+        mockMvc.perform(post("/api/more/add/" + ent + "/" + tercod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(content().string(containsString("Persona de contacto agregada")));
+
+        verify(tpeRepository).save(any(Tpe.class));
+    }
+
+    @Test
+    void shouldAddTpe_returns400OnDataAccessException() throws Exception {
+        int ent = 2;
+        int tercod = 77;
+
+        when(tpeRepository.existsByENTAndTERCODAndTPENOM(ent, tercod, "NewContact")).thenReturn(false);
+        when(tpeRepository.findFirstByENTAndTERCODOrderByTPECODDesc(ent, tercod)).thenReturn(null);
+        when(tpeRepository.save(any(Tpe.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "NewContact",
+            "tpetel", "111222333",
+            "tpetmo", "999000111",
+            "tpecoe", "COE",
+            "tpeobs", "OBS"
+        );
+
+        mockMvc.perform(post("/api/more/add/" + ent + "/" + tercod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("La inserción falló")));
+    }
+
+    @Test
     void shouldModifyTpe_returns204_and_updateEntity() throws Exception {
         int ent = 4;
         int tercod = 99;
@@ -157,6 +223,78 @@ public class TpeControllerTest {
     }
 
     @Test
+    void shouldModifyTpe_returns400WhenNullTpenom() throws Exception {
+        int ent = 4;
+        int tercod = 99;
+        int tpecod = 5;
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "",
+            "tpetel", "555",
+            "tpetmo", "666",
+            "tpecoe", "COE2",
+            "tpeobs", "OBS2"
+        );
+
+        mockMvc.perform(put("/api/more/modify/" + ent + "/" + tercod + "/" + tpecod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"tpetel\": \"555\"}"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("nombre requerido")));
+    }
+
+    @Test
+    void shouldModifyTpe_returns404WhenNotFound() throws Exception {
+        int ent = 4;
+        int tercod = 99;
+        int tpecod = 999;
+
+        when(tpeRepository.findById(new TpeId(ent, tercod, tpecod))).thenReturn(Optional.empty());
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "ModifiedName",
+            "tpetel", "555",
+            "tpetmo", "666",
+            "tpecoe", "COE2",
+            "tpeobs", "OBS2"
+        );
+
+        mockMvc.perform(put("/api/more/modify/" + ent + "/" + tercod + "/" + tpecod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void shouldModifyTpe_returns400OnDataAccessException() throws Exception {
+        int ent = 4;
+        int tercod = 99;
+        int tpecod = 5;
+        Tpe existing = createTpe(ent, tercod, tpecod, "ToModify");
+
+        when(tpeRepository.findById(new TpeId(ent, tercod, tpecod))).thenReturn(Optional.of(existing));
+        when(tpeRepository.save(any(Tpe.class))).thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        Map<String, String> payload = Map.of(
+            "tpenom", "ModifiedName",
+            "tpetel", "555",
+            "tpetmo", "666",
+            "tpecoe", "COE2",
+            "tpeobs", "OBS2"
+        );
+
+        mockMvc.perform(put("/api/more/modify/" + ent + "/" + tercod + "/" + tpecod)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
     void shouldDeleteTpe_returns200_and_deleteEntity() throws Exception {
         int ent = 5;
         int tercod = 101;
@@ -170,6 +308,36 @@ public class TpeControllerTest {
             .andExpect(status().isOk());
 
         verify(tpeRepository).deleteById(new TpeId(ent, tercod, tpecod));
+    }
+
+    @Test
+    void shouldDeleteTpe_returns404WhenNotFound() throws Exception {
+        int ent = 5;
+        int tercod = 101;
+        int tpecod = 999;
+
+        when(tpeRepository.existsById(new TpeId(ent, tercod, tpecod))).thenReturn(false);
+
+        mockMvc.perform(delete("/api/more/delete/" + ent + "/" + tercod + "/" + tpecod))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void shouldDeleteTpe_returns400OnDataAccessException() throws Exception {
+        int ent = 5;
+        int tercod = 101;
+        int tpecod = 10;
+
+        when(tpeRepository.existsById(new TpeId(ent, tercod, tpecod))).thenReturn(true);
+        doThrow(new DataAccessResourceFailureException("DB error"))
+            .when(tpeRepository).deleteById(new TpeId(ent, tercod, tpecod));
+
+        mockMvc.perform(delete("/api/more/delete/" + ent + "/" + tercod + "/" + tpecod))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test

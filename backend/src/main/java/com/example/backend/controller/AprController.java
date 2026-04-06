@@ -17,6 +17,9 @@ public class AprController {
     @Autowired
     private AprRepository aprRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     // fetching articulos fr proveedor
     @GetMapping("/by-apr/{ent}/{tercod}")
     public ResponseEntity<?> getApr(
@@ -27,17 +30,17 @@ public class AprController {
             List<Apr> articulos = aprRepository.findByENTAndTERCOD(ent, tercod);
             if (articulos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(articulos);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     // Modifying an articulo
-    public record articulo(String aprref, Double aprpre, Double apruem, String aprobs, Integer apracu) {}
+    public record Articulo(String aprref, Double aprpre, Double apruem, String aprobs, Integer apracu) {}
     @PatchMapping("/update-apr/{ent}/{tercod}/{afacod}/{asucod}/{artcod}")
     public ResponseEntity<?> updateArticulo(
         @PathVariable Integer ent,
@@ -45,7 +48,7 @@ public class AprController {
         @PathVariable String afacod,
         @PathVariable String asucod,
         @PathVariable String artcod,
-        @RequestBody articulo payload
+        @RequestBody Articulo payload
     ) {
         try {
 
@@ -53,7 +56,7 @@ public class AprController {
             Optional<Apr> articulo = aprRepository.findById(id);
             if(articulo.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             
             Apr articulosUpdate = articulo.get();
@@ -84,13 +87,13 @@ public class AprController {
             AprId id = new AprId(ent, tercod, afacod, asucod, artcod);
             if (!aprRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             aprRepository.deleteById(id);
             return ResponseEntity.ok("articulo eliminado exitosamente");
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -105,7 +108,7 @@ public class AprController {
                 .body(apr.getAPRREF() + " added successfully");
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error:" + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

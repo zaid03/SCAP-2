@@ -18,6 +18,9 @@ public class LenController {
     @Autowired
     private LenRepository lenRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //selecting all lugares de entrega
     @GetMapping("/fetch-all")
     public ResponseEntity<?> fetchLugares(
@@ -25,11 +28,11 @@ public class LenController {
         try {
             List<?> lugares = lenRepository.findAll();
             if (lugares.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(lugares);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -47,7 +50,7 @@ public class LenController {
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -67,7 +70,7 @@ public class LenController {
             Optional<Len> entrega = lenRepository.findById(LENCOD);
             if(entrega.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Len entregaUpdate = entrega.get();
@@ -78,7 +81,7 @@ public class LenController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -90,13 +93,13 @@ public class LenController {
         try {
             if (!lenRepository.existsById(LENCOD)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
             lenRepository.deleteById(LENCOD);
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -108,12 +111,12 @@ public class LenController {
         try {
             List<?> lugares = lenRepository.findByLENCOD(LENCOD);
             if (lugares.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(lugares);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -125,12 +128,12 @@ public class LenController {
         try {
             List<?> lugares = lenRepository.findByLENDESContaining(LENDES);
             if (lugares.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(lugares);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

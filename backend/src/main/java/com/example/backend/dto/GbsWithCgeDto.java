@@ -20,23 +20,63 @@ public class GbsWithCgeDto {
     private Double gbsict;
     private Double gbs413;
 
-    public GbsWithCgeDto(String cgecod, String cgedes, String cgecic, String gbsref, String gbsope, String gbsorg, String gbsfun, String gbseco,LocalDateTime gbsfop, Double gbsimp, Double gbsibg, Double gbsius, Double gbsico, Double gbsiut, Double gbsict, Double gbs413) {
-        this.cgecod = cgecod;
-        this.cgedes = cgedes;
-        this.cgecic = cgecic;
-        this.gbsref = gbsref;
-        this.gbsope = gbsope;
-        this.gbsorg = gbsorg;
-        this.gbsfun = gbsfun;
-        this.gbseco = gbseco;
-        this.gbsfop = gbsfop;
-        this.gbsimp = gbsimp;
-        this.gbsibg = gbsibg;
-        this.gbsius = gbsius;
-        this.gbsico = gbsico;
-        this.gbsiut = gbsiut;
-        this.gbsict = gbsict;
-        this.gbs413 = gbs413;
+    private GbsWithCgeDto(Builder builder) {
+        this.cgecod = builder.cgecod;
+        this.cgedes = builder.cgedes;
+        this.cgecic = builder.cgecic;
+        this.gbsref = builder.gbsref;
+        this.gbsope = builder.gbsope;
+        this.gbsorg = builder.gbsorg;
+        this.gbsfun = builder.gbsfun;
+        this.gbseco = builder.gbseco;
+        this.gbsfop = builder.gbsfop;
+        this.gbsimp = builder.gbsimp;
+        this.gbsibg = builder.gbsibg;
+        this.gbsius = builder.gbsius;
+        this.gbsico = builder.gbsico;
+        this.gbsiut = builder.gbsiut;
+        this.gbsict = builder.gbsict;
+        this.gbs413 = builder.gbs413;
+    }
+
+    public static class Builder {
+        private String cgecod;
+        private String cgedes;
+        private String cgecic;
+        private String gbsref;
+        private String gbsope;
+        private String gbsorg;
+        private String gbsfun;
+        private String gbseco;
+        private LocalDateTime gbsfop;
+        private Double gbsimp;
+        private Double gbsibg;
+        private Double gbsius;
+        private Double gbsico;
+        private Double gbsiut;
+        private Double gbsict;
+        private Double gbs413;
+
+        public Builder cgecod(String cgecod) { this.cgecod = cgecod; return this; }
+        public Builder cgedes(String cgedes) { this.cgedes = cgedes; return this; }
+        public Builder cgecic(String cgecic) { this.cgecic = cgecic; return this; }
+        public Builder gbsref(String gbsref) { this.gbsref = gbsref; return this; }
+        public Builder gbsope(String gbsope) { this.gbsope = gbsope; return this; }
+        public Builder gbsorg(String gbsorg) { this.gbsorg = gbsorg; return this; }
+        public Builder gbsfun(String gbsfun) { this.gbsfun = gbsfun; return this; }
+        public Builder gbseco(String gbseco) { this.gbseco = gbseco; return this; }
+        public Builder gbsfop(LocalDateTime gbsfop) { this.gbsfop = gbsfop; return this; }
+        public Builder gbsimp(Double gbsimp) { this.gbsimp = gbsimp; return this; }
+        public Builder gbsibg(Double gbsibg) { this.gbsibg = gbsibg; return this; }
+        public Builder gbsius(Double gbsius) { this.gbsius = gbsius; return this; }
+        public Builder gbsico(Double gbsico) { this.gbsico = gbsico; return this; }
+        public Builder gbsiut(Double gbsiut) { this.gbsiut = gbsiut; return this; }
+        public Builder gbsict(Double gbsict) { this.gbsict = gbsict; return this; }
+        public Builder gbs413(Double gbs413) { this.gbs413 = gbs413; return this; }
+
+        public GbsWithCgeDto build() {
+            return new GbsWithCgeDto(this);
+        }
     }
 
     public String getCgecod() { return cgecod; }

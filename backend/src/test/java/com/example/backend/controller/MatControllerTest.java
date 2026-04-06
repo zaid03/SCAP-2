@@ -5,6 +5,8 @@ import com.example.backend.sqlserver2.model.Mat;
 import com.example.backend.sqlserver2.model.Mta;
 import com.example.backend.sqlserver2.model.Mag;
 import com.example.backend.sqlserver2.repository.MatRepository;
+import com.example.backend.sqlserver2.repository.MagRepository;
+import com.example.backend.sqlserver2.repository.MtaRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,11 +16,12 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,6 +37,12 @@ public class MatControllerTest {
 
     @MockitoBean
     private MatRepository matRepository;
+    
+    @MockitoBean
+    private MagRepository magRepository;
+    
+    @MockitoBean
+    private MtaRepository mtaRepository;
 
     @Test
     void shouldReturnDistinctAlmacen_whenRecordsMatch() throws Exception {
@@ -41,21 +50,23 @@ public class MatControllerTest {
         mta.setMTACOD(11);
         mta.setMTADES("Almacen A");
 
-        Mag mag1 = new Mag();
-        mag1.setDEPCOD("D1");
+        Mag mag = new Mag();
+        mag.setMAGCOD(1);
+        mag.setDEPCOD("D1");
+        
         Mat mat1 = new Mat();
-        mat1.setMag(mag1);
+        mat1.setMag(mag);
         mat1.setMta(mta);
 
-        Mag mag2 = new Mag();
-        mag2.setDEPCOD("D1");
         Mat mat2 = new Mat();
-        mat2.setMag(mag2);
+        mat2.setMag(mag);
         mat2.setMta(mta); 
 
-        when(matRepository.findByENT(1)).thenReturn(List.of(mat1, mat2));
+        when(magRepository.findByENTAndDEPCOD(1, "D1")).thenReturn(Optional.of(mag));
+        when(matRepository.findByENTAndMAGCOD(1, 1)).thenReturn(List.of(mat1, mat2));
+        when(mtaRepository.findFirstByENTAndMTACOD(1, 11)).thenReturn(Optional.of(mta));
 
-        mockMvc.perform(get("/api/mat/fetch-almacen/1/D1")
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/1/D1")
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
@@ -63,35 +74,97 @@ public class MatControllerTest {
             .andExpect(jsonPath("$[0].mtacod").value(11))
             .andExpect(jsonPath("$[0].mtades").value("Almacen A"));
 
-        verify(matRepository).findByENT(1);
+        verify(magRepository).findByENTAndDEPCOD(1, "D1");
+        verify(matRepository).findByENTAndMAGCOD(1, 1);
     }
 
     @Test
     void shouldReturnNotFoundWhenNoMatchingRecords() throws Exception {
-        Mag mag = new Mag();
-        mag.setDEPCOD("X");
-        Mat m = new Mat();
-        m.setMag(mag);
-        m.setMta(new Mta());
-        when(matRepository.findByENT(2)).thenReturn(List.of(m));
+        when(magRepository.findByENTAndDEPCOD(2, "D1")).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/mat/fetch-almacen/2/D1")
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/2/D1")
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isNotFound())
-            .andExpect(content().string("No resultado"));
+            .andExpect(content().string("Sin resultado"));
 
-        verify(matRepository).findByENT(2);
+        verify(magRepository).findByENTAndDEPCOD(2, "D1");
     }
 
     @Test
     void shouldReturnBadRequestOnDataAccessException() throws Exception {
-        when(matRepository.findByENT(anyInt())).thenThrow(new DataAccessResourceFailureException("DB down"));
+        when(magRepository.findByENTAndDEPCOD(anyInt(), any())).thenThrow(new DataAccessResourceFailureException("DB down"));
 
-        mockMvc.perform(get("/api/mat/fetch-almacen/1/D1")
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/1/D1")
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("Error:")));
+    }
+
+    @Test
+    void shouldFilterOutMatWithNullMag() throws Exception {
+        Mag mag = new Mag();
+        mag.setMAGCOD(1);
+        mag.setDEPCOD("D1");
+        
+        Mta mta1 = new Mta();
+        mta1.setMTACOD(11);
+        mta1.setMTADES("Almacen A");
+
+        Mta mta2 = new Mta();
+        mta2.setMTACOD(22);
+        mta2.setMTADES("Almacen B");
+
+        Mat matWithMag = new Mat();
+        matWithMag.setMag(mag);
+        matWithMag.setMta(mta1);
+
+        Mat matWithoutMag = new Mat();
+        matWithoutMag.setMag(null);
+        matWithoutMag.setMta(mta2);
+
+        when(magRepository.findByENTAndDEPCOD(1, "D1")).thenReturn(Optional.of(mag));
+        when(matRepository.findByENTAndMAGCOD(1, 1)).thenReturn(List.of(matWithMag, matWithoutMag));
+        when(mtaRepository.findFirstByENTAndMTACOD(1, 11)).thenReturn(Optional.of(mta1));
+        when(mtaRepository.findFirstByENTAndMTACOD(1, 22)).thenReturn(Optional.of(mta2));
+
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/1/D1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    void shouldReturnBadRequestOnMatRepositoryException() throws Exception {
+        Mag mag = new Mag();
+        mag.setMAGCOD(1);
+        mag.setDEPCOD("D1");
+
+        when(magRepository.findByENTAndDEPCOD(1, "D1")).thenReturn(Optional.of(mag));
+        when(matRepository.findByENTAndMAGCOD(1, 1)).thenThrow(new DataAccessResourceFailureException("DB connection lost"));
+
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/1/D1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error:")));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenMatRecordIsEmpty() throws Exception {
+        Mag mag = new Mag();
+        mag.setMAGCOD(1);
+        mag.setDEPCOD("D1");
+
+        when(magRepository.findByENTAndDEPCOD(1, "D1")).thenReturn(Optional.of(mag));
+        when(matRepository.findByENTAndMAGCOD(1, 1)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/mat/fetch-almacenajes/1/D1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
     }
 }

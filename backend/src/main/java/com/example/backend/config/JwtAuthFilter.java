@@ -92,12 +92,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return true;
         }
         
-        // Dossier assets
         if (path.contains("/assets/")) {
             return true;
         }
         
-        // Extensions de fichiers statiques
         String lowerPath = path.toLowerCase();
         return STATIC_EXTENSIONS.stream().anyMatch(lowerPath::endsWith);
     }

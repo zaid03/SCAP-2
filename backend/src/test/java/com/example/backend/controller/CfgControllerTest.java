@@ -97,7 +97,7 @@ public class CfgControllerTest {
         mockMvc.perform(get("/api/cfg/fetch-Eje/1"))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -130,6 +130,6 @@ public class CfgControllerTest {
         mockMvc.perform(get("/api/cfg/search-Eje/1/2026"))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 }

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,18 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.backend.service.FacContabilizacionSpecification;
-import com.example.backend.service.FacSpecification;
 import com.example.backend.service.FacturaInsertService;
+import com.example.backend.service.FacturaSearch;
 import com.example.backend.sqlserver2.model.Fde;
 import com.example.backend.sqlserver2.model.Gbs;
 import com.example.backend.sqlserver2.model.Fac;
 import com.example.backend.sqlserver2.model.FacId;
-import com.example.backend.sqlserver2.model.Ter;
 import com.example.backend.sqlserver2.repository.FacRepository;
-import com.example.backend.sqlserver2.repository.TerRepository;
 import com.example.backend.sqlserver2.repository.FdeRepository;
 import com.example.backend.sqlserver2.repository.GbsRepository;
-import com.example.backend.dto.FacWithTerDto;
 import com.example.backend.dto.FacWithTerProjection;
 import com.example.backend.dto.FacturaInsertDto;
 
@@ -37,13 +33,16 @@ public class FacController {
     @Autowired
     private FacRepository facRepository;
     @Autowired
-    private TerRepository terRepository;
-    @Autowired
     private FacturaInsertService facturaInsertService;
     @Autowired
     private FdeRepository fdeRepository;
     @Autowired
     private GbsRepository gbsRepository;
+    @Autowired
+    private FacturaSearch facturaSearch;
+
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
 
     //for the main list
     @GetMapping("/{ent}/{eje}/{cgecod}")
@@ -55,58 +54,50 @@ public class FacController {
         try {
             List<FacWithTerProjection> facturas = facRepository.findByENTAndEJEAndCGECODOrderByFACFREAsc(ent, eje, cgecod);
             if (facturas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             
             return ResponseEntity.ok(facturas);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //search in gestion de factura
-    @GetMapping("/search")
-    public ResponseEntity<?> searchFacturas(
+    @GetMapping("/search-factura")
+    public ResponseEntity<?> searchFacturas (
         @RequestParam Integer ent,
         @RequestParam String eje,
         @RequestParam String cgecod,
-        @RequestParam(defaultValue = "TODAS") String estado,
-        @RequestParam(defaultValue = "REGISTRO") String dateType,
+        @RequestParam(required = false) String main_filter,
+        @RequestParam(required = false) Integer ej_factura,
+        @RequestParam(required = false) String estado,
+        @RequestParam(required = false) String fecha,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
-        @RequestParam(defaultValue = "ANY") String facannMode,
-        @RequestParam(required = false) String facann,
-        @RequestParam(required = false) String search,
-        @RequestParam(defaultValue = "OTROS") String searchType
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
     ) {
         try {
-            Specification<Fac> spec = FacSpecification.searchFacturas(
-                ent, eje, cgecod, estado, dateType, fromDate, toDate,
-                facannMode, facann, search, searchType
-            );
+            FacturaSearch.FacturaSearchCriteria criteria = new FacturaSearch.FacturaSearchCriteria.Builder()
+                .ent(ent)
+                .eje(eje)
+                .cgecod(cgecod)
+                .mainFilter(main_filter)
+                .ejFactura(ej_factura)
+                .estado(estado)
+                .fecha(fecha)
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .build();
             
-            List<Fac> facturas = facRepository.findAll(spec);
-            
-            List<FacWithTerDto> result = facturas.stream().map(f -> {
-                Ter ter = f.getTer();
-                return new FacWithTerDto(
-                    f.getENT(), f.getEJE(), f.getFACNUM(), f.getTERCOD(), f.getCGECOD(),
-                    f.getFACOBS(), f.getFACIMP(), f.getFACIEC(), f.getFACIDI(), f.getFACTDC(),
-                    f.getFACANN() != null ? String.valueOf(f.getFACANN()) : null,
-                    f.getFACFAC() != null ? String.valueOf(f.getFACFAC()) : null,
-                    f.getFACDOC(), f.getFACDAT(), f.getFACFCO(), f.getFACADO(),
-                    f.getFACTXT(), f.getFACFRE(), f.getCONCTP(), f.getCONCPR(),
-                    f.getCONCCR(), f.getFACOCT(), f.getFACFPG(), f.getFACOPG(),
-                    f.getFACTPG(), f.getFACDTO(),
-                    ter != null ? ter.getTERNOM() : null,
-                    ter != null ? ter.getTERNIF() : null
-                );
-            }).collect(Collectors.toList());
-            
-            return ResponseEntity.ok(result);
+            List<FacWithTerProjection> facturas = facturaSearch.searchFactura(criteria);
+
+            if (facturas.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            return ResponseEntity.ok(facturas);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMessage());
         }
     }
 
@@ -119,7 +110,7 @@ public class FacController {
             List<String> messages = facturaInsertService.insertFacturas(facturas);
             return ResponseEntity.ok(messages);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMessage());
         }
     }
 
@@ -141,7 +132,7 @@ public class FacController {
             Optional<Fac> facOptio = facRepository.findById(id);
             if (facOptio.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Fac factura = facOptio.get();
@@ -158,7 +149,7 @@ public class FacController {
 
             return ResponseEntity.noContent().build();
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMessage());
         }
     }
 
@@ -175,84 +166,122 @@ public class FacController {
         @RequestParam(required = false) String search 
     ) {
         try {
-            Specification<Fac> spec = FacContabilizacionSpecification.searchContabilizacion(
-                ent, eje, cgecod, fechaType, desde, hasta, facann, search
-            );
+            FacContabilizacionSpecification.SearchCriteria criteria = new FacContabilizacionSpecification.SearchCriteria.Builder()
+                .ent(ent)
+                .eje(eje)
+                .cgecod(cgecod)
+                .fechaType(fechaType)
+                .desde(desde)
+                .hasta(hasta)
+                .facann(facann)
+                .search(search)
+                .build();
+            Specification<Fac> spec = FacContabilizacionSpecification.searchContabilizacion(criteria);
 
             List<Fac> facturas = facRepository.findAll(spec);
 
             if (facturas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(facturas);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //contabilizar a factura
-    public record contabilizar(Integer ENT, String EJE, Integer FACNUM, String FACADO, LocalDateTime FACFCO, String CGECOD, Boolean ESCONTRATO) {}
+    public record Contabilizar(Integer ENT, String EJE, Integer FACNUM, String FACADO, LocalDateTime FACFCO, String CGECOD, Boolean ESCONTRATO) {}
+
     @PatchMapping("/contabilizar-facturas")
     public ResponseEntity<?> contabilizarFactura(
-        @RequestBody contabilizar payload
+        @RequestBody Contabilizar payload
     ) {
         try {
-            if (payload == null || payload.ENT() == null || payload.EJE() == null || payload.FACNUM() == null || payload.FACADO() == null || payload.FACFCO() == null || payload.CGECOD() == null || payload.ESCONTRATO() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falta un dato obligatorio");
-            }
-
-            FacId id = new FacId(payload.ENT(), payload.EJE(), payload.FACNUM());
-            Optional<Fac> facturaOptio = facRepository.findById(id);
-
-            if (facturaOptio.isPresent()) {
-                Fac factura = facturaOptio.get();
-                factura.setFACADO(payload.FACADO());
-                factura.setFACFCO(payload.FACFCO());
-                facRepository.save(factura);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Factura no encontrada"); 
-            }
-
+            ResponseEntity<?> validation = validateContabilizarPayload(payload);
+            if (validation != null) return validation;
+            
+            ResponseEntity<?> facturaResult = updateFacturaRecord(payload);
+            if (facturaResult != null) return facturaResult;
+            
             if (!payload.ESCONTRATO()) {
-                List<Fde> applicacionesList = fdeRepository.findByENTAndEJEAndFACNUM(payload.ENT(), payload.EJE(), payload.FACNUM());
-
-                List<String> errores = new ArrayList<>(); 
-
-                Double newGbsius;
-                Double newGbsiut;
-                Double fdeimp;
-                Double fdedif;
-                for (Fde fde : applicacionesList) {
-                    Optional<Gbs> bolsaOptio = gbsRepository.findByENTAndEJEAndCGECODAndGBSORGAndGBSFUNAndGBSECO(payload.ENT(), payload.EJE(), payload.CGECOD(), fde.getFDEORG(), fde.getFDEFUN(), fde.getFDEECO());
-
-                    if (bolsaOptio.isPresent()) {
-                        Gbs bolsa = bolsaOptio.get();
-
-                        fdeimp = fde.getFDEIMP() != null ? fde.getFDEIMP() : 0.0;
-                        fdedif = fde.getFDEDIF() != null ? fde.getFDEDIF() : 0.0;
-
-                        newGbsius = bolsa.getGBSIUS() + fdeimp + fdedif;
-                        newGbsiut = bolsa.getGBSIUT() + fdeimp + fdedif;
-
-                        bolsa.setGBSIUS(newGbsius);
-                        bolsa.setGBSIUT(newGbsiut);
-                        gbsRepository.save(bolsa);
-                    } else {
-                        errores.add(fde.getFDEORG() + "/" + fde.getFDEFUN() + "/" + fde.getFDEECO());
-                    }
-                }
-
-                if (!errores.isEmpty()) {
-                    return ResponseEntity.badRequest().body("No existe bolsa para: " + String.join(", ", errores));
-                }
+                ResponseEntity<?> bolsaResult = procesarBolsas(payload);
+                if (bolsaResult != null) return bolsaResult;
             }
-
+            
             return ResponseEntity.noContent().build();
+            
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
+    }
+
+    private ResponseEntity<?> validateContabilizarPayload(Contabilizar payload) {
+        if (payload == null || payload.ENT() == null || payload.EJE() == null || 
+            payload.FACNUM() == null || payload.FACADO() == null || payload.FACFCO() == null || 
+            payload.CGECOD() == null || payload.ESCONTRATO() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Falta un dato obligatorio");
+        }
+        return null;
+    }
+
+    private ResponseEntity<?> updateFacturaRecord(Contabilizar payload) {
+        FacId id = new FacId(payload.ENT(), payload.EJE(), payload.FACNUM());
+        Optional<Fac> facturaOptio = facRepository.findById(id);
+        
+        if (facturaOptio.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Factura no encontrada");
+        }
+        
+        Fac factura = facturaOptio.get();
+        factura.setFACADO(payload.FACADO());
+        factura.setFACFCO(payload.FACFCO());
+        facRepository.save(factura);
+        
+        return null;
+    }
+
+    private ResponseEntity<?> procesarBolsas(Contabilizar payload) {
+        List<Fde> applicacionesList = fdeRepository.findByENTAndEJEAndFACNUM(
+            payload.ENT(), payload.EJE(), payload.FACNUM()
+        );
+
+        List<String> errores = new ArrayList<>();
+        
+        for (Fde fde : applicacionesList) {
+            procesarFdeYBolsa(payload, fde, errores);
+        }
+        
+        if (!errores.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body("No existe bolsa para: " + String.join(", ", errores));
+        }
+        
+        return null;
+    }
+
+    private void procesarFdeYBolsa(Contabilizar payload, Fde fde, List<String> errores) {
+        Optional<Gbs> bolsaOptio = gbsRepository.findByENTAndEJEAndCGECODAndGBSORGAndGBSFUNAndGBSECO(
+            payload.ENT(), payload.EJE(), payload.CGECOD(), 
+            fde.getFDEORG(), fde.getFDEFUN(), fde.getFDEECO()
+        );
+        
+        if (bolsaOptio.isEmpty()) {
+            errores.add(fde.getFDEORG() + "/" + fde.getFDEFUN() + "/" + fde.getFDEECO());
+            return;
+        }
+        
+        Gbs bolsa = bolsaOptio.get();
+        Double fdeimp = fde.getFDEIMP() != null ? fde.getFDEIMP() : 0.0;
+        Double fdedif = fde.getFDEDIF() != null ? fde.getFDEDIF() : 0.0;
+        
+        Double newGbsius = bolsa.getGBSIUS() + fdeimp + fdedif;
+        Double newGbsiut = bolsa.getGBSIUT() + fdeimp + fdedif;
+        
+        bolsa.setGBSIUS(newGbsius);
+        bolsa.setGBSIUT(newGbsiut);
+        gbsRepository.save(bolsa);
     }
 }

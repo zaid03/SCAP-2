@@ -73,14 +73,4 @@ public class SicalControllerTest {
             .andExpect(status().isInternalServerError())
             .andExpect(content().string(containsString("Error:")));
     }
-
-    @Test
-    void testCrypto_returnsStatusAndPreviews() throws Exception {
-        mockMvc.perform(get("/api/sical/test-crypto")
-                .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("Crypto working"))
-            .andExpect(jsonPath("$.tokenPreview", containsString("...")))
-            .andExpect(jsonPath("$.originPreview", containsString("...")));
-    }
 }

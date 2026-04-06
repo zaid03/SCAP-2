@@ -22,6 +22,9 @@ public class CoaController {
     @Autowired
     private CoaRepository coaRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //selecting articulos for a contrato
     @GetMapping("/fetch-articulos/{ent}/{eje}/{concod}")
     public ResponseEntity<?> fetchArticulos(
@@ -32,20 +35,19 @@ public class CoaController {
         try {
             List<CoaArtProjection> articulos = coaRepository.findAllByENTAndEJEAndConnCONCOD(ent, eje, concod);
             if (articulos.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(articulos);
 
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //update articulo
-    public record artUpdate(Double COAPRE) {};
-
+    public record ArtUpdate(Double COAPRE) {}
     @PatchMapping("/update-articulo/{ent}/{eje}/{concod}/{afacod}/{asucod}/{artcod}")
     public ResponseEntity<?> updateArticulo(
         @PathVariable Integer ent,
@@ -54,7 +56,7 @@ public class CoaController {
         @PathVariable String afacod,
         @PathVariable String asucod,
         @PathVariable String artcod,
-        @RequestBody artUpdate payload
+        @RequestBody ArtUpdate payload
     ) {
         try {
             if(payload == null || payload.COAPRE() == null) {
@@ -64,7 +66,7 @@ public class CoaController {
             CoaId id = new CoaId(ent, eje, concod, afacod, asucod, artcod);
             Optional<Coa> articulo = coaRepository.findById(id);
             if (articulo.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             Coa coaUpdate = articulo.get();
@@ -74,7 +76,7 @@ public class CoaController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -91,14 +93,14 @@ public class CoaController {
         try {
             CoaId id = new CoaId(ent, eje, concod, afacod, asucod, artcod);
             if (!coaRepository.existsById(id)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             coaRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -131,7 +133,7 @@ public class CoaController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

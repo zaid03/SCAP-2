@@ -25,6 +25,9 @@ public class ArtController {
     private AfaRepository afaRepository;
     @Autowired
     private AsuRepository asuRepository;
+    
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
 
     // Method to find Art records by ENT and AFACOD and artcod
     @GetMapping("/by-ent/{ent}/{afacod}/{asucod}/{artcod}")
@@ -49,7 +52,7 @@ public class ArtController {
             return ResponseEntity.ok(combined);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -63,12 +66,12 @@ public class ArtController {
             List<Art> articulos = artRepository.findByENTAndARTDESContaining(ent, artdes);
             if(articulos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(articulos);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -84,13 +87,13 @@ public class ArtController {
             List<Art> articulo = artRepository.findByENTAndAFACODAndASUCODAndARTCOD(ent, afacod, asucod, artcod);
             if(articulo.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(articulo);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -111,11 +114,11 @@ public class ArtController {
             int removed = afaRepository.deleteByENTAndAFACOD(ent, afacod);
             return removed == 0
                 ? ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Sin resultado")
+                        .body(SIN_RESULTADO)
                 : ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -136,11 +139,11 @@ public class ArtController {
             int removed = asuRepository.deleteByENTAndAFACODAndASUCOD(ent, afacod, asucod);
             return removed == 0
                 ? ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado")
+                    .body(SIN_RESULTADO)
                 : ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -154,13 +157,13 @@ public class ArtController {
             List<ArtAsuContratoProjection> articulos = artRepository.findDistinctByENTAndAsuASUECO(ent, conlot);
             if(articulos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(articulos);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -175,13 +178,13 @@ public class ArtController {
             List<ArtAsuContratoProjection> articulos = artRepository.findDistinctByENTAndAsuASUECOAndAFACODOrENTAndAsuASUECOAndASUCOD(ent, conlot, term, ent, conlot, term);
             if(articulos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(articulos);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -196,13 +199,13 @@ public class ArtController {
             List<ArtAsuContratoProjection> articulos = artRepository.findDistinctByENTAndAsuASUECOAndARTDESContaining(ent, conlot, artdes);
             if(articulos.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(articulos);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

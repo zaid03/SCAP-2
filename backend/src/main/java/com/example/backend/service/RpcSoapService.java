@@ -18,26 +18,20 @@ public class RpcSoapService {
             String namespace,
             String soapAction,
             String payload,
-            String style,
-            String use,
-            String encodingStyle,
             Map<String, String> paramsMap 
     ) {
         RpcResult result = new RpcResult();
 
-        // If payload is missing and paramsMap is present, build XML from paramsMap
         if (payload == null && paramsMap != null) {
             payload = buildXmlFromParams(operation, paramsMap);
         }
 
-        // Build the RPC method element
         String nsPrefix = "ns1";
         String methodElement =
             "<" + nsPrefix + ":" + operation + " xmlns:" + nsPrefix + "=\"" + namespace + "\">" +
                 payload +
             "</" + nsPrefix + ":" + operation + ">";
 
-        // Build the SOAP envelope
         String soapEnvelope =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +

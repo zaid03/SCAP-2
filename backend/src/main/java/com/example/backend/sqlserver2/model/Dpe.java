@@ -45,7 +45,7 @@ public class Dpe {
     public Dep getDep() { return dep; }
     public void setDep(Dep dep) { this.dep = dep; }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PERCOD", referencedColumnName = "PERCOD", insertable = false, updatable = false)
     private Per per;
     public Per getPer() { return per; }

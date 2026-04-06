@@ -31,9 +31,6 @@ public class RpcSoapController {
             String namespace = (String) params.get("namespace");
             String soapAction = params.getOrDefault("soapAction", "").toString();
             String payload = params.get("payload") != null ? params.get("payload").toString() : null;
-            String style = params.getOrDefault("style", "rpc").toString();
-            String use = params.getOrDefault("use", "encoded").toString();
-            String encodingStyle = params.getOrDefault("encodingStyle", "http://schemas.xmlsoap.org/soap/encoding/").toString();
 
             Map<String, String> paramsMap = null;
                 if (payload == null && params.get("paramsMap") instanceof Map) {
@@ -50,9 +47,6 @@ public class RpcSoapController {
                 namespace,
                 soapAction,
                 payload,
-                style,
-                use,
-                encodingStyle,
                 paramsMap
             );
 

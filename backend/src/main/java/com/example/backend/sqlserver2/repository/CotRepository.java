@@ -18,7 +18,7 @@ public interface CotRepository extends JpaRepository<Cot, CotId> {
     //search by concod no bloqueado
     List<CotContratoProjection> findAllProjectedByConnCONTIPAndConnENTAndConnEJEAndConnCONCODAndConnCONBLONot(Integer CONTIP, Integer ent, String eje, Integer concod, Integer conblo);
 
-    //search by concod todos
+    //search by concod alls
     List<CotContratoProjection> findAllProjectedByConnCONTIPAndConnENTAndConnEJEAndConnCONCOD(Integer CONTIP, Integer ent, String eje, Integer concod);
 
     //search by condes bloqueado
@@ -27,7 +27,7 @@ public interface CotRepository extends JpaRepository<Cot, CotId> {
     //search by condes no bloqueado
     List<CotContratoProjection> findAllProjectedByConnCONTIPAndConnENTAndConnEJEAndConnCONDESContainingAndConnCONBLONot(Integer CONTIP, Integer ent, String eje, String condes, Integer conblo);
 
-    //search by condes todos
+    //search by condes alls
     List<CotContratoProjection> findAllProjectedByConnCONTIPAndConnENTAndConnEJEAndConnCONDESContaining(Integer CONTIP, Integer ent, String eje, String condes);
 
     //search by bloqueado all

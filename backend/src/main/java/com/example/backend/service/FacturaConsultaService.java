@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.backend.dto.FacturaConsultaRequestDto;
+import com.example.backend.exception.SmlProcessingException;
 import com.example.sical.CryptoSical;
 
 import java.time.Instant;
@@ -73,7 +74,7 @@ public class FacturaConsultaService {
             sb.append("</e>");
             return sb.toString();
         } catch (Exception ex) {
-            throw new RuntimeException("Error al generar la entrada SML: " + ex.getMessage(), ex);
+            throw new SmlProcessingException("Error al generar la entrada SML: " + ex.getMessage(), ex);
         }
     }
 

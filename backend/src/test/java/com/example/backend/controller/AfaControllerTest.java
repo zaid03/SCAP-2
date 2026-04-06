@@ -1,34 +1,41 @@
 package com.example.backend.controller;
 
-import com.example.backend.config.TestSecurityConfig;
-import com.example.backend.config.TestExceptionHandler;
-import com.example.backend.sqlserver2.model.Afa;
-import com.example.backend.sqlserver2.model.AfaId;
-import com.example.backend.sqlserver2.repository.AfaRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.example.backend.config.TestExceptionHandler;
+import com.example.backend.config.TestSecurityConfig;
+import com.example.backend.sqlserver2.model.Afa;
+import com.example.backend.sqlserver2.model.AfaId;
+import com.example.backend.sqlserver2.repository.AfaRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(controllers = AfaController.class)
 @ActiveProfiles("test")
@@ -96,6 +103,17 @@ public class AfaControllerTest {
     }
 
     @Test
+    void getByEntAndAfadesLike_returns400OnDataAccessException() throws Exception {
+        when(afaRepository.findByENTAndAFADESContaining(anyInt(), anyString()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/afa/by-ent-like/1/Desc"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error")));
+    }
+
+    @Test
     void getAfaByEnt_returnsListOr404() throws Exception {
         Afa a = new Afa();
         when(afaRepository.findByENT(1)).thenReturn(List.of(a));
@@ -111,6 +129,17 @@ public class AfaControllerTest {
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void getAfaByEnt_returns400OnDataAccessException() throws Exception {
+        when(afaRepository.findByENT(anyInt()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/afa/by-ent/1"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error")));
     }
 
     @Test
@@ -154,7 +183,7 @@ public class AfaControllerTest {
             .andExpect(status().isNotFound())
             .andExpect(content().string("Sin resultado"));
 
-        when(afaRepository.findById(Mockito.<AfaId>any()))
+        when(afaRepository.findById(any(AfaId.class)))
             .thenThrow(new DataAccessResourceFailureException("DB down"));
         mockMvc.perform(patch("/api/afa/update-familia/1/AF1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -162,6 +191,23 @@ public class AfaControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("Update failed")));
+    }
+
+    @Test
+    void updateFamilia_returns400WhenAFADESFieldNull() throws Exception {
+        AfaId id = new AfaId(1, "AF1");
+        Afa existing = new Afa();
+        when(afaRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String, Object> payloadWithNullField = new java.util.HashMap<>();
+        payloadWithNullField.put("AFADES", null);
+
+        mockMvc.perform(patch("/api/afa/update-familia/1/AF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payloadWithNullField)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
     }
 
     @Test
@@ -175,7 +221,7 @@ public class AfaControllerTest {
             .andDo(print())
             .andExpect(status().isCreated());
 
-        verify(afaRepository).save(Mockito.<Afa>any());
+        verify(afaRepository).save(any(Afa.class));
 
         Map<String,Object> missing = Map.of("ent", 1, "afacod", "A");
         mockMvc.perform(post("/api/afa/Insert-familia")
@@ -192,5 +238,50 @@ public class AfaControllerTest {
             .andDo(print())
             .andExpect(status().isConflict())
             .andExpect(content().string(containsString("Sin resultado")));
+    }
+
+    @Test
+    void insertFamilia_returns400WhenEntNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", null);
+        payload.put("afacod", "A");
+        payload.put("afades", "D");
+
+        mockMvc.perform(post("/api/afa/Insert-familia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertFamilia_returns400WhenAfacodNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", null);
+        payload.put("afades", "D");
+
+        mockMvc.perform(post("/api/afa/Insert-familia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertFamilia_returns400WhenAfadesNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", "A");
+        payload.put("afades", null);
+
+        mockMvc.perform(post("/api/afa/Insert-familia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
     }
 }

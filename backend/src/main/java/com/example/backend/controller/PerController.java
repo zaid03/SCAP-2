@@ -17,6 +17,9 @@ public class PerController {
     @Autowired
     private PerRepository perRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //for selecting all personas
     @GetMapping("/fetch-all")
     public ResponseEntity<?> fetchPersona(
@@ -24,11 +27,11 @@ public class PerController {
         try {
             List<Per> personas = perRepository.findAll();
             if(personas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(personas);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -40,11 +43,11 @@ public class PerController {
         try {
             List<Per> personas = perRepository.findByPERCODOrPERNOMContaining(search, search);
             if(personas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(personas);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -56,11 +59,11 @@ public class PerController {
         try {
             List<Per> personas = perRepository.findByPERNOMContaining(search);
             if(personas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(personas);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -91,7 +94,7 @@ public class PerController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -109,7 +112,7 @@ public class PerController {
             Optional<Per> persona = perRepository.findById(payload.PERCOD());
             if(persona.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Per personaUpdate = persona.get();
@@ -125,7 +128,7 @@ public class PerController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

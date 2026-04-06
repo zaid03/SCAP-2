@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -33,6 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -100,7 +103,7 @@ public class GbsControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -179,6 +182,299 @@ public class GbsControllerTest {
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void updateGbsibg_returnsNoContentOnSuccess() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        Gbs existing = new Gbs();
+        existing.setGBSIBG(0.0);
+        when(gbsRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String, Object> payload = Map.of("GBSIBG", 50.75);
+
+        mockMvc.perform(patch("/api/gbs/update-gbsibg/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNoContent());
+
+        verify(gbsRepository).save(any(Gbs.class));
+    }
+
+    @Test
+    void updateGbsibg_returnsBadRequestWhenPayloadNull() throws Exception {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("GBSIBG", null);
+
+        mockMvc.perform(patch("/api/gbs/update-gbsibg/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void updateGbsibg_returnsNotFoundWhenBolsaMissing() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class))).thenReturn(Optional.empty());
+
+        Map<String, Object> payload = Map.of("GBSIBG", 25.0);
+
+        mockMvc.perform(patch("/api/gbs/update-gbsibg/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void updateGbsibg_returnsBadRequestOnDataAccessException() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        Map<String, Object> payload = Map.of("GBSIBG", 25.0);
+
+        mockMvc.perform(patch("/api/gbs/update-gbsibg/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void transpasar_returnsNoContentOnSuccess() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        Gbs existing = new Gbs();
+        when(gbsRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String, Object> payload = Map.of(
+            "GBSIMP", 300.0,
+            "GBSIBG", 75.0,
+            "GBSIUS", 10.0,
+            "GBSICO", 20.0,
+            "GBSFOP", "2026-01-22T12:00:00"
+        );
+
+        mockMvc.perform(patch("/api/gbs/transpasar-bolsa/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNoContent());
+
+        verify(gbsRepository).save(any(Gbs.class));
+    }
+
+    @Test
+    void transpasar_returnsBadRequestWhenFieldsNull() throws Exception {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("GBSIMP", null);
+        payload.put("GBSIBG", 75.0);
+        payload.put("GBSIUS", 10.0);
+        payload.put("GBSICO", 20.0);
+        payload.put("GBSFOP", "2026-01-22T12:00:00");
+
+        mockMvc.perform(patch("/api/gbs/transpasar-bolsa/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void transpasar_returnsNotFoundWhenBolsaMissing() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class))).thenReturn(Optional.empty());
+
+        Map<String, Object> payload = Map.of(
+            "GBSIMP", 300.0,
+            "GBSIBG", 75.0,
+            "GBSIUS", 10.0,
+            "GBSICO", 20.0,
+            "GBSFOP", "2026-01-22T12:00:00"
+        );
+
+        mockMvc.perform(patch("/api/gbs/transpasar-bolsa/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void transpasar_returnsBadRequestOnDataAccessException() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        Map<String, Object> payload = Map.of(
+            "GBSIMP", 300.0,
+            "GBSIBG", 75.0,
+            "GBSIUS", 10.0,
+            "GBSICO", 20.0,
+            "GBSFOP", "2026-01-22T12:00:00"
+        );
+
+        mockMvc.perform(patch("/api/gbs/transpasar-bolsa/1/E1/C1/REF1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void addBolsa_returnsNoContentOnSuccess() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        when(gbsRepository.existsById(id)).thenReturn(false);
+        when(gbsRepository.findByENTAndEJEAndCGECODAndGBSECO(1, "E1", "C1", "ECO1")).thenReturn(Optional.empty());
+
+        List<Map<String, Object>> payload = List.of(
+            new HashMap<String, Object>() {{
+                put("ENT", 1);
+                put("EJE", "E1");
+                put("CGECOD", "C1");
+                put("GBSREF", "REF1");
+                put("GBSOPE", "OPE1");
+                put("GBSORG", "ORG1");
+                put("GBSFUN", "FUN1");
+                put("GBSECO", "ECO1");
+                put("GBSIMP", 100.0);
+                put("GBSIBG", 25.0);
+                put("GBSIUS", 5.0);
+                put("GBSICO", 10.0);
+                put("GBSIUT", 0.0);
+                put("GBSICT", 0.0);
+                put("GBS413", 0.0);
+            }}
+        );
+
+        mockMvc.perform(post("/api/gbs/add-Bolsa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNoContent());
+
+        verify(gbsRepository).saveAll(any());
+    }
+
+    @Test
+    void addBolsa_skipsExistingByRef() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        when(gbsRepository.existsById(id)).thenReturn(true);
+
+        List<Map<String, Object>> payload = List.of(
+            new HashMap<String, Object>() {{
+                put("ENT", 1);
+                put("EJE", "E1");
+                put("CGECOD", "C1");
+                put("GBSREF", "REF1");
+                put("GBSOPE", "OPE1");
+                put("GBSORG", "ORG1");
+                put("GBSFUN", "FUN1");
+                put("GBSECO", "ECO1");
+                put("GBSIMP", 100.0);
+                put("GBSIBG", 25.0);
+                put("GBSIUS", 5.0);
+                put("GBSICO", 10.0);
+                put("GBSIUT", 0.0);
+                put("GBSICT", 0.0);
+                put("GBS413", 0.0);
+            }}
+        );
+
+        mockMvc.perform(post("/api/gbs/add-Bolsa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isNoContent());
+
+        verify(gbsRepository).saveAll(argThat(list -> ((ArrayList<?>) list).isEmpty()));
+    }
+
+    @Test
+    void addBolsa_returnsBadRequestOnDataAccessException() throws Exception {
+        when(gbsRepository.existsById(any(GbsId.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        List<Map<String, Object>> payload = List.of(
+            new HashMap<String, Object>() {{
+                put("ENT", 1);
+                put("EJE", "E1");
+                put("CGECOD", "C1");
+                put("GBSREF", "REF1");
+                put("GBSOPE", "OPE1");
+                put("GBSORG", "ORG1");
+                put("GBSFUN", "FUN1");
+                put("GBSECO", "ECO1");
+                put("GBSIMP", 100.0);
+                put("GBSIBG", 25.0);
+                put("GBSIUS", 5.0);
+                put("GBSICO", 10.0);
+                put("GBSIUT", 0.0);
+                put("GBSICT", 0.0);
+                put("GBS413", 0.0);
+            }}
+        );
+
+        mockMvc.perform(post("/api/gbs/add-Bolsa")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void deleteBolsa_returnsNoContentOnSuccess() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        Gbs bolsa = new Gbs();
+        bolsa.setGBSIUT(0.0);
+        when(gbsRepository.findById(id)).thenReturn(Optional.of(bolsa));
+
+        mockMvc.perform(delete("/api/gbs/delete-bolsa/1/E1/C1/REF1"))
+            .andDo(print())
+            .andExpect(status().isNoContent());
+
+        verify(gbsRepository).deleteById(id);
+    }
+
+    @Test
+    void deleteBolsa_returnsNotFoundWhenMissing() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/api/gbs/delete-bolsa/1/E1/C1/REF1"))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void deleteBolsa_returnsConflictWhenGbsiutNotZero() throws Exception {
+        GbsId id = new GbsId(1, "E1", "C1", "REF1");
+        Gbs bolsa = new Gbs();
+        bolsa.setGBSIUT(50.0);
+        when(gbsRepository.findById(id)).thenReturn(Optional.of(bolsa));
+
+        mockMvc.perform(delete("/api/gbs/delete-bolsa/1/E1/C1/REF1"))
+            .andDo(print())
+            .andExpect(status().isConflict())
+            .andExpect(content().string(containsString("No se puede eliminar la aplicación")));
+
+        verify(gbsRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void deleteBolsa_returnsBadRequestOnDataAccessException() throws Exception {
+        when(gbsRepository.findById(any(GbsId.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        mockMvc.perform(delete("/api/gbs/delete-bolsa/1/E1/C1/REF1"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 }

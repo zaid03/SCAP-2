@@ -44,12 +44,12 @@ public class ContabilizacionController {
     @Autowired
     private TerRepository terRepository;
 
+    private record ContabilizacionData(String terAyt, List<Fde> fdeList, List<Fdt> fdtList) {}
     @PostMapping("/generar")
     public ResponseEntity<?> generarOperacion(@RequestBody ContabilizacionRequestDto request) {
         try {
-            if (request.getEnt() == null || request.getEje() == null || request.getFacnum() == null) {
-                return ResponseEntity.badRequest().body("Faltan datos obligatorios: ent, eje, facnum");
-            }
+            ResponseEntity<?> validation = validateRequest(request);
+            if (validation != null) return validation;
 
             Integer entInt = Integer.parseInt(request.getEnt());
             FacId facId = new FacId(entInt, request.getEje(), request.getFacnum());
@@ -60,52 +60,69 @@ public class ContabilizacionController {
             }
             
             Fac fac = facOpt.get();
-
-            String terAyt = null;
-            if (fac.getTERCOD() != null) {
-                Optional<Ter> terOpt = terRepository.findByENTAndTERCOD(entInt, fac.getTERCOD());
-                if (terOpt.isPresent() && terOpt.get().getTERAYT() != null) {
-                    terAyt = String.valueOf(terOpt.get().getTERAYT());
-                }
-            }
-
-            List<Fde> fdeList = fdeRepository.findByENTAndEJEAndFACNUM(entInt, request.getEje(), request.getFacnum());
-
-            List<Fdt> fdtList = fdtRepository.findByENTAndEJEAndFACNUM(entInt, request.getEje(), request.getFacnum());
-
-            String smlInput = contabilizacionService.buildSmlInput(request, fac, fdeList, fdtList, terAyt);
-
+            ContabilizacionData data = retrieveContabilizacionData(request, fac, entInt);
+            
+            String smlInput = contabilizacionService.buildSmlInput(request, fac, data.fdeList(), data.fdtList(), data.terAyt());
             String soapResponse = contabilizacionService.sendSmlRequest(smlInput, request.getWebserviceUrl());
-
             ContabilizacionResponseDto response = contabilizacionService.parseResponse(soapResponse);
-
-            if (response.isExito()) {
-                if (response.getOpesical() != null) {
-                    fac.setFACADO(response.getOpesical());
-                }
-                
-                if (request.getFechaContable() != null) {
-                    String fc = request.getFechaContable().replace("-", "");
-                    if (fc.length() == 8) {
-                        int year = Integer.parseInt(fc.substring(0, 4));
-                        int month = Integer.parseInt(fc.substring(4, 6));
-                        int day = Integer.parseInt(fc.substring(6, 8));
-                        fac.setFACFCO(LocalDateTime.of(year, month, day, 0, 0));
-                    }
-                }
-                
-                facRepository.save(fac);
-                
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
+            
+            return handleContabilizacionResponse(response, fac, request);
+            
         } catch (Exception ex) {
             ContabilizacionResponseDto error = new ContabilizacionResponseDto();
             error.setExito(false);
             error.setMensaje("Error: " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    private ResponseEntity<?> validateRequest(ContabilizacionRequestDto request) {
+        if (request.getEnt() == null || request.getEje() == null || request.getFacnum() == null) {
+            return ResponseEntity.badRequest().body("Faltan datos obligatorios: ent, eje, facnum");
+        }
+        return null;
+    }
+
+    private ContabilizacionData retrieveContabilizacionData(ContabilizacionRequestDto request, Fac fac, Integer entInt) {
+        String terAyt = null;
+        if (fac.getTERCOD() != null) {
+            Optional<Ter> terOpt = terRepository.findByENTAndTERCOD(entInt, fac.getTERCOD());
+            if (terOpt.isPresent() && terOpt.get().getTERAYT() != null) {
+                terAyt = String.valueOf(terOpt.get().getTERAYT());
+            }
+        }
+        
+        List<Fde> fdeList = fdeRepository.findByENTAndEJEAndFACNUM(entInt, request.getEje(), request.getFacnum());
+        List<Fdt> fdtList = fdtRepository.findByENTAndEJEAndFACNUM(entInt, request.getEje(), request.getFacnum());
+        
+        return new ContabilizacionData(terAyt, fdeList, fdtList);
+    }
+
+    private LocalDateTime parseFechaContable(String fechaContable) {
+        if (fechaContable == null) return null;
+        String fc = fechaContable.replace("-", "");
+        if (fc.length() == 8) {
+            int year = Integer.parseInt(fc.substring(0, 4));
+            int month = Integer.parseInt(fc.substring(4, 6));
+            int day = Integer.parseInt(fc.substring(6, 8));
+            return LocalDateTime.of(year, month, day, 0, 0);
+        }
+        return null;
+    }
+
+    private ResponseEntity<?> handleContabilizacionResponse(ContabilizacionResponseDto response, Fac fac, ContabilizacionRequestDto request) {
+        if (response.isExito()) {
+            if (response.getOpesical() != null) {
+                fac.setFACADO(response.getOpesical());
+            }
+            LocalDateTime facFco = parseFechaContable(request.getFechaContable());
+            if (facFco != null) {
+                fac.setFACFCO(facFco);
+            }
+            facRepository.save(fac);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

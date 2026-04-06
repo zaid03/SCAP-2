@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.config.TestSecurityConfig;
 import com.example.backend.dto.Operaciones;
 import com.example.backend.service.OperacionesService;
+import com.example.backend.exception.SmlProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,7 +37,7 @@ public class OperacionesControllerTest {
     @Test
     void shouldReturnOperacionesWithParams() throws Exception {
         Operaciones o = new Operaciones();
-        when(operacionesService.getOperaciones("1", "2", "cod", "org", "fun", "eco", "exp", "grp", "ofi"))
+        when(operacionesService.getOperaciones(any(OperacionesService.SearchCriteria.class)))
             .thenReturn(List.of(o));
 
         mockMvc.perform(get("/api/sical/operaciones")
@@ -54,12 +55,12 @@ public class OperacionesControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
 
-        verify(operacionesService).getOperaciones("1", "2", "cod", "org", "fun", "eco", "exp", "grp", "ofi");
+        verify(operacionesService).getOperaciones(any(OperacionesService.SearchCriteria.class));
     }
 
     @Test
     void shouldReturnEmptyListWhenNoResults() throws Exception {
-        when(operacionesService.getOperaciones(null, null, null, null, null, null, null, null, null))
+        when(operacionesService.getOperaciones(any(OperacionesService.SearchCriteria.class)))
             .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/sical/operaciones")
@@ -68,12 +69,26 @@ public class OperacionesControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(0)));
 
-        verify(operacionesService).getOperaciones(null, null, null, null, null, null, null, null, null);
+        verify(operacionesService).getOperaciones(any(OperacionesService.SearchCriteria.class));
+    }
+
+    @Test
+    void shouldReturnSmlProcessingErrorWhenSmlException() throws Exception {
+        when(operacionesService.getOperaciones(any(OperacionesService.SearchCriteria.class)))
+            .thenThrow(new SmlProcessingException("SML processing failed"));
+
+        mockMvc.perform(get("/api/sical/operaciones")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.error").value("SML processing error: SML processing failed"));
+
+        verify(operacionesService).getOperaciones(any(OperacionesService.SearchCriteria.class));
     }
 
     @Test
     void shouldReturn500WhenServiceThrows() throws Exception {
-        when(operacionesService.getOperaciones(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(operacionesService.getOperaciones(any(OperacionesService.SearchCriteria.class)))
             .thenThrow(new RuntimeException("sical fail"));
 
         mockMvc.perform(get("/api/sical/operaciones")
@@ -81,5 +96,7 @@ public class OperacionesControllerTest {
             .andDo(print())
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.error").value("sical fail"));
+
+        verify(operacionesService).getOperaciones(any(OperacionesService.SearchCriteria.class));
     }
 }

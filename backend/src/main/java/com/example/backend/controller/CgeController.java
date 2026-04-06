@@ -35,6 +35,9 @@ public class CgeController {
     @Autowired
     private DpeRepository dpeRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //selecting centro gestor for login
     @GetMapping("/{ent}/{eje}/{percod}")
     public ResponseEntity<?> getCentrosGestores(
@@ -45,7 +48,7 @@ public class CgeController {
         try {
             List<Dpe> dpes = dpeRepository.findByENTAndEJEAndPERCOD(ent, eje, percod);
             if (dpes.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             List<String> depcods = dpes.stream()
@@ -55,28 +58,19 @@ public class CgeController {
 
             List<Dep> deps = depRepository.findByENTAndEJEAndDEPCODIn(ent, eje, depcods);
             if (deps.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             Map<String, Dep> depByCgecod = deps.stream().collect(Collectors.toMap(
                 Dep::getCGECOD,
                 dep -> dep,
-                (existing, replacement) -> {
-                    existing.setDEPINT(Math.max(existing.getDEPINT() != null ? existing.getDEPINT() : 0, 
-                                                    replacement.getDEPINT() != null ? replacement.getDEPINT() : 0));
-                    existing.setDEPALM(Math.max(existing.getDEPALM() != null ? existing.getDEPALM() : 0, 
-                                                    replacement.getDEPALM() != null ? replacement.getDEPALM() : 0));
-                    existing.setDEPCOM(Math.max(existing.getDEPCOM() != null ? existing.getDEPCOM() : 0, 
-                                                    replacement.getDEPCOM() != null ? replacement.getDEPCOM() : 0));
-                    return existing;
-                }
+                this::mergeDeps 
             ));
 
             List<String> cgecods = List.copyOf(depByCgecod.keySet());
-
             List<Cge> cges = cgeRepository.findByENTAndEJEAndCGECODIn(ent, eje, cgecods);
             if (cges.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             List<CentroGestorLogin> result = cges.stream().map(cge -> {
@@ -93,8 +87,24 @@ public class CgeController {
 
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMessage());
+                .body(ERROR + ex.getMessage());
         }
+    }
+
+    private Dep mergeDeps(Dep existing, Dep replacement) {
+        existing.setDEPINT(Math.max(
+            existing.getDEPINT() != null ? existing.getDEPINT() : 0, 
+            replacement.getDEPINT() != null ? replacement.getDEPINT() : 0
+        ));
+        existing.setDEPALM(Math.max(
+            existing.getDEPALM() != null ? existing.getDEPALM() : 0, 
+            replacement.getDEPALM() != null ? replacement.getDEPALM() : 0
+        ));
+        existing.setDEPCOM(Math.max(
+            existing.getDEPCOM() != null ? existing.getDEPCOM() : 0, 
+            replacement.getDEPCOM() != null ? replacement.getDEPCOM() : 0
+        ));
+        return existing;
     }
 
     //selecting all centro gestores
@@ -106,16 +116,16 @@ public class CgeController {
         try {
             List<Cge> centros = cgeRepository.findByENTAndEJE(ent, eje);
             if (centros.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //update centro gestor
-    public record centroUpdate(String cgedes, String cgeorg, String cgefun, String cgedat, Integer cgecic) {}
+    public record CentroUpdate(String cgedes, String cgeorg, String cgefun, String cgedat, Integer cgecic) {}
 
     @PatchMapping("/update-cge/{ent}/{eje}/{cge}")
     @Transactional
@@ -123,7 +133,7 @@ public class CgeController {
         @PathVariable Integer ent,
         @PathVariable String eje,
         @PathVariable String cge,
-        @RequestBody centroUpdate payload
+        @RequestBody CentroUpdate payload
     ) {
         try {
             if (payload == null || payload.cgedes() == null || payload.cgeorg() == null || payload.cgefun() == null || payload.cgedat() == null || payload.cgecic() == null) {
@@ -135,7 +145,7 @@ public class CgeController {
 
             if (opt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Cge entity = opt.get();
@@ -150,15 +160,15 @@ public class CgeController {
 
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
     //add centro gestor
-    public record centroAdd(Integer ent, String eje, String cgecod, String cgedes, String cgeorg, String cgefun, String cgedat, Integer cgecic) {}
+    public record CentroAdd(Integer ent, String eje, String cgecod, String cgedes, String cgeorg, String cgefun, String cgedat, Integer cgecic) {}
 
     @PostMapping("/Insert-familia")
     public ResponseEntity<?> addCentroGestor(
-        @RequestBody centroAdd payload
+        @RequestBody CentroAdd payload
     ) {
         try {
             if (payload == null || payload.ent() == null || payload.eje() == null || payload.cgecod() == null || payload.cgedes() == null || payload.cgeorg() == null || payload.cgefun() == null || payload.cgedat() == null || payload.cgecic() == null) {
@@ -167,7 +177,7 @@ public class CgeController {
 
             if(!cgeRepository.findByENTAndEJEAndCGECOD(payload.ent(), payload.eje(), payload.cgecod()).isEmpty()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             
             Cge nueva = new Cge();
@@ -184,7 +194,7 @@ public class CgeController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch(DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -211,13 +221,13 @@ public class CgeController {
             CgeId id = new CgeId(ent, eje, cgecod);
             if (!cgeRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             cgeRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch(DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -231,12 +241,12 @@ public class CgeController {
             Optional<String> description = cgeRepository.findFirstByENTAndEJEAndCGECOD(ent, eje, cgecod).map(Cge::getCGEDES);
             if (description.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Sin resultado");
+                        .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(description.get());
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + ex.getMostSpecificCause().getMessage());
+                    .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -253,12 +263,12 @@ public class CgeController {
                 ent, eje, term
             );
             if (centros.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -271,11 +281,11 @@ public class CgeController {
         try {
             List<shortCentroContrato> centros = cgeRepository.findByENTAndEJEAndCGECOD(ent, eje, cgecod);
             if (centros.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -289,12 +299,12 @@ public class CgeController {
             List<shortCentroContrato> centros = cgeRepository.findByENTAndEJEAndCGEDESContaining(ent, eje, term);
             if (centros.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Sin resultado");
+                        .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: " + ex.getMostSpecificCause().getMessage());
+                    .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

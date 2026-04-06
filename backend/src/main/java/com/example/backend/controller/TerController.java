@@ -1,28 +1,40 @@
 package com.example.backend.controller;
 
-import com.example.backend.sqlserver2.model.Ter;
-import com.example.backend.sqlserver2.model.TerId;
-import com.example.backend.dto.TerDto;
-import com.example.backend.service.TerSearchOptions;
-import com.example.backend.sqlserver2.repository.TerRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Optional;
+import com.example.backend.dto.TerDto;
+import com.example.backend.sqlserver2.model.Ter;
+import com.example.backend.sqlserver2.model.TerId;
+import com.example.backend.sqlserver2.repository.TerRepository;
+import com.example.backend.service.ProveedoresSearch;
 
 @RestController
 @RequestMapping("/api/ter")
 public class TerController {
     @Autowired
     private TerRepository terRepository;
+    @Autowired
+    private ProveedoresSearch proveedoresSearch;
+
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
 
     // Get all Ter records for a specific ENT
     @GetMapping("/by-ent/{ent}")
@@ -33,267 +45,31 @@ public class TerController {
             List<Ter> proveedorees = terRepository.findByENT(ent);
             if(proveedorees.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(proveedorees);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
-    //for the list filtered by TERCOD and option bloqueado
-    @GetMapping("/by-tercod-bloqueado/{ent}/tercod/{tercod}")
-    public ResponseEntity<?> getByENTAndTERCODAndTERBLO(
-        @PathVariable int ent, 
-        @PathVariable Integer tercod
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findByENTAndTERCODAndTERBLO(ent, tercod, 1);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERCOD and option no bloqueado
-    @GetMapping("/by-tercod-no-bloqueado/{ent}/tercod/{tercod}")
-    public ResponseEntity<?> getByENTAndTERCODAndTERBLONot(
-        @PathVariable int ent,
-        @PathVariable Integer tercod
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findByENTAndTERCODAndTERBLO(ent, tercod, 0);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERNIF and option bloqueado
-    @GetMapping("/by-ternif-bloquado/{ent}/ternif/{ternif}")
-    public ResponseEntity<?> getByENTAndTERNIFAndTERBLO(
-        @PathVariable int ent, 
-        @PathVariable String ternif
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findByENTAndTERNIFContainingAndTERBLO(ent, ternif, 1);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERNIF and option no bloqueado 
-    @GetMapping("/by-ternif-no-bloqueado/{ent}/ternif/{ternif}")
-    public ResponseEntity<?> getByENTAndTERNIFAndTERBLONot(
-        @PathVariable int ent, 
-        @PathVariable String ternif
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findByENTAndTERNIFContainingAndTERBLO(ent, ternif, 0);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TerNIF and TERNOM and TERALI bloqueado
-    @GetMapping("/by-ternif-nom-ali-bloquado/{ent}/search")
-    public ResponseEntity<?> search(
-            @PathVariable int ent,
-            @RequestParam String term
-    ) {
-        try {
-            Specification<Ter> spec = TerSearchOptions.searchFiltered(ent, term);
-            List<Ter> results = terRepository.findAll(spec);
-            if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            
-            return ResponseEntity.ok(results);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERNIF and TERNOM and TERALI no bloqueado
-    @GetMapping("/by-nif-nom-ali-no-bloquado/{ent}/search-by-term")
-    public ResponseEntity<?> searchByTerm(
-        @PathVariable int ent,
+    //searching in proveedores
+    @GetMapping("/search-proveedores")
+    public ResponseEntity<?> searchProveedores (
+        @RequestParam Integer ent,
+        @RequestParam String searchMode,
         @RequestParam String term
     ) {
         try {
-            Specification<Ter> spec = TerSearchOptions.searchByTerm(ent, term);
-            List<Ter> results = terRepository.findAll(spec);
-            
-            if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            
-            return ResponseEntity.ok(results);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERNOM and TERALI bloqueado
-    @GetMapping("/by-nom-ali-bloquado/{ent}/searchByNomOrAli")
-    public ResponseEntity<?> searchByNomOrAli(
-        @PathVariable int ent,
-        @RequestParam String term
-    ) {
-        try {
-            Specification<Ter> spec = TerSearchOptions.searchByNomOrAli(ent, term);
-            List<Ter> results = terRepository.findAll(spec);
-            
-            if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(results);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the list filtered by TERNOM and TERALI no bloqueado
-    @GetMapping("/by-nom-ali-no-bloquado/{ent}/findMatchingNomOrAli")
-    public ResponseEntity<?> findMatchingNomOrAli(
-        @PathVariable int ent,
-        @RequestParam String term
-    ) {
-        try {
-            Specification<Ter> spec = TerSearchOptions.findMatchingNomOrAli(ent, term);
-            List<Ter> results = terRepository.findAll(spec);
-            
-            if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }   
-            return ResponseEntity.ok(results);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //for the option todos
-    // filtering by tercod
-    @GetMapping("/by-ent/{ent}/tercod/{tercod}")
-    public ResponseEntity<?> getByENTAndTERCOD(
-        @PathVariable int ent, 
-        @PathVariable Integer tercod
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findAllByENTAndTERCOD(ent, tercod);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-    
-    //filtering by ternif
-    @GetMapping("/by-ent/{ent}/ternif/{ternif}")
-    public ResponseEntity<?> getByENTAndTERNIF(
-        @PathVariable int ent, 
-        @PathVariable String ternif
-    ) {
-        try {
-            List<Ter> proveedorees = terRepository.findByENTAndTERNIFContaining(ent, ternif);
-            if(proveedorees.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(proveedorees);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    // filtering by ternif and ternom and terali
-    @GetMapping("/by-ent/{ent}/search-todos")
-    public ResponseEntity<?> searchTodos(
-        @PathVariable int ent,
-        @RequestParam String term
-    ) {
-        try {
-            Specification<Ter> spec = TerSearchOptions.searchTodos(ent, term);
-            List<Ter> results = terRepository.findAll(spec);
-            
-            if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
-            }
-            return ResponseEntity.ok(results);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
-
-    //to filter with bloqueado option only
-    @GetMapping("/filter/{ent}")
-    public ResponseEntity<?> filterBloqueado(
-        @PathVariable Integer ent
-    ) {
-        try {
-            List<Ter> proveedores = terRepository.findByENTAndTERBLO(ent, 1);
-
+            List<Ter> proveedores = proveedoresSearch.searchProveedoers(ent, searchMode, term);
             if (proveedores.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
-            return ResponseEntity.ok(proveedores);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al filter de proveedores: " + ex.getMostSpecificCause().getMessage());
-        }
-    }
 
-    //to filter with no bloqueado option only
-    @GetMapping("/filter-no/{ent}")
-    public ResponseEntity<?> filterNoBloqueado(
-        @PathVariable Integer ent
-    ) {
-        try {
-            List<Ter> proveedores = terRepository.findByENTAndTERBLO(ent, 0);
-
-            if (proveedores.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
-            }
             return ResponseEntity.ok(proveedores);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al filter de proveedores: " + ex.getMostSpecificCause().getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMessage());
         }
     }
 
@@ -309,7 +85,7 @@ public class TerController {
             TerId id = new TerId(ent, tercod);
             Optional<Ter> proveedor = terRepository.findById(id);
             if (proveedor.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");  
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);  
             }
 
             Ter updateProveedor = proveedor.get();
@@ -322,14 +98,17 @@ public class TerController {
             return ResponseEntity.noContent().build();
 
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //for selected proveedores to be added from sicalwin
     @PostMapping(value = "/save-proveedores/{ent}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public ResponseEntity<?> createMultipleForEnt(@PathVariable int ent, @RequestBody(required = false) List<TerDto> dtos) {
+    public ResponseEntity<?> createMultipleForEnt(
+        @PathVariable int ent, 
+        @RequestBody(required = false) List<TerDto> dtos
+    ) {
         try {
             if (dtos == null || dtos.isEmpty()) {
                 return ResponseEntity.badRequest().body("Faltan datos obligatorios");
@@ -361,7 +140,11 @@ public class TerController {
                 t.setTERWEB(dto.getTERWEB());
                 t.setTERCOE(dto.getTERCOE());
                 t.setTEROBS(dto.getTEROBS());
+                t.setPROCOD(dto.getPROCOD());
                 t.setTERPOB(dto.getTERPOB());
+                t.setTERAYT(dto.getTERAYT());
+                t.setTERACU(0);
+                t.setTERBLO(0);
                 saved.add(terRepository.save(t));
             }
 

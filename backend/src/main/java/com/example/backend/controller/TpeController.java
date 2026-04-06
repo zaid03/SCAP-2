@@ -19,6 +19,9 @@ public class TpeController {
     @Autowired
     private TpeRepository tpeRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     // Custom query to find Tpe by ENT and TERCOD
     @GetMapping("/by-tpe/{ent}/{tercod}")
     public ResponseEntity<?> getByEntAndTercod(
@@ -29,7 +32,7 @@ public class TpeController {
             List<Tpe> personas = tpeRepository.findByENTAndTERCOD(ent, tercod);
             if(personas.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(personas);
@@ -57,7 +60,7 @@ public class TpeController {
             Optional<Tpe> persona = tpeRepository.findById(id);
             if(persona.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Tpe updatePersona = persona.get();
@@ -71,7 +74,7 @@ public class TpeController {
             return ResponseEntity.noContent().build();
         } catch(DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -126,13 +129,13 @@ public class TpeController {
             TpeId id = new TpeId(ent, tercod, tpecod);
             if(!tpeRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             tpeRepository.deleteById(id);
             return ResponseEntity.ok("La persona ha sido eliminada con éxito");
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

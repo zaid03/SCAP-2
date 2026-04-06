@@ -37,17 +37,21 @@ public class OperacionesController {
         @RequestParam(name = "grupoApunte", required = false) String grupoApunte,
         @RequestParam(name = "oficina", required = false) String oficina) {
         try {
-            List<Operaciones> operaciones = operacionesService.getOperaciones(
-                    numeroOperDesde,
-                    numeroOperHasta,
-                    codigoOperacion,
-                    organica,
-                    funcional,
-                    economica,
-                    expediente,
-                    grupoApunte,
-                    oficina);
+            OperacionesService.SearchCriteria criteria = new OperacionesService.SearchCriteria.Builder()
+                    .numeroOperDesde(numeroOperDesde)
+                    .numeroOperHasta(numeroOperHasta)
+                    .codigoOperacion(codigoOperacion)
+                    .organica(organica)
+                    .funcional(funcional)
+                    .economica(economica)
+                    .expediente(expediente)
+                    .grupoApunte(grupoApunte)
+                    .oficina(oficina)
+                    .build();
+            List<Operaciones> operaciones = operacionesService.getOperaciones(criteria);
             return ResponseEntity.ok(operaciones);
+        } catch (com.example.backend.exception.SmlProcessingException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "SML processing error: " + ex.getMessage()));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", ex.getMessage()));
         }

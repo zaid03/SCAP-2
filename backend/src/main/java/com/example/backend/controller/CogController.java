@@ -30,6 +30,9 @@ public class CogController {
     @Autowired
     private CogRepository cogRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //selecting centro gestores for contrato
     @GetMapping("/fetch-centros/{ent}/{eje}/{concod}")
     public ResponseEntity<?> fetchCentroGestores(
@@ -40,13 +43,13 @@ public class CogController {
         try {
             List<CogCgeProjection> centros = cogRepository.findAllByENTAndEJEAndCONCOD(ent, eje, concod);
             if (centros.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -71,14 +74,14 @@ public class CogController {
 
                     return ResponseEntity.noContent().build();
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
                 }
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -106,12 +109,12 @@ public class CogController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //adding D to a contrato's centro gestor
-    public record addD(Double COGIMP, String COGOPD) {}
+    public record AddD(Double COGIMP, String COGOPD) {}
 
     @PatchMapping("/update-centro-D/{ent}/{eje}/{concod}/{cgecod}")
     public ResponseEntity<?> addDCentro(
@@ -119,7 +122,7 @@ public class CogController {
         @PathVariable String eje,
         @PathVariable Integer concod,
         @PathVariable String cgecod,
-        @RequestBody addD payload
+        @RequestBody AddD payload
     ) {
         try {
             if (payload == null || payload.COGIMP() == null || payload.COGOPD() == null) {
@@ -129,7 +132,7 @@ public class CogController {
             CogId id = new CogId(ent, eje, concod, cgecod);
             Optional<Cog> centro = cogRepository.findById(id);
             if (centro.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             Cog updateCentro = centro.get();
@@ -140,7 +143,7 @@ public class CogController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

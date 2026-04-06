@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import com.example.backend.dto.AsuEcoImpProjection;
 import com.example.backend.sqlserver2.model.Ade;
 import com.example.backend.sqlserver2.model.AdeId;

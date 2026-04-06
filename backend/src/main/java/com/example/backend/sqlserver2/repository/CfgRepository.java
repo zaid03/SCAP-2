@@ -20,7 +20,4 @@ public interface CfgRepository extends JpaRepository<Cfg, CfgId> {
     
     //to search in eje needed for adding facturas
     List<Cfg> findByENTAndEJE(@Param("ENT") Integer ENT, @Param("EJE") String EJE);
-
-    //needed for adding facturas
-    // Cfg findByENTAndEJE(Integer ent, String eje);
 }

@@ -73,7 +73,7 @@ public class PerControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error:")));
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error :")));
     }
 
     @Test
@@ -98,6 +98,54 @@ public class PerControllerTest {
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void shouldSearchCodNom_returns500OnDataAccessException() throws Exception {
+        when(perRepository.findByPERCODOrPERNOMContaining("C1", "C1"))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/Per/search-cod-nom/C1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isInternalServerError())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error :")));
+    }
+
+    @Test
+    void shouldSearchNom_returns200WithResults() throws Exception {
+        Per p = new Per();
+        p.setPERNOM("Persona1");
+        when(perRepository.findByPERNOMContaining("Persona")).thenReturn(List.of(p));
+
+        mockMvc.perform(get("/api/Per/search-nom/Persona")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void shouldSearchNom_returns404WhenEmpty() throws Exception {
+        when(perRepository.findByPERNOMContaining("Z")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/Per/search-nom/Z")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
+    void shouldSearchNom_returns500OnDataAccessException() throws Exception {
+        when(perRepository.findByPERNOMContaining("Persona"))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/Per/search-nom/Persona")
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isInternalServerError())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error :")));
     }
 
     @Test
@@ -149,6 +197,29 @@ public class PerControllerTest {
     }
 
     @Test
+    void shouldInsertPersona_returns400OnDataAccessException() throws Exception {
+        Map<String,Object> payload = Map.of(
+            "PERCOD", "P1",
+            "PERNOM", "Persona1",
+            "PERCOE", "COE",
+            "PERTEL", "111",
+            "PERTMO", "222",
+            "PERCAR", "ROLE",
+            "PEROBS", "OBS"
+        );
+        when(perRepository.existsById("P1")).thenReturn(false);
+        when(perRepository.save(any(Per.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        mockMvc.perform(post("/api/Per/Insert-persona")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error :")));
+    }
+
+    @Test
     void shouldUpdatePersona_returns204() throws Exception {
         Map<String,Object> payload = Map.of("PERCOD", "P2", "PERNOM", "Updated");
         Per existing = new Per();
@@ -187,5 +258,22 @@ public class PerControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(content().string("Faltan datos obligatorios"));
+    }
+
+    @Test
+    void shouldUpdatePersona_returns400OnDataAccessException() throws Exception {
+        Map<String,Object> payload = Map.of("PERCOD", "P2", "PERNOM", "Updated");
+        Per existing = new Per();
+        existing.setPERCOD("P2");
+        when(perRepository.findById("P2")).thenReturn(Optional.of(existing));
+        when(perRepository.save(any(Per.class)))
+            .thenThrow(new DataAccessResourceFailureException("DB error"));
+
+        mockMvc.perform(patch("/api/Per/update-persona")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Error :")));
     }
 }

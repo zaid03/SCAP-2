@@ -58,6 +58,17 @@ public class AsuControllerTest {
     }
 
     @Test
+    void getByEntAndAfacodOrAsucod_returns404WhenBothEmpty() throws Exception {
+        when(asuRepository.findByENTAndAFACOD(1, "A1")).thenReturn(List.of());
+        when(asuRepository.findByENTAndASUCOD(1, "B1")).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/asu/by-ent/1/A1/B1").accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
     void getByEntAndAfacodOrAsucod_returns400OnDataAccessException() throws Exception {
         when(asuRepository.findByENTAndAFACOD(anyInt(), anyString()))
             .thenThrow(new DataAccessResourceFailureException("DB down"));
@@ -65,7 +76,40 @@ public class AsuControllerTest {
         mockMvc.perform(get("/api/asu/by-ent/1/A1/B1"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void getByEntAndAsudesLike_returns400OnDataAccessException() throws Exception {
+        when(asuRepository.findByENTAndASUDESContaining(anyInt(), anyString()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/asu/by-ent-like/1/foo"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void getArtName_returns400OnDataAccessException() throws Exception {
+        when(asuRepository.findByENTAndAFACODAndASUCOD(anyInt(), anyString(), anyString()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/asu/art-name/1/AF/C1"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void getSubfamilias_returns400OnDataAccessException() throws Exception {
+        when(asuRepository.findByENTAndAFACOD(anyInt(), anyString()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        mockMvc.perform(get("/api/asu/by-ent-afacod/1/AF"))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -120,31 +164,97 @@ public class AsuControllerTest {
     }
 
     @Test
-    void updateSubFamilia_successAndValidation() throws Exception {
-        Asu existing = new Asu();
+    void updateSubFamilia_returns400WhenASUDESNull() throws Exception {
         AsuId id = new AsuId(1, "AF", "S1");
-        existing.setASUDES("old");
+        Asu existing = new Asu();
         when(asuRepository.findById(id)).thenReturn(Optional.of(existing));
 
-        Map<String,Object> payload = Map.of("ASUDES", "new", "ASUECO", "E", "MTACOD", 5);
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("ASUDES", null);
+        payload.put("ASUECO", "E");
+        payload.put("MTACOD", 5);
 
+        mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void updateSubFamilia_returns400WhenASUECONull() throws Exception {
+        AsuId id = new AsuId(1, "AF", "S1");
+        Asu existing = new Asu();
+        when(asuRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("ASUDES", "new");
+        payload.put("ASUECO", null);
+        payload.put("MTACOD", 5);
+
+        mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void updateSubFamilia_returns400WhenMTACODNull() throws Exception {
+        AsuId id = new AsuId(1, "AF", "S1");
+        Asu existing = new Asu();
+        when(asuRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("ASUDES", "new");
+        payload.put("ASUECO", "E");
+        payload.put("MTACOD", null);
+
+        mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void updateSubFamilia_successfulUpdate() throws Exception {
+        AsuId id = new AsuId(1, "AF", "S1");
+        Asu existing = new Asu();
+        when(asuRepository.findById(id)).thenReturn(Optional.of(existing));
+
+        Map<String,Object> payload = Map.of("ASUDES", "updated desc", "ASUECO", "E", "MTACOD", 10);
         mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isNoContent());
 
-        ArgumentCaptor<Asu> cap = ArgumentCaptor.forClass(Asu.class);
-        verify(asuRepository).save(cap.capture());
-        assertEquals("new", cap.getValue().getASUDES());
-        
-        Map<String,Object> bad = Map.of("ASUDES", "x");
+        ArgumentCaptor<Asu> captor = ArgumentCaptor.forClass(Asu.class);
+        verify(asuRepository).save(captor.capture());
+        assertEquals("updated desc", captor.getValue().getASUDES());
+        assertEquals("E", captor.getValue().getASUECO());
+        assertEquals(10, captor.getValue().getMTACOD());
+    }
+
+    @Test
+    void updateSubFamilia_returns400OnSaveException() throws Exception {
+        AsuId id = new AsuId(1, "AF", "S1");
+        Asu existing = new Asu();
+        when(asuRepository.findById(id)).thenReturn(Optional.of(existing));
+        when(asuRepository.save(Mockito.<Asu>any()))
+            .thenThrow(new DataAccessResourceFailureException("DB down"));
+
+        Map<String,Object> payload = Map.of("ASUDES", "new", "ASUECO", "E", "MTACOD", 5);
         mockMvc.perform(patch("/api/asu/update-subfamilia/1/AF/S1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(bad)))
+                .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -167,11 +277,119 @@ public class AsuControllerTest {
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
-    void insertSub_successValidationAndConflict() throws Exception {
+    void insertSub_returns400WhenEntNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", null);
+        payload.put("afacod", "A");
+        payload.put("asucod", "X");
+        payload.put("asudes", "D");
+        payload.put("asueco", "E");
+        payload.put("mtacod", 1);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_returns400WhenAfacodNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", null);
+        payload.put("asucod", "X");
+        payload.put("asudes", "D");
+        payload.put("asueco", "E");
+        payload.put("mtacod", 1);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_returns400WhenAsucodNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", "A");
+        payload.put("asucod", null);
+        payload.put("asudes", "D");
+        payload.put("asueco", "E");
+        payload.put("mtacod", 1);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_returns400WhenAsudesNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", "A");
+        payload.put("asucod", "X");
+        payload.put("asudes", null);
+        payload.put("asueco", "E");
+        payload.put("mtacod", 1);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_returns400WhenAsuEcoNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", "A");
+        payload.put("asucod", "X");
+        payload.put("asudes", "D");
+        payload.put("asueco", null);
+        payload.put("mtacod", 1);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_returns400WhenMtacodNull() throws Exception {
+        Map<String,Object> payload = new java.util.HashMap<>();
+        payload.put("ent", 1);
+        payload.put("afacod", "A");
+        payload.put("asucod", "X");
+        payload.put("asudes", "D");
+        payload.put("asueco", "E");
+        payload.put("mtacod", null);
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void insertSub_successfulInsertAndErrors() throws Exception {
         Map<String,Object> payload = Map.of("ent", 1, "afacod", "A", "asucod", "X", "asudes", "D", "asueco", "E", "mtacod", 1);
         when(asuRepository.findByENTAndAFACODAndASUCOD(1, "A", "X")).thenReturn(List.of());
 
@@ -198,5 +416,20 @@ public class AsuControllerTest {
             .andDo(print())
             .andExpect(status().isConflict())
             .andExpect(content().string(containsString("Sin resultado")));
+    }
+
+    @Test
+    void insertSub_returns400OnSaveException() throws Exception {
+        Map<String,Object> payload = Map.of("ent", 1, "afacod", "A", "asucod", "X", "asudes", "D", "asueco", "E", "mtacod", 1);
+        when(asuRepository.findByENTAndAFACODAndASUCOD(1, "A", "X")).thenReturn(List.of());
+        when(asuRepository.save(Mockito.<Asu>any()))
+            .thenThrow(new DataAccessResourceFailureException("DB down during insert"));
+
+        mockMvc.perform(post("/api/asu/Insert-Subfamilia")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Error :")));
     }
 }

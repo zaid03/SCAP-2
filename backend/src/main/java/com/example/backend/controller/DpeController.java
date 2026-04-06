@@ -2,10 +2,6 @@ package com.example.backend.controller;
 
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.PageRequest;
@@ -35,18 +31,22 @@ import com.example.backend.sqlserver2.model.Per;
 import com.example.backend.sqlserver2.repository.DepRepository;
 import com.example.backend.sqlserver2.repository.DpeRepository;
 import com.example.backend.sqlserver2.repository.PerRepository;
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/depe")
 public class DpeController {
     @Autowired
     private DpeRepository dpeRepository;
+
     @Autowired
     private PerRepository perRepository;
-    @Autowired DepRepository depRepository;
+
+    @Autowired 
+    private DepRepository depRepository;
+
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+    private static final String PETICIONARIO = "peticionario";
 
     //for adding personas to services and vice versa
     private final DpeService dpeService;
@@ -77,9 +77,13 @@ public class DpeController {
             List<PersonaDto> result = personas.stream()
                 .map(p -> new PersonaDto(p.getPERCOD(), p.getPERNOM()))
                 .toList();
+
+            if (result.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
             return ResponseEntity.ok(result);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     } 
 
@@ -95,13 +99,13 @@ public class DpeController {
             DpeId id = new DpeId(ent, eje, depcod, percod);
             if(!dpeRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             dpeRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -116,7 +120,7 @@ public class DpeController {
             List<Dpe> dpes = dpeRepository.findByENTAndEJEAndPERCOD(ent, eje, percod);
             if (dpes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             List<String> depcods = dpes.stream()
@@ -132,7 +136,7 @@ public class DpeController {
 
             return ResponseEntity.ok(result);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -148,13 +152,13 @@ public class DpeController {
             DpeId id = new DpeId(ent, eje, depcod, percod);
             if(!dpeRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             dpeRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -173,7 +177,7 @@ public class DpeController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMessage());
+                .body(ERROR + ex.getMessage());
         }
     }
 
@@ -188,13 +192,13 @@ public class DpeController {
             List<Dpe> existing = dpeRepository.findByENTAndEJEAndPERCOD(ent, eje, percod);
             if (existing.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             int deletedd = dpeRepository.deleteByENTAndEJEAndPERCOD(ent, eje, percod);
             if (deletedd == 0) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
@@ -217,7 +221,7 @@ public class DpeController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMessage());
+                .body(ERROR + ex.getMessage());
         }
     }
 
@@ -233,141 +237,14 @@ public class DpeController {
             Pageable pageable = PageRequest.of(page, size);
             List<personasPorServiciosProjection> personas = dpeRepository.findByENTAndEJE(ent, eje, pageable);
 
-            if (personas.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            if (personas == null || personas.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(personas);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMessage());
-        }
-    }
-
-    //downloading as excel
-    @GetMapping("/personas-servicios/excel/{ent}/{eje}")
-    public void exportPersonasServiciosExcel(
-        @PathVariable Integer ent,
-        @PathVariable String eje,
-        HttpServletResponse response
-    ) {
-        try {
-            List<personasPorServiciosProjection> personas = dpeRepository.findByENTAndEJE(ent, eje);
-            if (personas.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=personas_por_servicios.xlsx");
-
-            try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("Personas por Servicios");
-                String[] columns = {
-                    "#", "Cód Persona", "Nombre", "Cód Servicio", "Servicio",
-                    "Almacén/Farmacia", "Comprador", "Contable", "Cód Centro Gestor", "Nombre Centro Gestor"
-                };
-                Row header = sheet.createRow(0);
-                for (int i = 0; i < columns.length; i++) {
-                    header.createCell(i).setCellValue(columns[i]);
-                }
-                int rowIdx = 1;
-                for (personasPorServiciosProjection p : personas) {
-                    Row row = sheet.createRow(rowIdx);
-                    row.createCell(0).setCellValue(rowIdx);
-                    row.createCell(1).setCellValue(p.getPERCOD() != null ? p.getPERCOD() : "");
-                    row.createCell(2).setCellValue(p.getPer() != null && p.getPer().getPERNOM() != null ? p.getPer().getPERNOM() : "");
-                    row.createCell(3).setCellValue(p.getDEPCOD() != null ? p.getDEPCOD() : "");
-                    row.createCell(4).setCellValue(p.getDep() != null && p.getDep().getDEPDES() != null ? p.getDep().getDEPDES() : "");
-                    row.createCell(5).setCellValue(
-                        p.getDep() != null && p.getDep().getDEPALM() != null && p.getDep().getDEPALM() == 1 ? "Sí" : "No"
-                    );
-                    row.createCell(6).setCellValue(
-                        p.getDep() != null && p.getDep().getDEPCOM() != null && p.getDep().getDEPCOM() == 1 ? "Sí" : "No"
-                    );
-                    row.createCell(7).setCellValue(
-                        p.getDep() != null && p.getDep().getDEPINT() != null && p.getDep().getDEPINT() == 1 ? "Sí" : "No"
-                    );
-                    row.createCell(8).setCellValue(
-                        p.getDep() != null && p.getDep().getCge() != null && p.getDep().getCge().getCGECOD() != null ? p.getDep().getCge().getCGECOD() : ""
-                    );
-                    row.createCell(9).setCellValue(
-                        p.getDep() != null && p.getDep().getCge() != null && p.getDep().getCge().getCGEDES() != null ? p.getDep().getCge().getCGEDES() : ""
-                    );
-                    rowIdx++;
-                }
-                for (int i = 0; i < columns.length; i++) {
-                    sheet.autoSizeColumn(i);
-                }
-                workbook.write(response.getOutputStream());
-            }
-        } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    //downloading as pdf
-    @GetMapping("/personas-servicios/pdf/{ent}/{eje}")
-    public void exportPersonasServiciosPdf(
-        @PathVariable Integer ent,
-        @PathVariable String eje,
-        HttpServletResponse response
-    ) {
-        try {
-            List<personasPorServiciosProjection> personas = dpeRepository.findByENTAndEJE(ent, eje);
-            if (personas.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            StringBuilder htmlRows = new StringBuilder();
-            int idx = 1;
-            for (personasPorServiciosProjection p : personas) {
-                htmlRows.append("<tr>")
-                    .append("<td>").append(idx).append("</td>")
-                    .append("<td class='servicio-col'>").append(p.getPERCOD() != null ? p.getPERCOD() : "").append("</td>")
-                    .append("<td>").append(p.getPer() != null && p.getPer().getPERNOM() != null ? p.getPer().getPERNOM() : "").append("</td>")
-                    .append("<td>").append(p.getDEPCOD() != null ? p.getDEPCOD() : "").append("</td>")
-                    .append("<td class='servicio-col'>").append(p.getDep() != null && p.getDep().getDEPDES() != null ? p.getDep().getDEPDES() : "").append("</td>")
-                    .append("<td>").append(p.getDep() != null && p.getDep().getDEPALM() != null && p.getDep().getDEPALM() == 1 ? "Sí" : "No").append("</td>")
-                    .append("<td>").append(p.getDep() != null && p.getDep().getDEPCOM() != null && p.getDep().getDEPCOM() == 1 ? "Sí" : "No").append("</td>")
-                    .append("<td>").append(p.getDep() != null && p.getDep().getDEPINT() != null && p.getDep().getDEPINT() == 1 ? "Sí" : "No").append("</td>")
-                    .append("<td>").append(p.getDep() != null && p.getDep().getCge() != null && p.getDep().getCge().getCGECOD() != null ? p.getDep().getCge().getCGECOD() : "").append("</td>")
-                    .append("<td>").append(p.getDep() != null && p.getDep().getCge() != null && p.getDep().getCge().getCGEDES() != null ? p.getDep().getCge().getCGEDES() : "").append("</td>")
-                    .append("</tr>");
-                idx++;
-            }
-
-            String html = "<html><head><style>"
-                + "@page { size: A4 landscape; margin: 1px; }"
-                + ".servicio-col { width: 10px !important;}"
-                + "body { font-family: 'Poppins', sans-serif; padding: 24px; }"
-                + "h1 { text-align: center; margin-bottom: 16px; }"
-                + "table { width: 100%; border-collapse: collapse; }"
-                + "th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }"
-                + "th { background: #f3f4f6; }"
-                + "th:last-child, td:last-child { width: 180px; }"
-                + "</style></head><body>"
-                + "<h1>listas de servicios</h1>"
-                + "<table><thead><tr>"
-                + "<th>#</th><th class='servicio-col'>C.Persona</th><th>Nombre</th><th>C.Servicio</th>"
-                + "<th class='servicio-col'>Servicio</th><th>Alma</th><th>Com</th><th>Con</th>"
-                + "<th>C.C.Gestor</th><th>N.Gestor</th>"
-                + "</tr></thead><tbody>"
-                + htmlRows
-                + "</tbody></table></body></html>";
-
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "attachment; filename=personas_por_servicios.pdf");
-
-            try (var os = response.getOutputStream()) {
-                PdfRendererBuilder builder = new PdfRendererBuilder();
-                builder.withHtmlContent(html, null);
-                builder.toStream(os);
-                builder.run();
-            }
-        } catch (Exception ex) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                .body(ERROR + ex.getMessage());
         }
     }
 
@@ -382,134 +259,142 @@ public class DpeController {
         @RequestParam(required = false) String perfil
     ) {
         try {
-            List<personasPorServiciosProjection> result = null;
-
-            Integer perfilValue = null;
-            String perfilType = null;
-            if (perfil != null && !perfil.isEmpty()) {
-                switch (perfil.toLowerCase()) {
-                    case "almacen": perfilType = "depalm"; perfilValue = 1; break;
-                    case "comprador": perfilType = "depcom"; perfilValue = 1; break;
-                    case "contabilidad": perfilType = "depint"; perfilValue = 1; break;
-                    case "peticionario": perfilType = "peticionario"; break;
-                    case "todos": default: break;
-                }
-            }
-
-            boolean hasServicio = servicio != null && !servicio.isEmpty();
-            boolean hasPersona = persona != null && !persona.isEmpty();
-            boolean hasCgecod = cgecod != null && !cgecod.isEmpty();
-            boolean hasPerfil = perfilType != null && !"todos".equals(perfil);
-
-            if (hasServicio && hasPersona && hasCgecod && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPALM(ent, eje, servicio, persona, cgecod, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPCOM(ent, eje, servicio, persona, cgecod, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPINT(ent, eje, servicio, persona, cgecod, perfilValue);
-                }
-            }
-            else if (hasServicio && hasPersona && hasCgecod) {
-                result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_Cge_CGECOD(ent, eje, servicio, persona, cgecod);
-            }
-            else if (hasServicio && hasPersona && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_DEPALM(ent, eje, servicio, persona, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_DEPCOM(ent, eje, servicio, persona, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContainingAndDep_DEPINT(ent, eje, servicio, persona, perfilValue);
-                }
-            }
-            else if (hasServicio && hasCgecod && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_Cge_CGECODAndDep_DEPALM(ent, eje, servicio, cgecod, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_Cge_CGECODAndDep_DEPCOM(ent, eje, servicio, cgecod, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_Cge_CGECODAndDep_DEPINT(ent, eje, servicio, cgecod, perfilValue);
-                }
-            }
-            else if (hasPersona && hasCgecod && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPALM(ent, eje, persona, cgecod, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPCOM(ent, eje, persona, cgecod, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_Cge_CGECODAndDep_DEPINT(ent, eje, persona, cgecod, perfilValue);
-                }
-            }
-            else if (hasServicio && hasPersona) {
-                result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndPer_PERNOMContaining(ent, eje, servicio, persona);
-            }
-            else if (hasServicio && hasCgecod) {
-                result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_Cge_CGECOD(ent, eje, servicio, cgecod);
-            }
-            else if (hasServicio && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_DEPALM(ent, eje, servicio, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_DEPCOM(ent, eje, servicio, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPDESContainingAndDep_DEPINT(ent, eje, servicio, perfilValue);
-                }
-            }
-            else if (hasPersona && hasCgecod) {
-                result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_Cge_CGECOD(ent, eje, persona, cgecod);
-            }
-            else if (hasPersona && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_DEPALM(ent, eje, persona, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_DEPCOM(ent, eje, persona, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndPer_PERNOMContainingAndDep_DEPINT(ent, eje, persona, perfilValue);
-                }
-            }
-            else if (hasCgecod && hasPerfil && !"peticionario".equals(perfilType)) {
-                if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_Cge_CGECODAndDep_DEPALM(ent, eje, cgecod, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_Cge_CGECODAndDep_DEPCOM(ent, eje, cgecod, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_Cge_CGECODAndDep_DEPINT(ent, eje, cgecod, perfilValue);
-                }
-            }
-            else if (hasServicio) {
-                result = dpeRepository.findByENTAndEJEAndDep_DEPDESContaining(ent, eje, servicio);
-                if (result == null || result.isEmpty()) {
-                    result = dpeRepository.findByENTAndEJEAndDEPCODContaining(ent, eje, servicio);
-                }
-            }
-            else if (hasPersona) {
-                result = dpeRepository.findByENTAndEJEAndPer_PERNOMContaining(ent, eje, persona);
-                if (result == null || result.isEmpty()) {
-                    result = dpeRepository.findProjectionByENTAndEJEAndPERCOD(ent, eje, persona);
-                }
-            }
-            else if (hasCgecod) {
-                result = dpeRepository.findByENTAndEJEAndDep_Cge_CGECOD(ent, eje, cgecod);
-            }
-            else if (hasPerfil) {
-                if ("peticionario".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPALMAndDep_DEPCOMAndDep_DEPINT(ent, eje, 0, 0, 0);
-                } else if ("depalm".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPALM(ent, eje, perfilValue);
-                } else if ("depcom".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPCOM(ent, eje, perfilValue);
-                } else if ("depint".equals(perfilType)) {
-                    result = dpeRepository.findByENTAndEJEAndDep_DEPINT(ent, eje, perfilValue);
-                }
-            }
+            String perfilType = mapPerfilType(perfil);
+            
+            List<personasPorServiciosProjection> result = getInitialData(ent, eje, persona, cgecod);
+            result = applyFilters(result, servicio, persona, cgecod, perfilType);
 
             if (result == null || result.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(result);
+            
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
+    }
+
+    private String mapPerfilType(String perfil) {
+        if (perfil == null || perfil.trim().isEmpty()) {
+            return null;
+        }
+        return switch (perfil.trim().toLowerCase()) {
+            case "almacen" -> "depalm";
+            case "comprador" -> "depcom";
+            case "contabilidad" -> "depint";
+            case PETICIONARIO -> PETICIONARIO;
+            default -> null;
+        };
+    }
+
+    private List<personasPorServiciosProjection> getInitialData(Integer ent, String eje, String persona, String cgecod) {   
+        if (cgecod != null && !cgecod.isEmpty()) {
+            return nullSafeList(dpeRepository.findByENTAndEJEAndDep_Cge_CGECOD(ent, eje, cgecod));
+        }
+        return nullSafeList(dpeRepository.findByENTAndEJE(ent, eje));
+    }
+
+    private List<personasPorServiciosProjection> applyFilters(
+        List<personasPorServiciosProjection> data, 
+        String servicio, 
+        String persona, 
+        String cgecod,
+        String perfilType
+    ) {
+        if (data == null || data.isEmpty()) return data;
+        
+        if (servicio != null && !servicio.isEmpty()) {
+            data = filterByServicio(data, servicio);
+        }
+        if (persona != null && !persona.isEmpty()) {
+            data = filterByPersona(data, persona);
+        }
+        if (data != null && cgecod != null && !cgecod.isEmpty()) {
+            data = data.stream()
+                .filter(p -> p != null && p.getDep() != null && p.getDep().getCge() != null && p.getDep().getCge().getCGECOD() != null && p.getDep().getCge().getCGECOD().equals(cgecod))
+                .toList();
+        }
+        if (perfilType != null) {
+            data = filterByPerfil(data, perfilType);
+        }
+        return data;
+    }
+
+    private List<personasPorServiciosProjection> filterByPerfil(List<personasPorServiciosProjection> data, String perfilType) {
+        if (data == null || data.isEmpty()) return data;
+        if (perfilType == null) return data;
+        
+        if (PETICIONARIO.equals(perfilType)) {
+            return data.stream()
+                .filter(p -> p != null && p.getDep() != null 
+                    && isZero(p.getDep().getDEPALM()) 
+                    && isZero(p.getDep().getDEPCOM()) 
+                    && isZero(p.getDep().getDEPINT()))
+                .toList();
+        } else if ("depalm".equals(perfilType)) {
+            return data.stream()
+                .filter(p -> p != null && p.getDep() != null && isOne(p.getDep().getDEPALM()))
+                .toList();
+        } else if ("depcom".equals(perfilType)) {
+            return data.stream()
+                .filter(p -> p != null && p.getDep() != null && isOne(p.getDep().getDEPCOM()))
+                .toList();
+        } else if ("depint".equals(perfilType)) {
+            return data.stream()
+                .filter(p -> p != null && p.getDep() != null && isOne(p.getDep().getDEPINT()))
+                .toList();
+        }
+        return data;
+    }
+
+    private List<personasPorServiciosProjection> filterByPersona(List<personasPorServiciosProjection> data, String persona) {
+        if (data == null || data.isEmpty()) return data;
+        if (persona == null || persona.trim().isEmpty()) return data;
+        
+        String trimmedPersona = persona.trim();
+        if (trimmedPersona.length() <= 20) {
+            return data.stream()
+                .filter(p -> p != null && (
+                    trimmedPersona.equalsIgnoreCase(p.getPERCOD()) ||
+                    (p.getPer() != null && p.getPer().getPERNOM() != null && 
+                    p.getPer().getPERNOM().toLowerCase().contains(trimmedPersona.toLowerCase()))
+                ))
+                .toList();
+        } else {
+            return data.stream()
+                .filter(p -> p != null && p.getPer() != null && p.getPer().getPERNOM() != null 
+                    && p.getPer().getPERNOM().toLowerCase().contains(trimmedPersona.toLowerCase()))
+                .toList();
+        }
+    }
+
+    private List<personasPorServiciosProjection> filterByServicio(List<personasPorServiciosProjection> data, String servicio) {
+        if (data == null || data.isEmpty()) return data;
+        if (servicio == null || servicio.trim().isEmpty()) return data;
+        
+        String trimmedServicio = servicio.trim();
+        if (trimmedServicio.length() <= 6) {
+            return data.stream()
+                .filter(p -> p != null && p.getDEPCOD() != null && p.getDEPCOD().contains(trimmedServicio))
+                .toList();
+        } else {
+            return data.stream()
+                .filter(p -> p != null && p.getDep() != null && p.getDep().getDEPDES() != null 
+                    && p.getDep().getDEPDES().contains(trimmedServicio))
+                .toList();
+        }
+    }
+
+    private List<personasPorServiciosProjection> nullSafeList(List<personasPorServiciosProjection> data) {
+        return data == null ? List.of() : data;
+    }
+
+    private boolean isOne(Integer value) {
+        return value != null && value == 1;
+    }
+
+    private boolean isZero(Integer value) {
+        return value == null || value == 0;
     }
 }

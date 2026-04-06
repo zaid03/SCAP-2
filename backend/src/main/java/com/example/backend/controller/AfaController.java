@@ -20,6 +20,9 @@ public class AfaController {
     @Autowired
     private AfaRepository afaRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     @GetMapping("/by-ent/{ent}/{afacod}")
     public ResponseEntity<?> getByEntAndAfacod(
         @PathVariable int ent, 
@@ -29,12 +32,12 @@ public class AfaController {
             List<Afa> familias = afaRepository.findByENTAndAFACOD(ent, afacod);
             if(familias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(familias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error : " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -47,13 +50,13 @@ public class AfaController {
             List<Afa> familias = afaRepository.findByENTAndAFADESContaining(ent, afades);
             if(familias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(familias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error : " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -66,23 +69,23 @@ public class AfaController {
             List<Afa> familias = afaRepository.findByENT(ent);
             if(familias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(familias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error : " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //update description of familias
-    public record updateFamilia(String AFADES) {}
+    public record UpdateFamilia(String AFADES) {}
     @PatchMapping("/update-familia/{ent}/{afacod}")
     public ResponseEntity<?> updateFamilia(
         @PathVariable Integer ent,
         @PathVariable String afacod,
-        @RequestBody updateFamilia payload
+        @RequestBody UpdateFamilia payload
     ) {
         try {
             if(payload == null || payload.AFADES() == null) {
@@ -93,7 +96,7 @@ public class AfaController {
             Optional<Afa> familia = afaRepository.findById(id);
             if(familia.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Afa familiaUpdate = familia.get();
@@ -108,10 +111,10 @@ public class AfaController {
     }
 
     //familia add
-    public record newFamilia(Integer ent, String afacod, String afades) {}
+    public record NewFamilia(Integer ent, String afacod, String afades) {}
     @PostMapping("/Insert-familia")
     public ResponseEntity<?> insertFamilia(
-        @RequestBody newFamilia payload
+        @RequestBody NewFamilia payload
     )
     {
         if (payload == null || payload.ent() == null || payload.afacod() == null || payload.afades() == null) {
@@ -120,7 +123,7 @@ public class AfaController {
 
         if (!afaRepository.findByENTAndAFACOD(payload.ent(), payload.afacod()).isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
         }
 
         Afa nueva = new Afa();

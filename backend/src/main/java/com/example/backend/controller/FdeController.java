@@ -27,18 +27,21 @@ public class FdeController {
     @Autowired
     private FacRepository facRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     @GetMapping("/{ent}/{eje}/{facnum}")
     public ResponseEntity<?> getFde(
-            @PathVariable Integer ent,
-            @PathVariable String eje,
-            @PathVariable Integer facnum
+        @PathVariable Integer ent,
+        @PathVariable String eje,
+        @PathVariable Integer facnum
     ) {
         try {
             List<Fde> detalles = fdeRepository.findByENTAndEJEAndFACNUM(ent, eje, facnum);
         
             if(detalles.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             List<FdeResumeDto> result = detalles.stream()
@@ -53,7 +56,7 @@ public class FdeController {
             return ResponseEntity.ok(result);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -76,7 +79,7 @@ public class FdeController {
             FdeId id = new FdeId(ent, eje, facnum, fderef);
             Optional<Fde> applicacionOptio = fdeRepository.findById(id);
             if (applicacionOptio.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             Fde applicacion = applicacionOptio.get();
@@ -86,7 +89,7 @@ public class FdeController {
             FacId facId = new FacId(ent, eje, facnum);
             Optional<Fac> facturaOptio = facRepository.findById(facId);
             if (facturaOptio.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             Fac factura = facturaOptio.get();
@@ -95,7 +98,7 @@ public class FdeController {
 
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

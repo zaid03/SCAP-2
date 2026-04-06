@@ -19,72 +19,77 @@ import java.util.Optional;
 public class CcoController {
     @Autowired
     private CcoRepository ccoRepository;
-    @Autowired DepRepository depRepository;
+
+    @Autowired 
+    private DepRepository depRepository;
+
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
 
     //selecting all centros de coste
-    @GetMapping("/fetch-all/{ENT}/{EJE}")
+    @GetMapping("/fetch-all/{ent}/{eje}")
     public ResponseEntity<?> fetchCosteAll(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE
+        @PathVariable Integer ent,
+        @PathVariable String eje
     ) {
         try {
-            List<?> centros =  ccoRepository.findByENTAndEJE(ENT, EJE);
+            List<?> centros =  ccoRepository.findByENTAndEJE(ent, eje);
             if (centros.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //search by ccocod
-    @GetMapping("/filter-by/{ENT}/{EJE}/{CCOCOD}")
+    @GetMapping("/filter-by/{ent}/{eje}/{ccocod}")
     public ResponseEntity<?> searchCoste(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE,
-        @PathVariable String CCOCOD
+        @PathVariable Integer ent,
+        @PathVariable String eje,
+        @PathVariable String ccocod
     ) {
         try {
-            List<?> centros =  ccoRepository.findByENTAndEJEAndCCOCOD(ENT, EJE, CCOCOD);
+            List<?> centros =  ccoRepository.findByENTAndEJEAndCCOCOD(ent, eje, ccocod);
             if (centros.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //search by ccodes
-    @GetMapping("/filter-by-des/{ENT}/{EJE}/{CCODES}")
+    @GetMapping("/filter-by-des/{ent}/{eje}/{ccodes}")
     public ResponseEntity<?> searchCosteLike(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE,
-        @PathVariable String CCODES
+        @PathVariable Integer ent,
+        @PathVariable String eje,
+        @PathVariable String ccodes
     ) {
         try {
-            List<?> centros =  ccoRepository.findByENTAndEJEAndCCODESContaining(ENT, EJE, CCODES);
+            List<?> centros =  ccoRepository.findByENTAndEJEAndCCODESContaining(ent, eje, ccodes);
             if (centros.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(centros);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //to add a centro de coste
-    public record newCentro(Integer ENT, String EJE, String CCOCOD, String CCODES) {}
+    public record NewCentro(Integer ENT, String EJE, String CCOCOD, String CCODES) {}
     @PostMapping("/Insert-centro")
     public ResponseEntity<?> insertCentro(
-        @RequestBody newCentro payload
+        @RequestBody NewCentro payload
     ) {
         try {
             if (payload == null || payload.ENT() == null || payload.EJE() == null || payload.CCOCOD() == null || payload.CCODES() == null) {
@@ -93,7 +98,7 @@ public class CcoController {
 
             if(!ccoRepository.findByENTAndEJEAndCCOCOD(payload.ENT(), payload.EJE(), payload.CCOCOD()).isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
             Cco nueva = new Cco();
@@ -106,29 +111,29 @@ public class CcoController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //update a centro coste
-    public record updateCentro(String CCODES) {}
-    @PatchMapping("/update-centro/{ENT}/{EJE}/{CCOCOD}")
+    public record UpdateCentro(String CCODES) {}
+    @PatchMapping("/update-centro/{ent}/{eje}/{ccocod}")
     public ResponseEntity<?> UpdateCentro(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE,
-        @PathVariable String CCOCOD,
-        @RequestBody updateCentro payload
+        @PathVariable Integer ent,
+        @PathVariable String eje,
+        @PathVariable String ccocod,
+        @RequestBody UpdateCentro payload
     ) {
         try {
             if (payload == null || payload.CCODES() == null) {
                 return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
             }
 
-            CcoId id = new CcoId(ENT, EJE, CCOCOD);
+            CcoId id = new CcoId(ent, eje, ccocod);
             Optional<Cco> coste = ccoRepository.findById(id);
             if (coste.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Cco costeUpdate = coste.get();
@@ -138,25 +143,25 @@ public class CcoController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //delete a centro de coste
-    @DeleteMapping("/delete-coste/{ENT}/{EJE}/{CCOCOD}")
+    @DeleteMapping("/delete-coste/{ent}/{eje}/{ccocod}")
     public ResponseEntity<?> deleteCoste(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE,
-        @PathVariable String CCOCOD
+        @PathVariable Integer ent,
+        @PathVariable String eje,
+        @PathVariable String ccocod
     ) {
         try {
-            CcoId id = new CcoId(ENT, EJE, CCOCOD);
+            CcoId id = new CcoId(ent, eje, ccocod);
             if(!ccoRepository.existsById(id)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Sin resultado");
+                .body(SIN_RESULTADO);
             }
 
-            long costes = depRepository.countByENTAndEJEAndCCOCOD(ENT, EJE, CCOCOD);
+            long costes = depRepository.countByENTAndEJEAndCCOCOD(ent, eje, ccocod);
             if (costes > 0) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("No se puede borrar un centro de coste con centros gestores asociados");
@@ -166,7 +171,7 @@ public class CcoController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

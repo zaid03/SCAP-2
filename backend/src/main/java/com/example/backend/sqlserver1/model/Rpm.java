@@ -19,24 +19,12 @@ public class Rpm {
     @Column(name = "MNUCOD", nullable = false)
     private String MNUCOD;
 
-    public String getPERCOD() {
-        return PERCOD;
-    }
-    public void setPERCOD(String PERCOD) {
-        this.PERCOD = PERCOD;
-    }
+    public String getPERCOD() {return PERCOD;}
+    public void setPERCOD(String PERCOD) {this.PERCOD = PERCOD;}
 
-    public Integer getAPLCOD() {
-        return APLCOD;
-    }
-    public void setAPLCOD(Integer APLCOD) {
-        this.APLCOD = APLCOD;
-    }
+    public Integer getAPLCOD() {return APLCOD;}
+    public void setAPLCOD(Integer APLCOD) {this.APLCOD = APLCOD;}
 
-    public String getMNUCOD() {
-        return MNUCOD;
-    }
-    public void setMNUCOD(String MNUCOD) {
-        this.MNUCOD = MNUCOD;
-    }
+    public String getMNUCOD() {return MNUCOD;}
+    public void setMNUCOD(String MNUCOD) {this.MNUCOD = MNUCOD;}
 }

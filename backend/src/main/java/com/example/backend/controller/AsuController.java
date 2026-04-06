@@ -27,6 +27,9 @@ public class AsuController {
     @Autowired
     private AsuRepository asuRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     // Method to find Asu records by ENT and AFACOD
     @GetMapping("/by-ent/{ent}/{afacod}/{asucod}")
     public ResponseEntity<?> getByEntAndAfacodOrAsucod(
@@ -46,7 +49,7 @@ public class AsuController {
             return ResponseEntity.ok(combined);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -60,13 +63,13 @@ public class AsuController {
             List<Asu> subfamilias = asuRepository.findByENTAndASUDESContaining(ent, asudes);
             if(subfamilias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(subfamilias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -81,12 +84,12 @@ public class AsuController {
             List<Asu> subfamilias = asuRepository.findByENTAndAFACODAndASUCOD(ent, afacod, asucod);
             if(subfamilias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(subfamilias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -100,25 +103,25 @@ public class AsuController {
             List<Asu> subfamilias = asuRepository.findByENTAndAFACOD(ent, afacod);
             if(subfamilias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(subfamilias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //for updating subs
-    public record newSubFamilia(String ASUDES, String ASUECO, Integer MTACOD) {}
+    public record NewSubFamilia(String ASUDES, String ASUECO, Integer MTACOD) {}
 
     @PatchMapping("/update-subfamilia/{ent}/{afacod}/{asucod}")
     public ResponseEntity<?> updateSubFamilia(
         @PathVariable Integer ent,
         @PathVariable String afacod,
         @PathVariable("asucod") String asucod,
-        @RequestBody newSubFamilia payload
+        @RequestBody NewSubFamilia payload
     ) {
         try {
             if (payload == null || payload.ASUDES() == null || payload.ASUECO() == null || payload.MTACOD() == null) {
@@ -129,7 +132,7 @@ public class AsuController {
             Optional<Asu> subfamilia = asuRepository.findById(id);
             if (subfamilia.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Asu subfamiliaUpdate = subfamilia.get();
@@ -141,16 +144,16 @@ public class AsuController {
             return ResponseEntity.noContent().build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //subfamilia Add
-    public record newSub(Integer ent, String afacod, String asucod, String asudes, String asueco, Integer mtacod) {}
+    public record NewSub(Integer ent, String afacod, String asucod, String asudes, String asueco, Integer mtacod) {}
 
     @PostMapping("/Insert-Subfamilia")
     public ResponseEntity<?> insertSub(
-        @RequestBody newSub payload
+        @RequestBody NewSub payload
     ) {
         try {
             if (payload == null || payload.ent() == null || payload.afacod() == null || payload.asucod() == null || payload.asudes() == null || payload.asueco() == null || payload.mtacod() == null) {
@@ -159,7 +162,7 @@ public class AsuController {
 
             if (!asuRepository.findByENTAndAFACODAndASUCOD(payload.ent(), payload.afacod(), payload.asucod()).isEmpty()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Asu nueva = new Asu();
@@ -174,7 +177,7 @@ public class AsuController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

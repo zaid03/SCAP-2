@@ -36,9 +36,17 @@ public class PartidasController {
         @RequestParam(required = false) String usucenges
     ) {
         try {
-            List<Partida> partidas = partidasService.getPartidas(
-                cenges, alias, clorg, clfun, cleco, clcte, clpam, usucenges
-            );
+            PartidasService.SearchCriteria criteria = new PartidasService.SearchCriteria.Builder()
+                    .cenges(cenges)
+                    .alias(alias)
+                    .clorg(clorg)
+                    .clfun(clfun)
+                    .cleco(cleco)
+                    .clcte(clcte)
+                    .clpam(clpam)
+                    .usucenges(usucenges)
+                    .build();
+            List<Partida> partidas = partidasService.getPartidas(criteria);
             return ResponseEntity.ok(partidas);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

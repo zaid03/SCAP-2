@@ -44,6 +44,12 @@ public class TerDto {
     @JsonProperty("TERPOB")
     private String TERPOB;
 
+    @JsonProperty("PROCOD")
+    private String PROCOD;
+
+    @JsonProperty("TERAYT")
+    private Integer TERAYT;
+
     public String getTERWEB() { return TERWEB; }
     public void setTERWEB(String TERWEB) { this.TERWEB = TERWEB; }
 
@@ -82,4 +88,10 @@ public class TerDto {
 
     public String getTERPOB() { return TERPOB; }
     public void setTERPOB(String TERPOB) { this.TERPOB = TERPOB; }
+
+    public String getPROCOD() {return PROCOD;}
+    public void setPROCOD(String PROCOD) {this.PROCOD = PROCOD;}
+
+    public Integer getTERAYT() {return TERAYT;}
+    public void setTERAYT(Integer TERAYT) {this.TERAYT = TERAYT;}
 }

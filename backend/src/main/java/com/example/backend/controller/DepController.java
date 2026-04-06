@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.dto.DepWithCgeView;
 import com.example.backend.sqlserver2.model.Dep;
 import com.example.backend.sqlserver2.model.DepId;
-import com.example.backend.sqlserver2.model.Dpe;
 import com.example.backend.sqlserver2.repository.DepRepository;
-import com.example.backend.sqlserver2.repository.DpeRepository;
 import com.example.backend.sqlserver2.repository.CcoRepository;
 
 @RestController
@@ -31,9 +29,11 @@ public class DepController {
     @Autowired
     private DepRepository depRepository;
     @Autowired
-    private DpeRepository dpeRepository;
-    @Autowired
     private CcoRepository ccoRepository;
+
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+    private static final String FALTAN = "Faltan datos obligatorios";
 
     //fetching all services
     @GetMapping("/fetch-services/{ent}/{eje}")
@@ -44,12 +44,12 @@ public class DepController {
         try {
             List<Dep> services = depRepository.findByENTAndEJE(ent, eje);
             if (services.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             return ResponseEntity.ok(services);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -63,18 +63,18 @@ public class DepController {
         try {
             List<DepWithCgeView> services = depRepository.findByENTAndEJEAndDpes_PERCOD(ent, eje, percod);
             if (services.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(services);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //modifying a service
-    public record serviceUpdate(String depdes, Integer depalm, Integer depcom, Integer depint) {}
+    public record ServiceUpdate(String depdes, Integer depalm, Integer depcom, Integer depint) {}
 
     @PatchMapping("/update-service/{ent}/{eje}/{depcod}")
     @Transactional
@@ -82,19 +82,19 @@ public class DepController {
         @PathVariable Integer ent,
         @PathVariable String eje,
         @PathVariable String depcod,
-        @RequestBody serviceUpdate payload
+        @RequestBody ServiceUpdate payload
     ) {
         try {
             if (payload == null || payload.depdes() == null || payload.depalm() == null || payload.depcom() == null || payload.depint() == null) {
-                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+                return ResponseEntity.badRequest().body(FALTAN);
             }
-
+ 
             DepId id = new DepId(ent, eje, depcod);
             Optional<Dep> service = depRepository.findById(id);
 
             if (service.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Dep d = service.get();
@@ -108,7 +108,7 @@ public class DepController {
 
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -133,7 +133,7 @@ public class DepController {
                 payload.depd2c() == null || payload.depd2d() == null ||
                 payload.depd3c() == null || payload.depd3d() == null ||
                 payload.depdco() == null || payload.depden() == null) {
-                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+                return ResponseEntity.badRequest().body(FALTAN);
             }
 
             DepId id = new DepId(ent, eje, depcod);
@@ -141,7 +141,7 @@ public class DepController {
 
             if (service.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Sin resultado");
+                    .body(SIN_RESULTADO);
             }
 
             Dep d = service.get();
@@ -159,19 +159,19 @@ public class DepController {
 
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //adding a service
-    public record serviceAdd(Integer ent, String eje, String depcod, String depdes, Integer depalm, Integer depcom, Integer depint, String ccocod, String cgecod, String depd1c, String depd1d, String depd2c, String depd2d, String depd3c, String depd3d, String depdco, String depden, String percod) {}
+    public record ServiceAdd(Integer ent, String eje, String depcod, String depdes, Integer depalm, Integer depcom, Integer depint, String ccocod, String cgecod, String depd1c, String depd1d, String depd2c, String depd2d, String depd3c, String depd3d, String depdco, String depden, String percod) {}
     @PostMapping("/Insert-service")
     public ResponseEntity<?> addCentroGestor(
-        @RequestBody serviceAdd payload
+        @RequestBody ServiceAdd payload
     ) {
         try {
             if (payload == null || payload.ent() == null || payload.eje() == null || payload.depcod() == null || payload.depdes() == null || payload.depalm() == null || payload.depcom() == null || payload.depint() == null || payload.ccocod() == null || payload.cgecod() == null || payload.percod() == null) {
-                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+                return ResponseEntity.badRequest().body(FALTAN);
             }
             if(!depRepository.findByENTAndEJEAndDEPCOD(payload.ent(), payload.eje(), payload.depcod()).isEmpty()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -205,7 +205,7 @@ public class DepController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
@@ -220,50 +220,81 @@ public class DepController {
     ) {
         try {
             List<Dep> base = depRepository.findByENTAndEJE(ent, eje);
-
-            if (search != null && !search.isBlank()) {
-                final String searchLower = search.toLowerCase();
-                base = base.stream()
-                    .filter(d -> {
-                        String depcod = d.getDEPCOD() == null ? "" : d.getDEPCOD().toLowerCase();
-                        String depdes = d.getDEPDES() == null ? "" : d.getDEPDES().toLowerCase();
-                        return depcod.contains(searchLower) || depdes.contains(searchLower);
-                    })
-                    .toList();
-            }
-
-            if (cgecod != null && !cgecod.isBlank()) {
-                base = base.stream()
-                    .filter(d -> cgecod.equalsIgnoreCase(d.getCGECOD()))
-                    .toList();
-            }
-
-            if (perfil != null && !perfil.isBlank() && !perfil.equalsIgnoreCase("todos")) {
-                base = base.stream()
-                    .filter(d -> {
-                        return switch (perfil.toLowerCase()) {
-                            case "almacen" -> d.getDEPALM() != null && d.getDEPALM() == 1;
-                            case "comprador" -> d.getDEPCOM() != null && d.getDEPCOM() == 1;
-                            case "contabilidad" -> d.getDEPINT() != null && d.getDEPINT() == 1;
-                            case "peticionario" ->
-                                (d.getDEPALM() == null || d.getDEPALM() == 0) &&
-                                (d.getDEPCOM() == null || d.getDEPCOM() == 0) &&
-                                (d.getDEPINT() == null || d.getDEPINT() == 0);
-                            default -> true;
-                        };
-                    })
-                    .toList();
-            }
+            base = filterBySearch(base, search);
+            base = filterByCgecod(base, cgecod);
+            base = filterByPerfil(base, perfil);
 
             if (base.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
-
             return ResponseEntity.ok(base);
 
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
+    }
+
+    private List<Dep> filterBySearch(List<Dep> services, String search) {
+        if (search == null || search.isBlank()) {
+            return services;
+        }
+        final String searchLower = search.toLowerCase();
+        return services.stream()
+            .filter(d -> {
+                String depcod = nullSafeString(d.getDEPCOD()).toLowerCase();
+                String depdes = nullSafeString(d.getDEPDES()).toLowerCase();
+                return depcod.contains(searchLower) || depdes.contains(searchLower);
+            })
+            .toList();
+    }
+
+    private String nullSafeString(String value) {
+        return value == null ? "" : value;
+    }
+    private List<Dep> filterByCgecod(List<Dep> services, String cgecod) {
+        if (cgecod == null || cgecod.isBlank()) {
+            return services;
+        }
+        return services.stream()
+            .filter(d -> cgecod.equalsIgnoreCase(d.getCGECOD()))
+            .toList();
+    }
+
+    private List<Dep> filterByPerfil(List<Dep> services, String perfil) {
+        if (perfil == null || perfil.isBlank() || perfil.equalsIgnoreCase("todos")) {
+            return services;
+        }
+        return services.stream()
+            .filter(d -> matchesPerfil(d, perfil))
+            .toList();
+    }
+
+    private boolean matchesPerfil(Dep dep, String perfil) {
+        return switch (perfil.toLowerCase()) {
+            case "almacen" -> isAlmacenUser(dep);
+            case "comprador" -> isCompradorUser(dep);
+            case "contabilidad" -> isContabilidadUser(dep);
+            case "peticionario" -> isPeticionarioUser(dep);
+            default -> true;
+        };
+    }
+
+    private boolean isAlmacenUser(Dep dep) {
+        return dep.getDEPALM() != null && dep.getDEPALM() == 1;
+    }
+
+    private boolean isCompradorUser(Dep dep) {
+        return dep.getDEPCOM() != null && dep.getDEPCOM() == 1;
+    }
+
+    private boolean isContabilidadUser(Dep dep) {
+        return dep.getDEPINT() != null && dep.getDEPINT() == 1;
+    }
+
+    private boolean isPeticionarioUser(Dep dep) {
+        return (dep.getDEPALM() == null || dep.getDEPALM() == 0) &&
+            (dep.getDEPCOM() == null || dep.getDEPCOM() == 0) &&
+            (dep.getDEPINT() == null || dep.getDEPINT() == 0);
     }
 }

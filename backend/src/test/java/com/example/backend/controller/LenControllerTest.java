@@ -77,7 +77,27 @@ public class LenControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
+    }
+
+    @Test
+    void addLugar_createsWithCodeOneWhenNoExistingRecords() throws Exception {
+        when(lenRepository.findFirstByOrderByLENCODDesc()).thenReturn(null);
+
+        Len payload = new Len();
+        payload.setLENDES("Primer");
+        payload.setLENTXT("Txt");
+
+        mockMvc.perform(post("/api/Len/add-lugar")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isCreated());
+
+        ArgumentCaptor<Len> cap = ArgumentCaptor.forClass(Len.class);
+        verify(lenRepository).save(cap.capture());
+        assert cap.getValue().getLENCOD() == 1;
+        assert "Primer".equals(cap.getValue().getLENDES());
     }
 
     @Test
@@ -114,7 +134,7 @@ public class LenControllerTest {
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isInternalServerError())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -166,6 +186,30 @@ public class LenControllerTest {
     }
 
     @Test
+    void updateLugar_returns400WhenLENTXTIsNull() throws Exception {
+        var payload = new LenController.lugarUpdate("Des", null);
+
+        mockMvc.perform(patch("/api/Len/update-lugar/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
+    void updateLugar_returns400WhenBothFieldsNull() throws Exception {
+        var payload = new LenController.lugarUpdate(null, null);
+
+        mockMvc.perform(patch("/api/Len/update-lugar/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(containsString("Faltan datos obligatorios")));
+    }
+
+    @Test
     void updateLugar_returns400OnDataAccessException() throws Exception {
         when(lenRepository.findById(3)).thenThrow(new DataAccessResourceFailureException("DB down"));
         var payload = new LenController.lugarUpdate("X", "Y");
@@ -175,7 +219,7 @@ public class LenControllerTest {
                 .content(objectMapper.writeValueAsString(payload)))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -206,7 +250,7 @@ public class LenControllerTest {
         mockMvc.perform(delete("/api/Len/delete-lugar/5"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -239,7 +283,7 @@ public class LenControllerTest {
         mockMvc.perform(get("/api/Len/filter-lencod/9"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 
     @Test
@@ -272,6 +316,6 @@ public class LenControllerTest {
         mockMvc.perform(get("/api/Len/filter-lendes/Z"))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(content().string(containsString("Error:")));
+            .andExpect(content().string(containsString("Error :")));
     }
 }

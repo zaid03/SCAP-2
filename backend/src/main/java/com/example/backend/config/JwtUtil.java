@@ -21,7 +21,6 @@ public class JwtUtil {
         @Value("${security.jwt.secret}") String secret,
         @Value("${security.jwt.exp-min}") long expMin
     ){
-        // Ensure secret length >= 32 bytes
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expMillis = expMin * 60_000;
     }
@@ -32,7 +31,7 @@ public class JwtUtil {
             .setSubject(username)
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(now.plusMillis(expMillis)))
-            .signWith(key) // HS256 inferred
+            .signWith(key) 
             .compact();
     }
 

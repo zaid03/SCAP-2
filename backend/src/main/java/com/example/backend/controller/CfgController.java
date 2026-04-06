@@ -18,14 +18,19 @@ public class CfgController {
     @Autowired
     private CfgRepository cfgRepository;
 
+    private static final String SIN_RESULTADO = "Sin resultado";
+    private static final String ERROR = "Error :";
+
     //method to ejercicio in Cfg table by entidad and CFGEST
     @GetMapping("/by-ent/{ent}")
-    public ResponseEntity<?> getEJE(@PathVariable int ent) {
+    public ResponseEntity<?> getEJE(
+        @PathVariable int ent
+    ) {
         try {
             List<Cfg> results = cfgRepository.findEjeByENTAndCFGEST(ent, 0);
             
             if (results.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
             
             return ResponseEntity.ok(results);
@@ -37,39 +42,39 @@ public class CfgController {
     }
 
     //to fetch all ejes
-    @GetMapping("/fetch-Eje/{ENT}")
+    @GetMapping("/fetch-Eje/{ent}")
     public ResponseEntity<?> fetchAllEjercicios(
-        @PathVariable Integer ENT
+        @PathVariable Integer ent
     ) {
         try {
-            List<Cfg> Eje = cfgRepository.findByENT(ENT);
+            List<Cfg> Eje = cfgRepository.findByENT(ent);
             if(Eje.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(Eje);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 
     //to search in eje
-    @GetMapping("/search-Eje/{ENT}/{EJE}")
+    @GetMapping("/search-Eje/{ent}/{eje}")
     public ResponseEntity<?> searchEjercicios(
-        @PathVariable Integer ENT,
-        @PathVariable String EJE
+        @PathVariable Integer ent,
+        @PathVariable String eje
     ) {
         try {
-            List<Cfg> Eje = cfgRepository.findByENTAndEJE(ENT, EJE);
+            List<Cfg> Eje = cfgRepository.findByENTAndEJE(ent, eje);
             if(Eje.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(Eje);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error: " + ex.getMostSpecificCause().getMessage());
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
         }
     }
 }

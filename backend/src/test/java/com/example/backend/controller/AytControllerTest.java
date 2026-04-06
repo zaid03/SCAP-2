@@ -55,6 +55,16 @@ public class AytControllerTest {
     }
 
     @Test
+    void fetchAyt_returns404WhenNull() throws Exception {
+        when(aytRepository.findByENTCOD(3)).thenReturn(null);
+
+        mockMvc.perform(get("/api/ayt/fetch-all/3"))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("Sin resultado"));
+    }
+
+    @Test
     void fetchAyt_returns400OnDataAccessException() throws Exception {
         when(aytRepository.findByENTCOD(anyInt())).thenThrow(new DataAccessResourceFailureException("DB down"));
 
