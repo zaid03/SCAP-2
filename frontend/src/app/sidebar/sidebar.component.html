@@ -109,7 +109,7 @@
               [class.disabled]="isDisabled('acGBS')"
               (click)="navigateTo('credito')"
             >Gestión bolsa de crédito</a>
-            <a class="acGBSM margin" 
+            <a class="acGBSM" 
               [class.disabled]="isDisabled('acGBSM')"
               (click)="navigateTo('credito-Cge')"
             >Gestión bolsa de crédito por centro gestor</a>
@@ -117,17 +117,31 @@
         </div>
       </div>
 
-      <!-- <div class="menu" (click)="articulos = !articulos" tabindex="0">
+      <div class="menu" (click)="articulos = !articulos" tabindex="0">
         <a class="choice">Artículos</a>
         <div class="menu-content" [class.open]="articulos">
           <div class="menu-item">
-            <a class="acAFA margin" 
+            <a class="acAFA" 
               [class.disabled]="isDisabled('acAFA')"
               (click)="navigateTo('familia')"
             >Familias y subfamilias</a>
           </div>
         </div>
-      </div> -->
+      </div>
+
+      <div class="menu" (click)="temp = !temp" tabindex="0">
+        <a class="choice">Tipos</a>
+        <div class="menu-content" [class.open]="temp">
+          <div class="menu-item">
+            <a class="" 
+              (click)="navigateTo('almacenaje')"
+            >Tipos de almacenaje</a>
+            <a class="margin" 
+              (click)="navigateTo('unidades')"
+            >tipos de unidades</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

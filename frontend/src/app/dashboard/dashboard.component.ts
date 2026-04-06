@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, JsonPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -34,6 +35,7 @@ export class DashboardComponent implements OnInit {
   proveedores = false;
   contabilidad = false;
   articulos = false;
+  temp = false;
   constructor(private http: HttpClient, private router: Router) {}
 
   //main functions
@@ -152,6 +154,15 @@ export class DashboardComponent implements OnInit {
         break;
       case 'credito-Cge':
         this.router.navigate(['credito-Cge']);
+        break;
+      case 'familia':
+        this.router.navigate(['/familia'])
+        break;
+      case 'almacenaje':
+        this.router.navigate(['/almacenaje']);
+        break;
+      case 'unidades':
+        this.router.navigate(['/unidades']);
         break;
       default:
         break;

@@ -8,7 +8,6 @@ import { CentrogestorComponent } from './centrogestor/centrogestor.component';
 import { EjeComponent } from './eje/eje.component';
 import { FacturasComponent } from './facturas/facturas.component';
 import { CreditoComponent } from './credito/credito.component';
-import { FamiliaComponent } from './familia/familia.component';
 import { CgeComponent } from './cge/cge.component';
 import { ServiciosComponent } from './servicios/servicios.component';
 import { EntregaComponent } from './entrega/entrega.component';
@@ -22,6 +21,7 @@ import { BolsaCreditoComponent } from './bolsa-credito/bolsa-credito.component';
 import { ConsultaBolsasComponent } from './consulta-bolsas/consulta-bolsas.component';
 import { ContratosComponent } from './contratos/contratos.component';
 import { MonitorContabilizacionComponent } from './monitor-contabilizacion/monitor-contabilizacion.component';
+import { FamiliaComponent } from './familia/familia.component';
 import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
 import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
 
@@ -48,6 +48,7 @@ export const routes: Routes = [
     { path: 'Ccredito', component: ConsultaBolsasComponent},
     { path: 'contratos', component: ContratosComponent},
     { path: 'contabilizacion', component: MonitorContabilizacionComponent},
+    { path: 'familia', component: FamiliaComponent},
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
     { path: 'unidades', component: TiposUnidadesComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
