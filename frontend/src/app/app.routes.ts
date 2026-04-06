@@ -24,6 +24,8 @@ import { MonitorContabilizacionComponent } from './monitor-contabilizacion/monit
 import { FamiliaComponent } from './familia/familia.component';
 import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
 import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
+import { ConsultaContabilizadoComponent } from './consulta-contabilizado/consulta-contabilizado.component';
+import { ConsultaPendienteContabilizarComponent } from './consulta-pendiente-contabilizar/consulta-pendiente-contabilizar.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -51,6 +53,8 @@ export const routes: Routes = [
     { path: 'familia', component: FamiliaComponent},
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
     { path: 'unidades', component: TiposUnidadesComponent},
+    { path: 'Ccontabilizado', component: ConsultaContabilizadoComponent},
+    { path: 'Ccontabilizar', component: ConsultaPendienteContabilizarComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 

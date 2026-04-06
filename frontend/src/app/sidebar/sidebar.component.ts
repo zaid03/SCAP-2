@@ -109,6 +109,12 @@ export class SidebarComponent implements OnInit {
         break;
       case 'Fcontabilizadas':
         break;
+      case 'Ccontabilizado':
+        this.router.navigate(['/Ccontabilizado']);
+        break;
+      case 'Ccontabilizar':
+        this.router.navigate(['/Ccontabilizar']);
+        break;
       case 'Ccredito':
         this.router.navigate(['Ccredito']);
         break;
