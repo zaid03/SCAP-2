@@ -48,7 +48,6 @@ export class ServiciosComponent {
   isLoading: boolean = false;
 
   ngOnInit() {
-    this.isLoading = true;
     this.limpiarMessages();
     const entidad = sessionStorage.getItem('Entidad');
     const eje = sessionStorage.getItem('EJERCICIO');
@@ -71,6 +70,7 @@ export class ServiciosComponent {
 
   //main table functions
   private fetchServices(): void {
+    this.isLoading = true;
     if (this.entcod === null || this.eje === null) return;
     this.http.get<any>(`${environment.backendUrl}/api/dep/fetch-services/${this.entcod}/${this.eje}`).subscribe({
       next: (res) => {
@@ -213,16 +213,13 @@ export class ServiciosComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.backupServices.length ? this.backupServices : this.services;
+    const rows = this.paginatedServices;
     if (!rows || rows.length === 0) {
       this.servicessMessageError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
-      Entidad: row.ent ?? '',
-      EJE: row.eje ?? '',
       Servicio: row.depcod ?? '',
       Descripción: row.depdes ?? '',
       centro_gestor: row.cgecod ?? '',
@@ -235,13 +232,10 @@ export class ServiciosComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['listas de servicios']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Entidad', 'EJE', 'Servicio', 'Descripción', 'Cód. C.G.', 'Centro de Coste', 'Almacén', 'Comprador/Farmacia', 'Contabilidad']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Servicio', 'Descripción', 'Cód. C.G.', 'Centro de Coste', 'Almacén', 'Comprador/Farmacia', 'Contabilidad']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 6 },
-      { wch: 12 },
-      { wch: 12 },
       { wch: 15 },
       { wch: 45 },
       { wch: 12 },
@@ -262,16 +256,13 @@ export class ServiciosComponent {
 
   exportPdf() {
     this.limpiarMessages();
-    const source = this.backupServices.length ? this.backupServices : this.services;
+    const source = this.paginatedServices;
     if (!source?.length) {
       this.servicessMessageError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
-      ent: row.ent ?? '',
-      eje: row.eje ?? '',
       depcod: row.depcod ?? '',
       depdes: row.depdes ?? '',
       cgecod: row.cgecod ?? '',
@@ -287,9 +278,6 @@ export class ServiciosComponent {
     doc.text('Listado de servicios', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
-      { header: 'Entidad', dataKey: 'ent' },
-      { header: 'Ejercicio', dataKey: 'eje' },
       { header: 'Servicio', dataKey: 'depcod' },
       { header: 'Descripción', dataKey: 'depdes' },
       { header: 'Cód. C.G.', dataKey: 'cgecod' },
@@ -388,6 +376,13 @@ export class ServiciosComponent {
     };
 
     const cgecod = this.selectedService.cgecod;
+    this.fetchServiceDescription(cgecod);
+
+    this.option = 'personas';
+    this.fetchPersonas(services.depcod);
+  }
+
+  fetchServiceDescription(cgecod: string) {
     this.http.get(`${environment.backendUrl}/api/cge/fetch-description-services/${this.entcod}/${this.eje}/${cgecod}`, { responseType: 'text' }
     ).subscribe({
       next: (res) => {
@@ -399,9 +394,17 @@ export class ServiciosComponent {
         this.servicesDetailError = err.error.error ?? err.error;
       }
     })
+  }
 
-    this.option = 'personas';
-    this.fetchPersonas(services.depcod);
+  isAccesible: boolean = false;
+  isAlmacenAccesible(depalm: number) {
+    if (depalm != 1) {
+      this.isAccesible = this.isAccesible;
+    } else if (depalm = 1) {
+      this.isAccesible = !this.isAccesible;
+    }
+
+    return this.isAccesible;
   }
 
   toggleDetailFlag(field: 'depalm' | 'depcom' | 'depint', value: boolean): void {
@@ -508,37 +511,26 @@ export class ServiciosComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.personasPage=0;
+        this.personas = [];
         this.personasError = err.error.error ?? err.error;
         this.isLoading = false;
       }
     })
   }
 
-  get paginatedPersonas(): any[] {
-    const start = this.personasPage * this.personasPageSize;
+  get paginatedPersonas(): any[] {const start = this.personasPage * this.personasPageSize;
     return this.personas.slice(start, start + this.personasPageSize);
   }
-
-  get personasTotalPages(): number {
-    return Math.max(1, Math.ceil(this.personas.length / this.personasPageSize));
-  }
-
-  personasPrevPage(): void {
-    if (this.personasPage > 0) this.personasPage--;
-  }
-
-  personasNextPage(): void {
-    if (this.personasPage < this.personasTotalPages - 1) this.personasPage++;
-  }
-
-  personasGoToPage(event: any): void {
-    const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.personasTotalPages) {
-      this.personasPage = inputPage - 1;
-    }
+  get personasTotalPages(): number {return Math.max(1, Math.ceil(this.personas.length / this.personasPageSize));}
+  personasPrevPage(): void {if (this.personasPage > 0) this.personasPage--;}
+  personasNextPage(): void {if (this.personasPage < this.personasTotalPages - 1) this.personasPage++;}
+  personasGoToPage(event: any): void {const inputPage = Number(event.target.value);
+    if (inputPage >= 1 && inputPage <= this.personasTotalPages) {this.personasPage = inputPage - 1;}
   }
 
   almacenErro: string = '';
+  almacenSecondError: string = '';
   almacenArray: any = null;
   almacenDatosArray: any[] = [];
   almacenDatos(depcod: string) {
@@ -546,29 +538,40 @@ export class ServiciosComponent {
     this.isLoading = true;
     if (!depcod) {
       this.almacenErro = 'codigo extraviato';
+      return;
     }
 
     this.http.get<any>(`${environment.backendUrl}/api/mag/fetch-almacen-nombre/${this.entcod}/${depcod}`).subscribe({
       next: (res) => {
         this.almacenArray = res;
-        this.isLoading = false;
       },
       error: (err) => {
         this.almacenErro = err.error.error ?? err.error;
-        this.isLoading = false;
       }
     })
 
-    this.http.get<any>(`${environment.backendUrl}/api/mat/fetch-almacen/${this.entcod}/${depcod}`).subscribe({
+    this.http.get<any>(`${environment.backendUrl}/api/mat/fetch-almacenajes/${this.entcod}/${depcod}`).subscribe({
       next: (res) => {
         this.almacenDatosArray = res;
         this.isLoading = false;
+        this.almacenPage = 0;
       },
       error: (err) => {
-        this.almacenErro = err.error.error ?? err.error;
+        this.almacenDatosArray = [];
+        this.almacenSecondError = err.error.error ?? err.error;
         this.isLoading = false;
       }
     })
+  }
+  almacenPage = 0;
+  get paginatedAlmacen(): any[] {const start = this.almacenPage * this.personasPageSize;
+    return this.almacenDatosArray.slice(start, start + this.personasPageSize);
+  }
+  get almacenTotalPages(): number {return Math.max(1, Math.ceil(this.almacenDatosArray.length / this.personasPageSize));}
+  almacenPrevPage(): void {if (this.almacenPage > 0) this.almacenPage--;}
+  almacenNextPage(): void {if (this.almacenPage < this.almacenTotalPages - 1) this.almacenPage++;}
+  almacenGoToPage(event: any): void {const inputPage = Number(event.target.value);
+    if (inputPage >= 1 && inputPage <= this.almacenTotalPages) {this.almacenPage = inputPage - 1;}
   }
 
   updateServiceSecondError: string = '';
@@ -844,8 +847,8 @@ export class ServiciosComponent {
     this.http.post(`${environment.backendUrl}/api/depe/add-services-persona`, payload).subscribe({
       next: (res) => {
         this.personasSuccess = 'Las personas han sido agregadas exitosamente';
-        this.fetchPersonas(this.selectedService.depcod);
         this.closeAddPersonas();
+        this.option = 'personas';
       },
       error: (err) => {
         this.errorCopy = err.error.error ?? err.error;
@@ -866,5 +869,6 @@ export class ServiciosComponent {
     this.addServiceErrorMessage = '';
     this.personasSuccess = '';
     this.deleErr = '';
+    this.almacenSecondError = '';
   }
 }

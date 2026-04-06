@@ -20,12 +20,14 @@
                             class="search-bar"
                             placeholder="servicios" 
                             [(ngModel)]="servicio"
+                            (ngModelChange)="servicio = $event"
+                            (input)="serviceUpper($event)"
                         >
                         <label>Persona</label>
                         <input 
                             type="text" 
                             class="search-bar"
-                            placeholder="servicios" 
+                            placeholder="persona" 
                             [(ngModel)]="persona"
                         >
                         <label>Centro gestor</label>
@@ -34,6 +36,8 @@
                             class="search-bar"
                             placeholder="centro gestor"
                             [(ngModel)]="centroGestor"
+                            (ngModelChange)="centroGestor = $event"
+                            (input)="handleSearchInput($event)"
                         >
                         <label for="">Perfil de servicio</label>
                         <select [(ngModel)]="perfilServicio">
@@ -122,11 +126,11 @@
                         <td>{{p.percod}}</td>
                         <td>{{p.per?.pernom}}</td>
                         <td>{{p.depcod}}</td>
-                        <td>{{p.dep.depdes}}</td>
+                        <td>{{p.dep?.depdes}}</td>
                         <td>
                             <input 
                                 type="checkbox"
-                                [checked]="p.dep.depalm === 1"
+                                [checked]="p.dep?.depalm === 1"
                                 class="locked-radio"
                                 (click)="$event.preventDefault()"
                             >  
@@ -134,7 +138,7 @@
                         <td>
                             <input 
                                 type="checkbox"
-                                [checked]="p.dep.depcom === 1"
+                                [checked]="p.dep?.depcom === 1"
                                 class="locked-radio"
                                 (click)="$event.preventDefault()"
                             >
@@ -142,13 +146,13 @@
                         <td>
                             <input
                                 type="checkbox"
-                                [checked]="p.dep.depint === 1"
+                                [checked]="p.dep?.depint === 1"
                                 class="locked-radio"
                                 (click)="$event.preventDefault()"
                             >   
                         </td>
-                        <td>{{p.dep.cge.cgecod}}</td>
-                        <td>{{p.dep.cge.cgedes}}</td>
+                        <td>{{p.dep?.cge?.cgecod}}</td>
+                        <td>{{p.dep?.cge?.cgedes}}</td>
                     </tr>
                 </tbody>
             </table>

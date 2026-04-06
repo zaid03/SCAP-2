@@ -121,13 +121,6 @@
                             <h3>Detalles de Persona</h3>
                         </div>
                         <button 
-                            class="purple-btn" 
-                            [disabled]="isUpdate" 
-                            [ngClass]="{ 'disabled-btn': isUpdate }" 
-                            (click)="showCopiar(selectedPersona.percod)"
-                        >✂️</button>
-                        
-                        <button 
                             class="red-btn" 
                             [disabled]="isUpdate" 
                             [ngClass]="{ 'disabled-btn': isUpdate }" 
@@ -210,6 +203,20 @@
                     </div> 
                     <div class="btns space">
                         <button 
+                            type="button" 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }"
+                            (click)="showAddService()"
+                        >Añadir servicios</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            [ngClass]="{ 'disabled-btn': personServicesOrigin.length == 0}"
+                            (click)="showCopiar(selectedPersona.percod)"
+                        >Copiar servicios</button>
+                        <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
                             (click)="cancelar()"
@@ -225,24 +232,18 @@
                             (click)="isUpdateAllowed(pernom.value, percoe.value, pertel.value, pertmo.value, percar.value, perobs.value)"
                             [disabled]="!isUpdate" 
 	                        *ngIf="isUpdate" 
-                        >Gurdar</button>
+                        >Guardar</button>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
                             <button
-                                class="tab-btn"
-                                role="tab"
-                                [attr.aria-selected]="activeDetailTab === 'services'"
-                                [class.active-tab]="activeDetailTab === 'services'"
+                                class="tab-like-btn p-style"
                                 (click)="showServices(selectedPersona)"
-                            >
-                                Servicios
+                            > Servicios
                             </button>
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showSerivcesGrid">
-                        <button type="button" class="purple-btn margin" (click)="showAddService()">+</button>
-                        <h1 class="errorBtn">{{serviceErrorMessage}}</h1>
                         <h1 class="successBtn">{{serviceSuccessMessage}}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
@@ -264,6 +265,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{serviceErrorMessage}}</h1>
                         <div class="pagination-controls">
                             <button (click)="prevPageService()" [disabled]="pageServices === 0">Anterior</button>
                             <span>Página</span>
@@ -327,18 +329,20 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteGrid" (click)="closeDelete()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteGrid">
-    <h3>¿Seguro que quieres eliminar este servicio?</h3>
-    <div class="delete-content" *ngIf="serviceToDelete">
-        <p class="p-style">Código:</p>
-        <h1 class="h1-style">{{serviceToDelete.depcod}}</h1>
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDelete()">✖</button>
     </div>
+    <h3>¿Seguro que quieres eliminar este servicio?</h3>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
+    <div class="delete-content" *ngIf="serviceToDelete">
+        <p class="p-style">Código:</p>
+        <h1 class="h1-style">{{serviceToDelete.depcod}}</h1>
+    </div>
     <h1 class="errorBtn">{{ErrorDelete}}</h1>
-    <button class="red-btn" (click)="deleteService(serviceToDelete.depcod)">-</button>
-    <button class="purple-btn" (click)="closeDelete()">✖</button>
+    <button class="red-btn" (click)="deleteService(serviceToDelete.depcod)">Confirmar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addService" (click)="closeAddService()"></div>
@@ -462,8 +466,8 @@
         <p class="sure-msg">{{gridMessag}}</p>        
     </div>
     <div class="btns alignment">
-        <button class="purple-btn" (click)="showCopiarPersonas()">+</button>
-        <button class="red-btn" (click)="closeCopiar()">✖</button>
+        <button class="purple-btn" (click)="showCopiarPersonas()">Si</button>
+        <button class="red-btn" (click)="closeCopiar()">No</button>
     </div>
 </div>
 
@@ -536,7 +540,7 @@
         <span>añadiendo</span>
     </div>
     <div class="btns alignment">
-        <button class="purple-btn" [disabled]="isAvailable" [class.disabled]="isAvailable" (click)="copyPerfil()">+</button>
-        <button class="red-btn" (click)="closecontinueAdCheckGrid()">✖</button>
+        <button class="purple-btn" [disabled]="isAvailable" [class.disabled]="isAvailable" (click)="copyPerfil()">Si</button>
+        <button class="red-btn" (click)="closecontinueAdCheckGrid()">No</button>
     </div>
 </div>

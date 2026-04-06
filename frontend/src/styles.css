@@ -37,6 +37,7 @@ app-sidebar { flex-shrink: 0; z-index: 2000; }
 .purple-btn:hover { background-color: #25176b; color: #e6edf3; }
 .red-btn { background-color: rgb(221, 66, 66); }
 .red-btn:hover { background-color: rgb(117, 28, 28); }
+.tab-like-btn {text-decoration: none; border: none; background: none; outline: none; cursor: pointer;}
 /* pagination */
 .pagination-controls { display: flex; align-items: center; gap: 12px; margin: 10px 0 20px 0; font-family: inherit; }
 .pagination-controls button:disabled,

@@ -72,6 +72,7 @@ export class EjercicioComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.ejercicios = [];
         this.ejercicioError = err.error.error ?? err.error;
         this.isLoading = false;
       }
@@ -191,15 +192,13 @@ export class EjercicioComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.backupEjercicios.length ? this.backupEjercicios : this.ejercicios;
+    const rows = this.paginatedEjercicios;
     if (!rows || rows.length === 0) {
       this.ejercicioError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
-      Entidad: row.ent ?? '',
       Ejercicio: row.eje ?? '',
       Estado: this.getstatus(row.cfgest) ?? '',
     }));
@@ -207,12 +206,10 @@ export class EjercicioComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['listas de Ejercicios']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Entidad', 'Ejercicio', 'Estado']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Ejercicio', 'Estado']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 6 },
-      { wch: 12 },
       { wch: 15 },
       { wch: 20 }
     ];
@@ -229,15 +226,13 @@ export class EjercicioComponent {
   pdfDownload() {
     this.limpiarMessages();
     this.ejercicioError = '';
-    const source = this.backupEjercicios.length ? this.backupEjercicios : this.ejercicios;
+    const source = this.paginatedEjercicios;
     if (!source?.length) {
       this.ejercicioError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
-      ent: row.ent ?? '',
       eje: row.eje ?? '',
       status: this.getstatus(row.cfgest)
     }));
@@ -248,8 +243,6 @@ export class EjercicioComponent {
     doc.text('Listado de Ejercicios', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
-      { header: 'Entidad', dataKey: 'ent' },
       { header: 'Ejercicio', dataKey: 'eje' },
       { header: 'Estado', dataKey: 'status' }
     ];
@@ -294,6 +287,7 @@ export class EjercicioComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.ejercicios = [];
         this.ejercicioError = err.error.error ?? err.error;
         this.isLoading = false;
       }

@@ -17,9 +17,9 @@
                         <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm" (keyup.enter)="search()"/>
                         <div class="search-options">
                             <label>
-                                <input type="radio" name="optiones" value="Todos" [(ngModel)]="filterOption" /> Todos
-                                <input type="radio" name="optiones" value="noBloqueados" [(ngModel)]="filterOption" /> No Bloqueados
-                                <input type="radio" name="optiones" value="Bloqueados" [(ngModel)]="filterOption"  /> Bloqueados
+                                <input type="radio" name="optiones" value="todos" [(ngModel)]="filterOption" /> Todos
+                                <input type="radio" name="optiones" value="Nobloqueado" [(ngModel)]="filterOption" /> No Bloqueados
+                                <input type="radio" name="optiones" value="bloqueado" [(ngModel)]="filterOption"  /> Bloqueados
                             </label>
                         </div>
                         <div class="search-btns">
@@ -34,8 +34,8 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
+                    <button type="button" (click)="downloadExcel()">Exportar a Excel</button>
                     <button type="button" (click)="DownloadPDF()">Exportar a PDF</button>
-                    <button type="button" (click)="DownloadCSV()">Exportar a CSV</button>
                     <button type="button" (click)="openProveedorModal()">Añadir proveedor</button>
                 </div>
             </div>
@@ -229,7 +229,7 @@
                             <div class="right">
                                 <h1 class="h1-style">{{tempProveedor.terfax || '#'}}</h1>
                                 <textarea 
-                                    class="largeArea" 
+                                    class="textArea-style largeArea" 
                                     [(ngModel)]="tempProveedor.terweb"
                                     [disabled]="!isUpdate"
                                     (input)="allowToUpdate = true"
@@ -250,6 +250,7 @@
                         <div class="observ">
                             <p class="p-style">Observaciones:</p>
                             <textarea 
+                                class="textArea-style"
                                 [(ngModel)]="tempProveedor.terobs"
                                 [disabled]="!isUpdate"
                                 (input)="allowToUpdate = true"
@@ -257,6 +258,18 @@
                         </div>
                     </div>
                     <div class="btns">
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="showHello()"
+                        >Añadir articulo</button>
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="showPersonas()"
+                        >Añadir persona</button>
                         <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
@@ -298,7 +311,6 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showContactPersonsGrid">
-                        <button class="purple-btn space" (click)="showPersonas()">+</button>
                         <h1 class="errorBtn">{{ personasContactoErrorMessage }}</h1>
                         <h1 class="successBtn">{{ personasContactoSuccessMessage }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
@@ -340,6 +352,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{personaError}}</h1>
                         <div class="pagination-controls">
                             <button 
                                 class="pag-btn" 
@@ -367,7 +380,6 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showArticulosGrid">
-                        <button class="purple-btn space" (click)="showHello()">+</button>
                         <h1 class="errorBtn">{{ articuloError }}</h1>
                         <h1 class="successBtn">{{ articuloSuccessMessage }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
@@ -429,6 +441,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{articulosShowError}}</h1>
                         <div class="pagination-controls">
                             <button 
                                 class="pag-btn" 
@@ -464,35 +477,39 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
-    <h3>¿Seguro que quieres eliminar este artículo?</h3>
-    <div *ngIf="articuloToDelete">
-        <p><strong>Familia:</strong> {{ articuloToDelete.afacod }}</p>
-        <p><strong>Subfamilia:</strong> {{ articuloToDelete.asucod }}</p>
-        <p><strong>Artículo:</strong> {{ articuloToDelete.artcod }}</p>
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
     </div>
+    <h3>¿Seguro que quieres eliminar este artículo?</h3>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
+    <div *ngIf="articuloToDelete">
+        <p class="p-style">Familia: {{ articuloToDelete.afacod }}</p>
+        <p class="p-style">Subfamilia: {{ articuloToDelete.asucod }}</p>
+        <p class="p-style">Artículo: {{ articuloToDelete.artcod }}</p>
+    </div>
     <button class="red-btn" (click)="confirmDelete()">-</button>
-    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showDeletePersona" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeletePersona">
-    <h3>¿Seguro que quieres eliminar este Persona?</h3>
-    <div *ngIf="personaToDelete">
-        <div class="detailPersonnaDelete">
-            <h1 class="h1-style titleDelete">Nombre:</h1>
-            <h1 class="h1-style titleDelete">{{personaToDelete.tpenom}}</h1>
-        </div>
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeletePersonas()">✖</button>
     </div>
+    <h3>¿Seguro que quieres eliminar este Persona?</h3>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
+    <div *ngIf="personaToDelete">
+        <div class="detailPersonnaDelete">
+            <h1 class="p-style titleDelete">Nombre:</h1>
+            <h1 class="p-style titleDelete">{{personaToDelete.tpenom}}</h1>
+        </div>
+    </div>
     <button class="red-btn" (click)="confirmDeletePersona()">-</button>
-    <button class="purple-btn" (click)="closeDeletePersonas()">✖</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showPersonasGrid" (click)="hidePersonas()"></div>
@@ -518,11 +535,11 @@
             <p class="p-style">Observaciones</p>
         </div>
         <div class="right-persona">
-            <textarea #nombreadd></textarea>
-            <textarea #telefonoadd></textarea>
-            <textarea #moviladd></textarea>
-            <textarea #correoadd></textarea>
-            <textarea #observacionesadd></textarea>
+            <textarea class="textArea-style" #nombreadd></textarea>
+            <textarea class="textArea-style" #telefonoadd></textarea>
+            <textarea class="textArea-style" #moviladd></textarea>
+            <textarea class="textArea-style" #correoadd></textarea>
+            <textarea class="textArea-style" #observacionesadd></textarea>
         </div>
     </div>
 </div>
@@ -590,54 +607,70 @@
         <div class="title">
             <h1>Añadir proveedor</h1>
         </div>
-        <button class="purple-btn" (click)="saveProveedorees()" [disabled]="isSaving || selectedProveediresFromResults.length === 0">
-            <span *ngIf="!isSaving">✔</span>
-            <span *ngIf="isSaving">Guardando...</span>
+        <span class="p-style">Seleccionados: {{ selectedProveediresFromResults.length }}</span>
+        <button 
+            class="purple-btn" 
+            (click)="saveProveedorees()" 
+            [ngClass]="{ 'disabled-btn': selectedProveediresFromResults.length === 0 }"
+        >✔
         </button>
         <button class="red-btn" (click)="closeProveedorModal()">×</button>
     </div>
     <h1 class="successBtn">{{ guardarMessageProveedor }}</h1>
+    <div *ngIf="isSaving" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
     <div class="content-container-for-proveedor">
-        <form class="proveedor-anadir-form">
-            <div class="search-anadir">
+        <div class="search-options-prov">
+            <div class="search">
                 <input 
-                type="text" 
-                class="search-bar"
-                placeholder="Buscar NIF, NOM o APELL" 
-                name="search"
-                [(ngModel)]="searchProveedor"
-                (keyup.enter)="onProveedorSearch()"
-                (input)="onProveedorSearchChange()"
+                    type="text" 
+                    class="search-bar"
+                    placeholder="Buscar NIF, NOM o APELL" 
+                    name="search"
+                    [(ngModel)]="searchProveedor"
+                    (input)="onProveedorSearchChange()"
                 />
-
                 <input 
-                type="radio" 
-                class="checkbox" 
-                name="searchAdd"
-                [(ngModel)]="searchAdd"
-                [value]="'nif'" 
-                />
-                NIF
-
+                    type="radio" 
+                    class="checkbox" 
+                    name="searchAdd"
+                    [(ngModel)]="searchAdd"
+                    [value]="'nif'" 
+                /> NIF
                 <input 
-                type="radio" 
-                class="checkbox" 
-                name="searchAdd"
-                [(ngModel)]="searchAdd" 
-                [value]="'nom'" 
-                />
-                NOM
-
+                    type="radio" 
+                    class="checkbox" 
+                    name="searchAdd"
+                    [(ngModel)]="searchAdd" 
+                    [value]="'nom'" 
+                /> Nombre
                 <input 
-                type="radio" 
-                class="checkbox"
-                name="searchAdd"
-                [(ngModel)]="searchAdd" 
-                [value]="'apell'" 
-                />
-                APELL
-            </div>   
-        </form>
+                    type="radio" 
+                    class="checkbox"
+                    name="searchAdd"
+                    [(ngModel)]="searchAdd" 
+                    [value]="'apell'" 
+                /> Apellido
+            </div>
+            <div class="search-btns-prov">
+                <button 
+                    class="purple-btn"
+                    (click)="onProveedorSearch()"
+                >Buscar
+                </button>
+                <button 
+                    class="purple-btn" 
+                    (click)="clearSelectedProveedores()" 
+                >Limpiar
+                </button>   
+            </div>
+        </div>
+        <div *ngIf="isSearching" class="loading-message">
+            <div class="spinner"></div>
+            <span>Cargando</span>
+        </div>
         <h1 class="errorBtn">{{ anadirProveedorErrorMessage }}</h1>
         <table class="pat main-table">
             <thead>
@@ -669,16 +702,21 @@
                 </tr>
             </tbody>
         </table>
-        <div class="pagination-controls" *ngIf="proveedoresSearchResults.length > proveedoresSearchPageSize">
-            <button class="pag-btn" (click)="proveedoresSearchPrev()" [disabled]="proveedoresSearchPage === 0">Anterior</button>
+        <div 
+            class="pagination-controls" 
+            *ngIf="proveedoresSearchResults.length > proveedoresSearchPageSize"
+        >
+            <button 
+                class="pag-btn" 
+                (click)="proveedoresSearchPrev()" 
+                [disabled]="proveedoresSearchPage === 0"
+            >Anterior</button>
             <span> {{ proveedoresSearchPage + 1 }} de {{ proveedoresSearchTotalPages }}</span>
-            <button class="pag-btn" (click)="proveedoresSearchNext()" [disabled]="proveedoresSearchPage + 1 >= proveedoresSearchTotalPages">Siguiente</button>
-        </div>
-    </div>
-    <div class="modal-actions">
-        <div class="selection-summary" style="display:flex;gap:8px;align-items:center;">
-            <span>Seleccionados: {{ selectedProveediresFromResults.length }}</span>
-            <button class="red-btn" (click)="clearSelectedProveedores()" [disabled]="selectedProveediresFromResults.length === 0">Limpiar</button>
+            <button 
+                class="pag-btn" 
+                (click)="proveedoresSearchNext()"  
+                [disabled]="proveedoresSearchPage + 1 >= proveedoresSearchTotalPages"
+            >Siguiente</button>
         </div>
     </div>
 </div>

@@ -8,6 +8,8 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { environment } from '../../environments/environment';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-proveedorees',
@@ -69,6 +71,7 @@ export class ProveedoreesComponent {
           }
         },
         error: (err) => {
+          this.proveedores = [];
           this.error = err.error.error ?? err.error;
           this.isLoading = false;
         }
@@ -196,190 +199,36 @@ export class ProveedoreesComponent {
 
   //proveedores main related functions
   searchTerm: string = '';
-  filterOption: string = 'noBloqueados';
+  filterOption: string = 'Nobloqueado';
   search() {
     this.limpiarMessages();
     this.isLoading = true
-    if (this.searchTerm.trim() === '') {
-      if (this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/filter/${this.entcod}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error.error ?? err.error;
-            this.isLoading = false;
-          }
-        })
-      } else if (this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/filter-no/${this.entcod}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error.error ?? err.error;
-            this.isLoading = false;
-          }
-        })
-      }
-    }
+    const params = {
+      ent: this.entcod || '',
+      searchMode: this.filterOption,
+      term: this.searchTerm
+    };
 
-    if(/^\d+$/.test(this.searchTerm)) {
-      if(this.filterOption === 'noBloqueados') {
-        if ((this.searchTerm.length <= 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-tercod-no-bloqueado/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        } else if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-no-bloqueado/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        }
-      } else if(this.filterOption === 'Bloqueados') {
-        if ((this.searchTerm.length <= 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-tercod-bloqueado/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        } if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-bloquado/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        }
-      } else if(this.filterOption === 'Todos') {
-        if ((this.searchTerm.length <= 5)){
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        } else if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoading = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoading = false;
-            }
-          })
-        }
+    this.http.get<any[]>(`${environment.backendUrl}/api/ter/search-proveedores`, {params}).subscribe({
+      next: (response) => {
+        this.proveedores = response;
+        this.page = 0;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.proveedores = [];
+        this.error = err.error.error ?? err.error;
+        this.isLoading = false;
       }
-    } else if (/^[a-zA-Z0-9]+$/.test(this.searchTerm)) {
-      if(this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nif-nom-ali-no-bloquado/${this.entcod}/search-by-term?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoading = false;
-          }
-        })
-      } if(this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-nom-ali-bloquado/${this.entcod}/search?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoading = false;
-          }
-        })
-      } if(this.filterOption === 'Todos') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/search-todos?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoading = false;
-          }
-        })
-      }
-    } else {
-      if(this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nom-ali-no-bloquado/${this.entcod}/findMatchingNomOrAli?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoading = false;
-          }
-        })
-      }
-      if(this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nom-ali-bloquado/${this.entcod}/searchByNomOrAli?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoading = false;
-          }
-        })
-      }
-    }
+    })
   }
 
   clearSearch() {
     this.limpiarMessages();
     this.proveedores = [...this.backupProveedores];
+    this.filterOption = 'Nobloqueado';
     this.page = 0;
+    this.searchTerm = '';
   }
   
   DownloadPDF() {
@@ -437,17 +286,15 @@ export class ProveedoreesComponent {
     doc.save('proveedores.pdf');
   }
 
-  DownloadCSV() {
+  downloadExcel() {
     this.limpiarMessages();
-
-    const source = this.backupProveedores.length ? this.backupProveedores : this.proveedores;
-    if (!source?.length) {
+    const rows = this.paginatedProveedores;
+    if (!rows || rows.length === 0) {
       this.error = 'No hay datos para exportar.';
       return;
     }
-
-    const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
+  
+    const exportRows = rows.map(row => ({
       tercod: row.tercod ?? '',
       ternom: row.ternom ?? '',
       ternif: row.ternif ?? '',
@@ -462,41 +309,36 @@ export class ProveedoreesComponent {
       tercoe: row.tercoe ?? '',
       terobs: row.terobs ?? ''
     }));
+  
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['Listado de proveedores']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['Código', 'Nombre', 'NIF', 'Alias', 'Teléfono', 'Domicilio', 'Código Postal', 'Municipio', 'Código contable', 'Fax', 'Web', 'Correo electrónico', 'Observaciones']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
-    const columns = [
-      { header: '#', key: 'index' },
-      { header: 'Código', key: 'tercod' },
-      { header: 'Nombre', key: 'ternom' },
-      { header: 'NIF', key: 'ternif' },
-      { header: 'Alias', key: 'terali' },
-      { header: 'Teléfono', key: 'tertel' },
-      { header: 'Domicilio', key: 'terdom' },
-      { header: 'Código Postal', key: 'tercpo' },
-      { header: 'Municipio', key: 'terpob' },
-      { header: 'Código contable', key: 'terayt' },
-      { header: 'Fax', key: 'terfax' },
-      { header: 'Web', key: 'terweb' },
-      { header: 'Correo electrónico', key: 'tercoe' },
-      { header: 'Observaciones', key: 'terobs' }
+    worksheet['!cols'] = [
+      { wch: 8 },
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 40 },
+      { wch: 10 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 30 },
+      { wch: 40 }
     ];
-
-    const csvRows = [
-      columns.map(col => `"${col.header}"`).join(';'),
-      ...rows.map(row =>
-        columns
-          .map(col => `"${row[col.key as keyof typeof row] ?? ''}"`)
-          .join(';')
-      )
-    ];
-
-    const csvContent = csvRows.join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'proveedores.csv';
-    link.click();
-    URL.revokeObjectURL(url);
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Proveedores');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'Provedores.xlsx'
+    );
   }
 
   tempProveedor: any = {};
@@ -586,6 +428,7 @@ export class ProveedoreesComponent {
   showContactPersonsGrid = false;
   contactPersons: any = null;
   activeDetailTab: 'contact' | 'articulo' | null = null;
+  personaError: string = '';
   showContactPersons(proveedore: any){
     this.limpiarMessages();
     this.showContactPersonsGrid = true;
@@ -597,20 +440,13 @@ export class ProveedoreesComponent {
     this.isLoading = true;
     this.http.get<any[]>(`${environment.backendUrl}/api/more/by-tpe/${this.entcod}/${tercod}`)
       .subscribe({ next: (response) => {
-        const respArray = Array.isArray(response) ? response : (response ? [response] : []);
-        if (respArray.length === 0) { 
-          this.contactPersons = null;           
-          this.personasContactoErrorMessage = 'No se encontraron personas de contacto.';
-          this.isLoading = false;
-        } else {
-          this.contactPersons = respArray;
-          this.personasContactoErrorMessage = '';
-          this.isLoading = false;
-        }
-          this.pagePersona = 0;
+        this.contactPersons = response;
+        this.personaError = '';
+        this.isLoading = false;
+        this.pagePersona = 0;
       },
       error: (err) => {
-        this.personasContactoErrorMessage = err.error.error ?? err.error;
+        this.personaError = err.error.error ?? err.error;
         this.contactPersons = [];
         this.pagePersona = 0;
         this.isLoading = false;
@@ -688,12 +524,10 @@ export class ProveedoreesComponent {
       { responseType: 'text' }
     ).subscribe({
       next: (res) => {
-        this.personasContactoErrorMessage = '';
         this.personasContactoSuccessMessage = 'Persona de contacto actualizada correctamente';
         this.isUpdating = false;
       },
       error: (err) => {
-        this.personasContactoSuccessMessage = '';
         this.personasContactoErrorMessage = err.error.error ?? err.error;
         this.isUpdating = false;
       }
@@ -710,11 +544,7 @@ export class ProveedoreesComponent {
       { responseType: 'text' }).subscribe({
       next: (res) => {
         this.personasContactoSuccessMessage = 'Persona de contacto eliminada correctamente';
-        if (Array.isArray(this.contactPersons)) {
-          this.contactPersons = this.contactPersons.filter((p: any) =>
-            !(p.tercod === tercod && p.tpecod === tpecod)
-          );
-        }
+        this.reloadContactPersons();
         this.isDeleting = false;
         this.closeDeletePersonas();
       },
@@ -785,6 +615,7 @@ export class ProveedoreesComponent {
   showArticulosGrid = false;
   articulos: any = null;
   articuloError: string = '';
+  articulosShowError: string = '';
   showArticulos(proveedore: any){
     this.limpiarMessages();
     this.showArticulosGrid = true;
@@ -810,7 +641,9 @@ export class ProveedoreesComponent {
         this.pageArticulo = 0;
       },
       error: (err) => {
-        this.articuloError = err.error.error ?? err.error;
+        this.articulos = [];
+        this.pageArticulo = 0;
+        this.articulosShowError = err.error.error ?? err.error;
         this.isLoading = false;
       } 
     });
@@ -859,33 +692,25 @@ export class ProveedoreesComponent {
     this.isDeleting = true;
     this.limpiarMessages();
     const params = [
-    `ent=${articulo.ent}`,
-    `tercod=${articulo.tercod}`,
-    `afacod=${articulo.afacod}`,
-    `asucod=${articulo.asucod}`,
-    `artcod=${articulo.artcod}`
-  ].join('&');
+      `ent=${articulo.ent}`,
+      `tercod=${articulo.tercod}`,
+      `afacod=${articulo.afacod}`,
+      `asucod=${articulo.asucod}`,
+      `artcod=${articulo.artcod}`
+    ].join('&');
 
-    this.http.delete(
-      `${environment.backendUrl}/api/more/delete-apr?${ params}`,
-      { responseType: 'text' }).subscribe({
-        next: (res) => {
-            this.articuloSuccessMessage = 'Artículo eliminado correctamente';
-            this.articulos = this.articulos.filter((a: any) =>
-            !(a.ent === articulo.ent &&
-              a.tercod === articulo.tercod &&
-              a.afacod === articulo.afacod &&
-              a.asucod === articulo.asucod &&
-              a.artcod === articulo.artcod)
-          );
-          this.isDeleting = false;
-          this.closeDeleteConfirm();
-        },
-        error: (err) => {
-          this.articuloError = err.error.error ?? err.error;
-          this.isDeleting = false;
-        }
-      });
+    this.http.delete(`${environment.backendUrl}/api/more/delete-apr?${ params}`, { responseType: 'text' }).subscribe({
+      next: (res) => {
+        this.articuloSuccessMessage = 'Artículo eliminado correctamente';
+        this.showArticulos(this.selectedProveedor);
+        this.isDeleting = false;
+        this.closeDeleteConfirm();
+      },
+      error: (err) => {
+        this.articuloError = err.error.error ?? err.error;
+        this.isDeleting = false;
+      }
+    });
   }
 
   showDeleteConfirm = false;
@@ -1065,13 +890,13 @@ export class ProveedoreesComponent {
     this.showProveedorModal = true;
     this.limpiarMessages();
     this.resetProveedorModalState();
-    this.onProveedorFetch();
   }
 
   closeProveedorModal(): void {
     this.showProveedorModal = false;
     this.limpiarMessages();
     this.resetProveedorModalState();
+    this.clearSelectedProveedores();
   }
 
   private resetProveedorModalState(): void {
@@ -1087,6 +912,7 @@ export class ProveedoreesComponent {
 
   searchAdd: string = 'nif';
   searchProveedor: string = '';
+  isSearching: boolean = false;
   onProveedorSearchChange(): void {
     const q = (this.searchProveedor || '').toString().trim();
     if (q.length === 0) {
@@ -1100,15 +926,50 @@ export class ProveedoreesComponent {
   proveedoresSearchResults: any[] = [];
   fullProveedoresSearchResults: any[] = [];
   selectedProveediresFromResults: any[] = [];
-  onProveedorFetch(){
-    const ent = this.entcod;
+  onProveedorSearch(){
+    this.limpiarMessages();
+    const q = (this.searchProveedor || '').toString().trim();
+    if (!this.searchAdd) {
+      this.anadirProveedorErrorMessage = 'Selecciona tipo de búsqueda';
+      return;
+    }
 
-    this.http.get<any[]>(`${environment.backendUrl}/api/sical/terceros`, { withCredentials: true}).subscribe({
-      next:(data) => {
-        this.fullProveedoresSearchResults = Array.isArray(data) ? data: [];
-        this.proveedoresSearchResults = [...this.fullProveedoresSearchResults];
-        const normalized = (Array.isArray(data) ? data : []).map(d => ({
-          ENT: ent,
+    if (q.length === 0) {
+      this.proveedoresSearchResults = [];
+      this.fullProveedoresSearchResults = [];
+      this.proveedoresSearchPage = 0;
+      this.anadirProveedorErrorMessage = '';
+      return;
+    }
+
+    this.callProveedorSearchApi(q);
+  }
+
+  private callProveedorSearchApi(searchTerm: string): void {
+    let nif: string | null = null;
+    let nom: string | null = null;
+    let apell: string | null = null;
+
+    if (this.searchAdd === 'nif') {
+      nif = searchTerm;
+    } else if (this.searchAdd === 'nom') {
+      nom = searchTerm;
+    } else if (this.searchAdd === 'apell') {
+      apell = searchTerm;
+    }
+
+    this.isSearching = true;
+    let apiUrl = `${environment.backendUrl}/api/sical/terceros?`;
+    const params: string[] = [];
+    if (nif) params.push(`nif=${encodeURIComponent(nif)}`);
+    if (nom) params.push(`nom=${encodeURIComponent(nom)}`);
+    if (apell) params.push(`apell=${encodeURIComponent(apell)}`);
+    apiUrl += params.join('&');
+
+    this.http.get<any[]>(apiUrl).subscribe({
+      next: (response) => {
+        const mappedResults = (response || []).map(d => ({
+          ENT: d.idenTercero || this.entcod?.toString() || '',
           TERNOM: d.nomTercero ?? '',
           TERALI: d.apellTercero ?? '',
           NIF: d.niftercero ?? d.ternif ?? '',
@@ -1119,57 +980,26 @@ export class ProveedoreesComponent {
           TERWEB: d.web ?? '',
           TERCOE: d.email ?? '',
           TEROBS: d.observaciones ?? '',
+          PROCOD: d.provincia ?? '',
           TERPOB: d.poblacion ?? '',
+          // TERAYT: d. ?? '',
+          TERACU: 0,
+          TERBLO: 0,
           __raw: d
-          }));
-        this.fullProveedoresSearchResults = normalized;
-        this.proveedoresSearchResults = [...normalized];
-        if (this.proveedoresSearchResults.length === 0) {
-          this.anadirProveedorErrorMessage = 'No se encontraron proveedores.';
-        }
-      }, error: (err) => {
+        }));
+        this.fullProveedoresSearchResults = mappedResults;
+        this.proveedoresSearchResults = [...this.fullProveedoresSearchResults];
+        this.proveedoresSearchPage = 0;
+        this.isSearching = false;
+      },
+      error: (err) => {
         this.anadirProveedorErrorMessage = err.error.error ?? err.error;
+        this.proveedoresSearchResults = [];
+        this.fullProveedoresSearchResults = [];
+        this.proveedoresSearchPage = 0;
+        this.isSearching = false;
       }
     });
-  }
-
-  onProveedorSearch(){
-    this.limpiarMessages();
-    const q = (this.searchProveedor || '').toString().trim();
-    if (!this.searchAdd) {
-      this.anadirProveedorErrorMessage = 'Selecciona tipo de búsqueda';
-      return;
-    }
-
-    if (q.length === 0) {
-      this.proveedoresSearchResults = [...(this.fullProveedoresSearchResults || [])];
-      this.proveedoresSearchPage = 0;
-      this.anadirProveedorErrorMessage = '';
-      return;
-    }
-
-    const applyFilter = () => {
-      const term = q.toLowerCase();
-      let filtered: any[] = [];
-      if (this.searchAdd === 'nif') {
-        filtered = this.fullProveedoresSearchResults.filter(p => (p.NIF || p.ternif || '').toString().toLowerCase().includes(term));
-      } else if (this.searchAdd === 'nom') {
-        filtered = this.fullProveedoresSearchResults.filter(p => (p.TERNOM || p.ternom || '').toString().toLowerCase().includes(term));
-      } else if (this.searchAdd === 'apell') {
-        filtered = this.fullProveedoresSearchResults.filter(p => (p.TERALI || '').toString().toLowerCase().includes(term));
-      } else {
-        filtered = this.fullProveedoresSearchResults.filter(p =>
-          (p.NIF || p.ternif || '').toString().toLowerCase().includes(term) ||
-          (p.TERNOM || p.ternom || '').toString().toLowerCase().includes(term) ||
-          (p.TERALI || '').toString().toLowerCase().includes(term)
-        );
-      }
-
-      this.proveedoresSearchResults = filtered;
-      this.proveedoresSearchPage = 0;
-      this.anadirProveedorErrorMessage = filtered.length === 0 ? 'No se encontraron proveedores.' : '';
-    };
-    applyFilter();
   }
 
   private proveedorKey(p: any): string {
@@ -1197,6 +1027,9 @@ export class ProveedoreesComponent {
 
   clearSelectedProveedores() {
     this.selectedProveediresFromResults = [];
+    this.proveedoresSearchResults = [];
+    this.searchProveedor = '';
+    this.searchAdd = 'nif';
     this.limpiarMessages();
   }
 
@@ -1237,7 +1070,9 @@ export class ProveedoreesComponent {
       TERWEB: p.TERWEB ?? '',
       TERCOE: p.TERCOE ?? '',
       TEROBS: p.TEROBS ?? '',
+      PROCOD: p.PROCOD ?? '',
       TERPOB: p.TERPOB ?? '',
+      TERAYT: p.TERAYT ?? ''
     }));
 
     const token = sessionStorage.getItem('JWT');
@@ -1247,6 +1082,7 @@ export class ProveedoreesComponent {
 
     this.isSaving = true;
     this.limpiarMessages();
+    console.log(payload)
     this.http.post<any[]>(`${environment.backendUrl}/api/ter/save-proveedores/${ent}`, payload, { headers, observe: 'response', responseType: 'text' as 'json' })
       .subscribe({
         next: (res) => {
@@ -1327,5 +1163,7 @@ export class ProveedoreesComponent {
     this.anadirErrorMessage = '';
     this.guardarMessageProveedor = '';
     this.anadirProveedorErrorMessage = '';
+    this.articulosShowError = '';
+    this.personaError = '';
   }
 }

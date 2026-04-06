@@ -79,7 +79,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let c of centroGestores">
+                    <tr *ngFor="let c of paginatedCentroGestor">
                         <td (click)="showDetails(c)" style="cursor: pointer;">{{ c.cgecod }}</td>
                         <td>{{ c.cgedes }}</td>
                         <td>{{ c.cgeorg }}</td>
@@ -234,14 +234,16 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    </div>
     <h3>¿Seguro que quieres eliminar este Centro gestor?</h3>
     <h1 class="errorBtn">{{deleErr}}</h1>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
-    <button class="red-btn" (click)="confirmDelete()">-</button>
-    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">Confirmar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showAddConfirm" (click)="closeAddConfirm()"></div>

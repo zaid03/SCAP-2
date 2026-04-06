@@ -147,7 +147,7 @@
                 <div class="modal" *ngIf="selectedContrato">
                     <div class="btns">
                         <div class="title-detail">
-                            <h3>detalles del contrato</h3>
+                            <h3>Detalles del contrato</h3>
                         </div>
                         <button 
                             class="red-btn" 
@@ -196,13 +196,13 @@
                                 </div>
                                 <div class="left-right">
                                     <textarea 
-                                        class="average" 
+                                        class="textArea-style average" 
                                         [(ngModel)]="tempContrato.confin" 
                                         [disabled]="!isUpdate"
                                         (input)="allowToUpdate = true"
                                         #confin></textarea>
                                     <textarea 
-                                        class="average" 
+                                        class="textArea-style average" 
                                         [(ngModel)]="tempContrato.conffi" 
                                         [disabled]="!isUpdate"
                                         (input)="allowToUpdate = true"
@@ -214,16 +214,29 @@
                                 <div class="content">
                                     <p class="p-style">Descripción</p>
                                     <textarea 
-                                        class="long" 
+                                        class="textArea-style long" 
                                         [(ngModel)]="tempContrato.condes" 
                                         [disabled]="!isUpdate"
                                         (input)="allowToUpdate = true"
-                                        #desc></textarea>
+                                        #desc
+                                    ></textarea>
                                 </div>
                             </div>  
                         </div>
                     </div>
-                    <div class="btns">
+                    <div class="btns space">
+                        <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="showArticulosAddGrid(selectedContrato.conlot)"
+                        >Añadir articulo</button>
+                        <button 
+                            class="purple-btn"
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="showAddCentro()"
+                        >Añadir D/ centro Gestor</button>
                         <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
@@ -265,7 +278,6 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showArticulosGrid">
-                        <button class="purple-btn space" (click)="showArticulosAddGrid(selectedContrato.conlot)">+</button>
                         <h1 class="errorBtn">{{articulosError}}</h1>
                         <h1 class="successBtn">{{articulosSuccess}}</h1>
                         <div *ngIf="isLoadingArticulos" class="loading-message">
@@ -305,6 +317,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{articuloError}}</h1>
                         <div class="pagination-controls">
                             <button (click)="prevPageART()" [disabled]="pageARt === 0">Anterior</button>
                             <span>Página</span>
@@ -321,8 +334,7 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showCentroGestorGrid">
-                        <button class="purple-btn space" (click)="showAddCentro()">+</button>
-                        <h1 class="errorBtn">{{cgeError}}</h1>
+                        <h1 class="errorBtn">{{DError}}</h1>
                         <h1 class="successBtn">{{cgeSuccess}}</h1>
                         <div *ngIf="isLoadingCentroGestor" class="loading-message">
                             <div class="spinner"></div>
@@ -363,6 +375,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{cgeError}}</h1>
                         <div class="pagination-controls">
                             <button (click)="prevpageCNT()" [disabled]="pageCNT === 0">Anterior</button>
                             <span>Página</span>
@@ -406,21 +419,21 @@
             </div>
             <div class="right-add">
                 <div class="on-two">
-                    <textarea class="long-add" #fechaIni></textarea>
+                    <textarea class="textArea-style long-add" #fechaIni></textarea>
                     <p class="p-style patch">Fecha fin</p>
-                    <textarea class="long-add" #fechaFin></textarea>
+                    <textarea class="textArea-style long-add" #fechaFin></textarea>
                 </div>
                 <div class="on-two">
-                    <textarea class="long-add" #economica></textarea>
+                    <textarea class="textArea-style long-add" #economica></textarea>
                     <p class="p-style">Descripción*</p>
-                    <textarea class="long-add height" #description></textarea>
+                    <textarea class="textArea-style long-add height" #description></textarea>
                 </div>  
             </div>
         </div>
     </div>  
     <div class="proveedor-select">
         <h1 class="p-style" *ngIf="proveedorTernom">El proveedor {{proveedorTernom}} ha sido seleccionado</h1>
-        <button class="purple-btn" (click)="openProveedores()">⧉</button>
+        <button class="purple-btn" (click)="openProveedores()">Seleccione un proveedor</button>
     </div>
 </div>
 
@@ -428,7 +441,7 @@
 <div class="proveedor-grid-modal" *ngIf="showProveedorGrid">
     <div class="btns">
         <div class="title">
-            <h1>seleccione un proveedor</h1>
+            <h1>Seleccione un proveedor</h1>
         </div>
         <button class="red-btn" (click)="closeProveedores()">✖</button>
     </div>
@@ -438,9 +451,9 @@
                 <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm" (keyup.enter)="search()"/>
                 <div class="search-options">
                     <label>
-                        <input type="radio" name="optiones" value="Todos" [(ngModel)]="filterOption" /> Todos
-                        <input type="radio" name="optiones" value="noBloqueados" [(ngModel)]="filterOption" /> No Bloqueados
-                        <input type="radio" name="optiones" value="Bloqueados" [(ngModel)]="filterOption"  /> Bloqueados
+                        <input type="radio" name="optiones" value="todos" [(ngModel)]="filterOption" /> Todos
+                        <input type="radio" name="optiones" value="Nobloqueado" [(ngModel)]="filterOption" /> No Bloqueados
+                        <input type="radio" name="optiones" value="bloqueado" [(ngModel)]="filterOption"  /> Bloqueados
                     </label>
                 </div>
                 <div class="search-btns">
@@ -455,8 +468,8 @@
         <div class="spinner"></div>
         <span>Cargando</span>
     </div>
-    <div class="main-table">
-        <table class="">
+    <div class="main-list">
+        <table  class="main-table">
             <thead>
                 <tr>
                     <th>Código</th>
@@ -467,9 +480,9 @@
                     <th>Domicilio</th>
                     <th>Código Postal</th>
                     <th>Municipio</th>
-                    <th>Código contable</th>
+                    <!-- <th>Código contable</th>
                     <th>Fax</th>
-                    <th>Web</th>
+                    <th>Web</th> -->
                     <th>Correo electrónico</th>
                     <th>Observaciones</th>
                 </tr>
@@ -484,15 +497,16 @@
                     <td>{{ p.terdom }}</td>
                     <td>{{ p.tercpo }}</td>
                     <td>{{ p.terpob }}</td>
-                    <td>{{ p.terayt }}</td>
+                    <!-- <td>{{ p.terayt }}</td>
                     <td>{{ p.terfax }}</td>
-                    <td>{{ p.terweb }}</td>
+                    <td>{{ p.terweb }}</td> -->
                     <td>{{ p.tercoe }}</td>
                     <td>{{ p.terobs }}</td>
                 </tr>
             </tbody>
         </table>
     </div>
+    
     <div class="container-pag-wrap">
         <div class="pagination-controls">
             <button class="pag-btn" (click)="prevPagePro()" [disabled]="pagePro === 0">Anterior</button>
@@ -513,17 +527,19 @@
 
 <div class="modal-backdrop" *ngIf="deleteArticuloGrid" (click)="closeDeleteArticulo()"></div>
 <div class="delete-confirm-modal" *ngIf="deleteArticuloGrid">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteArticulo()">✖</button>
+    </div>
     <h3>¿Seguro que quieres eliminar este Contrato?</h3>
+    <div *ngIf="isDeleting" class="loading-message">
+        <div class="spinner"></div>
+        <span>borrando</span>
+    </div>
     <div *ngIf="articuloToDelete">
-        <div *ngIf="isDeleting" class="loading-message">
-            <div class="spinner"></div>
-            <span>borrando</span>
-        </div>
         <p class="p-style delete-info">Familia: {{articuloToDelete[0].concod}}</p>
     </div>
     <h1 class="errorBtn">{{detallesMessageErrorDelete}}</h1>
-    <button class="red-btn" (click)="deleteArticulo(articuloToDelete[0]?.concod, articuloToDelete[1]?.afacod, articuloToDelete[1]?.asucod, articuloToDelete[1]?.artcod)">-</button>
-    <button class="purple-btn margin" (click)="closeDeleteArticulo()">✖</button>
+    <button class="red-btn" (click)="deleteArticulo(articuloToDelete[0]?.concod, articuloToDelete[1]?.afacod, articuloToDelete[1]?.asucod, articuloToDelete[1]?.artcod)">Borrar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="articulosAddGrid" (click)="closeArticuloAddGrid()"></div>
@@ -578,7 +594,7 @@
                 </tr>
             </tbody>
         </table>
-        <p class="p-style" *ngIf="coughtArticulos.length > 0">{{coughtArticulos.length}} artículos seleccionados</p>
+        <p class="p-style selected" *ngIf="coughtArticulos.length > 0">{{coughtArticulos.length}} artículos seleccionados</p>
         <div class="pagination-controls" *ngIf="articulosAdd.length > searchPageSize">
             <button class="pag-btn" (click)="searchPage = searchPage - 1" [disabled]="searchPage === 0">Anterior</button>
             <span> {{ searchPage + 1 }} de {{ searchTotalPages }}</span>
@@ -589,12 +605,15 @@
 
 <div class="modal-backdrop" *ngIf="centroGestorDelete" (click)="closeDeleteCentro()"></div>
 <div class="delete-confirm-modal" *ngIf="centroGestorDelete">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteCentro()">✖</button>
+    </div>
     <h3>¿Quiere borrar el centro gestor y su D del contrato?</h3>
+    <div *ngIf="isDeletingCentro" class="loading-message">
+        <div class="spinner"></div>
+        <span>borrando</span>
+    </div>
     <div *ngIf="centroToDelete">
-        <div *ngIf="isDeletingCentro" class="loading-message">
-            <div class="spinner"></div>
-            <span>borrando</span>
-        </div>
         <div class="delete-info-titles">
             <div class="left-delete">
                 <p class="p-style">Centro gestor:</p>
@@ -607,8 +626,7 @@
         </div>
     </div>
     <h1 class="errorBtn">{{centroDeleteError}}</h1>
-    <button class="red-btn" (click)="deleteCentroGestor(centroToDelete.cgecod)">-</button>
-    <button class="purple-btn margin" (click)="closeDeleteCentro()">✖</button>
+    <button class="red-btn" (click)="deleteCentroGestor(centroToDelete.cgecod)">Borrar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addCentroGestor" (click)="closeAddCentro()"></div>
@@ -617,8 +635,8 @@
         <div class="title">
             <h1 class="art-title widthSecond">Añadir centro Gestor</h1>
         </div>
-        <button class="red-btn" (click)="saveCentroGestores()">+</button>
-        <button class="purple-btn" (click)="closeAddCentro()">✖</button>
+        <button class="purple-btn" (click)="saveCentroGestores()">+</button>
+        <button class="red-btn" (click)="closeAddCentro()">✖</button>
     </div>
     <div *ngIf="isAddingCentro" class="loading-message">
         <div class="spinner"></div>
@@ -678,7 +696,7 @@
             <h1 class="art-title widthThird">Asignar D</h1>
         </div>
         <button class="purple-btn">+</button>
-        <button class="purple-btn" (click)="closeAddD()">✖</button>
+        <button class="red-btn" (click)="closeAddD()">✖</button>
     </div>
     <h1 class="errorBtn">{{DErrorMessage}}</h1>
     <div *ngIf="isLoadingD" class="loading-message">

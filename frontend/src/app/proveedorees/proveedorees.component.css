@@ -61,17 +61,10 @@
 .art input[type="text"]:focus { border-color: #38249b; outline: none; background: #f0f7ff; }
 .checkbox { outline: none; }
 .art h2{ text-align: left; font-size: 15px; color: #333; margin: 0; padding: 0; }
-.space { margin-top: 10px; }
 .save-btn-articulos {margin-top: 10px;}
 .pct .red-btn,
 .art .red-btn { margin-right: 10px;}
 /* sub tables and lists */
-/* delete-modal */
-.delete-confirm-modal div { margin-bottom: 18px; }
-.delete-confirm-modal p { font-weight: bold; margin: 6px 0; font-size: 1.05rem; color: #333; }
-.delete-confirm-modal strong { color: #2c3e50; font-weight: 600; font-weight: bold; }
-.delete-confirm-modal .red-btn {margin-right: 10px;}
-/* delete-modal */
 /* add articulo modal */
 .hello-modal,
 .personas-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 300px; min-height: 120px; z-index: 3000; display: flex; flex-direction: column; align-items: center; }
@@ -96,19 +89,15 @@
 /* delete persona modal */
 /* adding proveedor grid style */
 .proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 940px; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 4000; display: flex; flex-direction: column; gap: 12px; }
-.content-container-for-proveedor { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.content-container-for-proveedor { display: flex; flex-direction: column; justify-content: center; align-items: center;}
 .proveedor-grid-modal h3,
 .proveedor-grid-modal .title h1,
 .hello-modal .title h1 {font-size: 1.2rem; color: #38249b; text-align: center; }
-.proveedor-grid-modal .modal-actions {display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
-.proveedor-grid-modal .proveedor-anadir-form { display: flex; width: 95%; flex-direction: column; gap: 12px; padding: 12px; background: linear-gradient(180deg, rgba(28,93,140,0.03), rgba(20,72,95,0.01)); border-radius: 8px; border: 1px solid #e6edf3; box-shadow: 0 6px 18px rgba(17,48,71,0.06); }
-.proveedor-grid-modal .search-anadir {display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.proveedor-grid-modal .search-anadir .search-bar {flex: 1 1 360px; padding: 10px 14px; border-radius: 10px; border: 1px solid #dce7f1; background: #fbfeff; color: #162a3a; font-size: 0.96rem; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
-.proveedor-grid-modal .search-anadir .search-bar:focus {outline: none; border-color: #1c5d8c; box-shadow: 0 0 0 4px rgba(28,93,140,0.06); }
-.proveedor-grid-modal .search-anadir .checkbox { accent-color: #38249b; width: 16px; height: 16px; margin: 0 6px 0 4px; vertical-align: middle; }
-.proveedor-grid-modal .search-anadir label {display: inline-flex; align-items: center; gap: 6px; color: #6b7c8f; font-size: 0.96rem; }
 .selected-row { background: #e6f0ff; }
-.proveedor-grid-modal .title{width: 80%;}
+.proveedor-grid-modal .title {width: 57%;}
+.search-options-prov {width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;}
+.search {display: flex; gap: 10px; align-items: center;}
+.search-btns-prov {width: 12%; display: flex; gap: 10px;}
 /* adding proveedor grid style */
 @media (min-width: 1700px) { .chunk-one, .chunk-two, .chunk-three, .chunk-four { width: 22%; }
 .save-btn-articulos {margin-left: 10px;} }

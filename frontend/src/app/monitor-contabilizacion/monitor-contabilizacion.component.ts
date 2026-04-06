@@ -438,8 +438,7 @@ export class MonitorContabilizacionComponent {
     if (this.selectedFacturas.facfre) {
       this.selectedFacturas.facfre = this.datePipe.transform(this.selectedFacturas.facfre, 'yyyy-MM-dd');
     }
-    this.detailView = 'Albaranes';
-    this.setAlbaranesOptio('albaranes', factura?.facnum);
+    this.openAlbarnaes();
   }
 
   closeDetails() {
@@ -452,6 +451,26 @@ export class MonitorContabilizacionComponent {
     const toNum = (v: any) => (v === null || v === undefined || v === '' ? 0 : Number(v) || 0);
     let pending = toNum(f.facimp) - (toNum(f.faciec) + toNum(f.facidi));
     return Math.round(pending * 100) / 100;
+  }
+
+  AlbaranesGrid: boolean = false;
+  ContabilizacionGrid: boolean = false;
+  albaranesGrid: boolean = false;
+  aplicacionesGrid: boolean = false;
+  descuentosGrid: boolean = false;
+  openAlbarnaes() {
+    this.limpiarMEssages();
+    this.AlbaranesGrid = true;
+    this.ContabilizacionGrid = false;
+    this.detailView = 'Albaranes';
+    this.setAlbaranesOptio('albaranes', this.selectedFacturas.facnum);
+  }
+
+  openContabilizacion() {
+    this.limpiarMEssages();
+    this.AlbaranesGrid = false;
+    this.ContabilizacionGrid = true;
+    this.detailView = 'Contabilización';
   }
 
   setAlbaranesOptio(option: 'albaranes' | 'aplicaciones' | 'descuentos', facnum: number): void {
@@ -475,7 +494,7 @@ export class MonitorContabilizacionComponent {
         if (!Array.isArray(response) || response.length === 0) {
           this.moreInfoMessageIsSuccess = true;
           this.moreInfoMessageSuccess = 'No hay albaranes por las medidas de búsqueda';
-          this.albaranes = []
+          this.albaranes = [];
           this.isLoading = false;
           this.pageAlbaranes = 0;
         } else {
@@ -484,6 +503,7 @@ export class MonitorContabilizacionComponent {
           this.pageAlbaranes = 0;
         }
       }, error: (err) => {
+        this.albaranes = [];
         this.moreInfoMessageError = err.error.error ?? err.error;
         this.isLoading = false;
         this.pageAlbaranes = 0;
@@ -532,6 +552,7 @@ export class MonitorContabilizacionComponent {
           this.pageAplicaiones = 0
         }
       }, error: (err) => {
+        this.apalicaciones = [];
         this.moreInfoMessageError = err.error.error ?? err.error;
         this.isLoading = false;
         this.pageAplicaiones = 0
@@ -562,6 +583,7 @@ export class MonitorContabilizacionComponent {
           this.pageDescuentos = 0;
         }
       }, error: (err) => {
+        this.descuentos = [];
         this.moreInfoMessageError = err.error.error ?? err.error;
         this.isLoading = false;
         this.pageDescuentos = 0;

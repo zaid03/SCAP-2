@@ -301,6 +301,12 @@
                     </div>
                     <div class="btns space">
                         <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }"
+                            (click)="showAddPersonas()"
+                        >Añadir personas</button>
+                        <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
                             (click)="cancelar()"
@@ -338,16 +344,14 @@
                                 role="tab"
                                 [attr.aria-selected]="option === 'almacen'"
                                 [class.active-tab]="option === 'almacen'"
-                                (click)="[setOption('almacen'), almacenDatos(selectedService.depcod)]"
-                                [disabled]="selectedService?.depalm !== 1"
+                                (click)="[setOption('almacen'), almacenDatos(tempServicio.depcod)]"
+                                [disabled]="detailFlags.depalm !== true"
                             > Almacen
                             </button>
                         </div>
                     </div>
                     <div class="custom-grid-modal" [ngSwitch]="option">
                         <ng-container *ngSwitchCase="'personas'">
-                            <button class="purple-btn space-top" (click)="showAddPersonas()">+</button>
-                            <h1 class="errorBtn">{{personasError}}</h1>
                             <h1 class="successBtn">{{personasSuccess}}</h1>
                             <div *ngIf="isLoading" class="loading-message">
                                 <div class="spinner"></div>
@@ -374,6 +378,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <h1 class="errorBtn">{{personasError}}</h1>
                                 <div class="pagination-controls">
                                     <button (click)="personasPrevPage()" [disabled]="personasPage === 0">Anterior</button>
                                     <span>Página</span>
@@ -395,11 +400,10 @@
                                 <div class="spinner"></div>
                                 <span>Cargando</span>
                             </div>
-                            <div class="almacen-title" *ngIf="almacenArray">
+                            <div class="almacen-title">
                                 <p class="p-style">Nombre</p>
-                                <h1 class="h1-style">{{almacenArray.magnom}}</h1>  
+                                <h1 class="h1-style">{{ almacenErro === 'No resultado' ? '-' : almacenArray?.magnom }}</h1>
                             </div>
-                            <h1 class="errorBtn">{{almacenErro}}</h1>
                             <div class="main-list">
                                 <table class="main-table aT">
                                     <thead>
@@ -409,12 +413,27 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let a of almacenDatosArray">
-                                            <td>{{ a.mtacod}}</td>
-                                            <td>{{ a.mtades }}</td>
+                                        <tr *ngFor="let a of paginatedAlmacen">
+                                            <td>{{a.mtacod}}</td>
+                                            <td>{{a.mtades}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
+                                <h1 class="errorBtn">{{almacenSecondError}}</h1>
+                                <div class="pagination-controls">
+                                    <button (click)="almacenPrevPage()" [disabled]="almacenPage === 0">Anterior</button>
+                                    <span>Página</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        [max]="almacenTotalPages"
+                                        [value]="almacenPage + 1"
+                                        (change)="almacenGoToPage($event)"
+                                        class="pagination-input"
+                                    />
+                                    <span>de {{ almacenTotalPages }}</span>
+                                    <button (click)="almacenNextPage()" [disabled]="almacenPage + 1 >= almacenTotalPages">Siguiente</button>
+                                </div>
                             </div>
                         </ng-container>
                     </div>
@@ -525,20 +544,20 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    </div>
     <h3>¿Seguro que quieres eliminar este Persona?</h3>
     <h1 class="errorBtn">{{deleErr}}</h1>
-    <div class="persona-details">
-        <p class="p-style">Código:</p>
-        <p class="p-style">{{personaTodelete.percod}}</p>
-    </div>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
-    <div class="btns">
-        <button class="red-btn" (click)="confirmDelete(personaTodelete.percod)">-</button>
-        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    <div class="persona-details">
+        <p class="p-style">Código:</p>
+        <p class="p-style">{{personaTodelete.percod}}</p>
     </div>
+    <button class="red-btn" (click)="confirmDelete(personaTodelete.percod)">Confirmar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="addPersonas" (click)="closeAddPersonas()"></div>

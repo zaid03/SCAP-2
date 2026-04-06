@@ -419,8 +419,7 @@ export class FacturasComponent {
       this.tempFactura.facfre = this.datePipe.transform(this.tempFactura.facfre, 'yyyy-MM-dd');
     }
 
-    this.detailView = 'Albaranes';
-    this.setAlbaranesOptio('albaranes', factura?.facnum);
+    this.openAlbarnaes();
   }
 
   closeDetails() {
@@ -481,146 +480,83 @@ export class FacturasComponent {
   }
 
   //search functions
-  fechaTipo: 'registro' | 'factura' | 'contable' | 'Fecha' | '' = '';
-  estadoTipo: 'contabilizadas' | 'no-contabilizadas' | 'aplicadas' | 'sin-aplicadas' | '' = 'no-contabilizadas';
-  fromDate: string = '';
-  toDate: string = '';
-  filterFacturaMessage: string = '';
-  facturaSearch: string = '';
-  public searchQuery: string = '';
-
   onEjeInput(event: Event) {
     const input = event.target as HTMLInputElement;
     const sanitized = input.value.replace(/\D+/g, '').slice(0, 4);
-    if (sanitized !== this.facturaSearch) {
-      this.facturaSearch = sanitized;
-    }
+    input.value = sanitized;
+    this.facturaSearch = sanitized;
     this.facturaSearchTouched = true;
   }
   
+  filterFacturaMessage: string = '';
+  
+  fechaTipo: 'registro' | 'factura' | 'contable' | 'Fecha' | '' = '';
+  estadoTipo: 'contabilizadas' | 'noContabilizadas' | 'ptApplidas' | 'sinPtApplicar' | '' = 'noContabilizadas';
+  fromDate: string = '';
+  toDate: string = '';
+  facturaSearch: string = '';
+  public searchQuery: string = '';
   filterFacturas(): void {
     this.limpiarMEssages();
+
     this.isLoading = true;
     if (this.entcod == null || this.eje == null || !this.centroGestor) {
       this.filterFacturaMessage = 'Faltan datos de sesión.';
       this.isLoading = false;
       return;
     }
-
     if (!this.searchQuery && !this.fechaTipo && !this.fromDate && !this.toDate && !this.facturaSearch) {
       this.fetchFacturas();
       this.isLoading = false;
       return;
     }
-
-    this.filterFacturaMessage = '';
-
-    const estadoMap: Record<string, string> = {
-      'contabilizadas': 'CONT',
-      'no-contabilizadas': 'NO_CONT',
-      'aplicadas': 'PTE_APL',
-      'sin-aplicadas': 'PTE_SIN',
-      'todas': 'TODAS',
-      '': 'NO_CONT' 
-    };
-    const fechaMap: Record<string, string> = {
-      'registro': 'REGISTRO',
-      'factura': 'FACTURA',
-      'contable': 'CONTABLE',
-      '': 'REGISTRO'
-    };
-
-    const estado = estadoMap[this.estadoTipo ?? ''] ?? 'NO_CONT';
-    const dateType = fechaMap[this.fechaTipo ?? ''] ?? 'REGISTRO';
-
-    const desde = this.fromDate?.trim() || '';
-    const hasta = this.toDate?.trim() || '';
-    if ((desde || hasta) && !this.fechaTipo) {
+    if ((this.fromDate || this.toDate) && !this.fechaTipo) {
       this.filterFacturaMessage = 'Seleccione un tipo de fecha antes de buscar.';
       this.isLoading = false;
       return;
-    }
-
-    const facann = this.facturaSearch?.trim() || '';
-    let facannMode = 'ANY';
-    
-    if (facann) {
-      facannMode = 'VALUE';
-    } else {
-      if (estado === 'CONT') {
-        facannMode = 'NOT_NULL';
-      } else if (estado === 'NO_CONT' || estado === 'PTE_APL' || estado === 'PTE_SIN') {
-        facannMode = 'NULL';
-      }
-    }
-
-    const searchRaw = this.searchQuery?.trim() || '';
-    const digits = searchRaw.replace(/\D/g, '');
-    const hasLetters = /[A-Za-z]/.test(searchRaw);
-    const hasDigits = /\d/.test(searchRaw);
-    const NIF_MIN_DIGITS = 5;
-    let searchType = 'OTROS';
-    let search = '';
-
-    if (searchRaw) {
-      if (!hasLetters && hasDigits && digits.length > 0 && digits.length <= NIF_MIN_DIGITS) {
-        searchType = 'TERCOD';
-        search = digits;
-      } else if (!hasLetters && hasDigits && digits.length > NIF_MIN_DIGITS) {
-        searchType = 'NIF';
-        search = digits;
-      } else if (hasLetters && hasDigits && searchRaw.length > NIF_MIN_DIGITS) {
-        searchType = 'NIF_LETTERS';
-        search = searchRaw;
-      } else {
-        searchType = 'OTROS';
-        search = searchRaw;
-      }
     }
 
     const params: Record<string, string> = {
       ent: String(this.entcod),
       eje: String(this.eje),
       cgecod: this.centroGestor,
-      estado,
-      dateType,
-      facannMode
     };
-    
-    if (desde) params['fromDate'] = desde; 
-    if (hasta) params['toDate'] = hasta;    
-    if (facann && facannMode === 'VALUE') params['facann'] = facann;
-    if (search) {
-      params['search'] = search;
-      params['searchType'] = searchType;
+
+    if (this.estadoTipo) {
+      params['estado'] = this.estadoTipo;
     }
 
-    this.http.get<any[]>(`${environment.backendUrl}/api/fac/search`, { observe: 'response', params })
+    if (this.fechaTipo) {
+      params['fecha'] = this.fechaTipo;
+    }
+
+    if (this.fromDate && this.fromDate.trim() !== '') {
+      params['fromDate'] = this.fromDate;
+    }
+
+    if (this.toDate && this.toDate.trim() !== '') {
+      params['toDate'] = this.toDate;
+    }
+
+    if (this.facturaSearch && this.facturaSearch.trim() !== '') {
+      params['ej_factura'] = this.facturaSearch;
+    }
+
+    if (this.searchQuery && this.searchQuery.trim() !== '') {
+      params['main_filter'] = this.searchQuery;
+    }
+
+    this.http.get<any[]>(`${environment.backendUrl}/api/fac/search-factura`, {params} )
     .subscribe({
       next: (res) => {
-        if (res.status === 204 || !res.body || res.body.length === 0) {
-          this.facturaMessageIsSuccess = true;
-          this.filterFacturaMessage = 'No resultado';
-          this.facturas = [];
-          this.defaultFacturas = [];
-          this.sortField = null;
-          this.sortDirection = 'asc';
-          this.updatePagination();
-          this.isLoading = false;
-          return;
-        }
-        const body = res.body ?? [];
-        this.facturas = body;
-        this.defaultFacturas = [...body];
-        if (this.sortField) {
-          this.applySort();
-        } else {
-          this.page = 0;
-          this.updatePagination();
-        }
+        this.facturas = res;
+        this.defaultFacturas = [...this.facturas]
+        this.page = 0;
+        this.updatePagination();
         this.isLoading = false;
       },
       error: (err) => {
+        this.facturas = [];
         this.filterFacturaMessage = err.error.error ?? err.error;
         this.isLoading = false;
       }
@@ -635,7 +571,7 @@ export class FacturasComponent {
     this.facturaSearchTouched = false;
     this.searchQueryTouched = false;
     this.fechaTipo = '';
-    this.estadoTipo = 'no-contabilizadas';
+    this.estadoTipo = 'noContabilizadas';
     this.fromDate = '';
     this.toDate = '';
     this.page = 0;
@@ -721,6 +657,25 @@ export class FacturasComponent {
   moreInfoMessageIsSuccess: boolean = false;
   moreInfoMessageError: string = '';
   moreInfoMessageIsError: boolean = false;
+  AlbaranesGrid: boolean = false;
+  ContabilizacionGrid: boolean = false;
+  albaranesGrid: boolean = false;
+  aplicacionesGrid: boolean = false;
+  descuentosGrid: boolean = false;
+  openAlbarnaes() {
+    this.limpiarMEssages();
+    this.AlbaranesGrid = true;
+    this.ContabilizacionGrid = false;
+    this.detailView = 'Albaranes';
+    this.setAlbaranesOptio('albaranes', this.selectedFacturas.facnum);
+  }
+
+  openContabilizacion() {
+    this.limpiarMEssages();
+    this.AlbaranesGrid = false;
+    this.ContabilizacionGrid = true;
+    this.detailView = 'Contabilización';
+  }
 
   setAlbaranesOptio(option: 'albaranes' | 'aplicaciones' | 'descuentos', facnum: number): void {
     this.albaranesOptio = option;
@@ -731,30 +686,21 @@ export class FacturasComponent {
     this.descuentos = [];
 
     if ( option === 'albaranes') {this.fetchAlbaranesDEtail(facnum);}
-    if ( option === 'aplicaciones') {
-      this.fetchApplicacionesDetails(facnum);
-    }
+    if ( option === 'aplicaciones') {this.fetchApplicacionesDetails(facnum);}
     if ( option === 'descuentos') {this.fetchDescuentosDetails(facnum);}
   }
 
+  albaranError: string = '';
   fetchAlbaranesDEtail(facnum: number) {
     this.http.get<any>(`${environment.backendUrl}/api/alb/albaranes/${this.entcod}/${this.eje}/${facnum}`).subscribe({
       next: (response) => {
-        if (!Array.isArray(response) || response.length === 0) {
-          this.moreInfoMessageIsSuccess = true;
-          this.moreInfoMessageSuccess = 'No hay albaranes por las medidas de búsqueda';
-          this.albaranes = []
-          this.isLoading = false;
-          this.pageAlbaranes = 0;
-        } else {
-          this.albaranes = response;
-          this.backipAlbaranes = Array.isArray(response) ? [...response] : [];
-          this.isLoading = false;
-          this.pageAlbaranes = 0;
-        }
+        this.albaranes = response;
+        this.backipAlbaranes = Array.isArray(response) ? [...response] : [];
+        this.isLoading = false;
+        this.pageAlbaranes = 0;
       }, error: (err) => {
-        this.moreInfoMessageIsError = true;
-        this.moreInfoMessageError = err.error.error ?? err.error;
+        this.albaranes = [];
+        this.albaranError = err.error.error ?? err.error;
         this.isLoading = false;
         this.pageAlbaranes = 0;
       }
@@ -770,43 +716,36 @@ export class FacturasComponent {
   }
 
   fetchApplicacionesDetails(facnum: number) {
+    this.limpiarMEssages();
     this.http.get<any>(`${environment.backendUrl}/api/fde/${this.entcod}/${this.eje}/${facnum}`).subscribe({
       next: (response) => {
-        if (!Array.isArray(response) || response.length === 0) {
-          this.moreInfoMessageIsSuccess = true;
-          this.moreInfoMessageSuccess = 'No hay aplicaciones por las medidas de búsqueda';
-          this.apalicaciones = []
-          this.isLoading = false;
-          this.pageAplicaiones = 0
-        } else {
+        this.apalicaciones = response.map((item: any) => {
+        if (item.FDEDIF !== undefined && item.FDEDIF !== null && item.FDEDIF !== '') {
+          let value = String(item.FDEDIF)
+            .replace(/[^\d,.-]/g, '') 
+            .replace(/\s/g, '');      
 
-          this.apalicaciones = response.map((item: any) => {
-            if (item.FDEDIF !== undefined && item.FDEDIF !== null && item.FDEDIF !== '') {
-              let value = String(item.FDEDIF)
-                .replace(/[^\d,.-]/g, '') 
-                .replace(/\s/g, '');      
+          if (value.indexOf(',') > -1) {
+            value = value.replace(/\./g, '');
+          }
+          value = value.replace(',', '.');
 
-              if (value.indexOf(',') > -1) {
-                value = value.replace(/\./g, '');
-              }
-              value = value.replace(',', '.');
-
-              let num = parseFloat(value);
-              if (!isNaN(num)) {
-                item.FDEDIF = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-              }
-            }
-            return item;
-          });
-          this.backupAplicaciones = Array.isArray(response) ? [...this.apalicaciones] : [];
-          this.isLoading = false;
-          this.pageAplicaiones = 0
+          let num = parseFloat(value);
+          if (!isNaN(num)) {
+            item.FDEDIF = num.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+          }
         }
-      }, error: (err) => {
-        this.moreInfoMessageIsError = true;
-        this.moreInfoMessageError = err.error.error ?? err.error;
+        return item;
+      });
+      this.backupAplicaciones = Array.isArray(response) ? [...this.apalicaciones] : [];
+      this.isLoading = false;
+      this.pageAplicaiones = 0;
+      }, 
+      error: (err) => {
+        this.apalicaciones = [];
         this.isLoading = false;
-        this.pageAplicaiones = 0
+        this.pageAplicaiones = 0;
+        this.moreInfoMessageError = err.error.error ?? err.error;
       }
     });
   }
@@ -819,24 +758,17 @@ export class FacturasComponent {
     if (inputPage >= 1 && inputPage <= this.totalPagesAplicaciones) {this.pageAplicaiones = inputPage - 1;}
   }
 
+  descuentosError: string = '';
   fetchDescuentosDetails(facnum: number) {
     this.http.get<any>(`${environment.backendUrl}/api/fdt/${this.entcod}/${this.eje}/${facnum}`).subscribe({
       next: (response) => {
-        if (!Array.isArray(response) || response.length === 0) {
-          this.moreInfoMessageIsSuccess = true;
-          this.moreInfoMessageSuccess = 'No hay descuentos por las medidas de búsqueda';
-          this.descuentos = []
-          this.isLoading = false;
-          this.pageDescuentos = 0;
-        } else {
-          this.descuentos = response;
-          this.backupDescuentos = Array.isArray(response) ? [...response] : [];
-          this.isLoading = false;
-          this.pageDescuentos = 0;
-        }
+        this.descuentos = response;
+        this.backupDescuentos = Array.isArray(response) ? [...response] : [];
+        this.isLoading = false;
+        this.pageDescuentos = 0;
       }, error: (err) => {
-        this.moreInfoMessageIsError = true;
-        this.moreInfoMessageError = err.error.error ?? err.error;
+        this.descuentos = [];
+        this.descuentosError = err.error.error ?? err.error;
         this.isLoading = false;
         this.pageDescuentos = 0;
       }
@@ -884,6 +816,7 @@ export class FacturasComponent {
         this.pageAlbaranesAdd = 0;
       },
       error: (err) => {
+        this.albaranesAdd = [];
         this.albaranesError = err.error.error ?? err.error;
         this.isLoadingAlbaranes = false;
         this.pageAlbaranesAdd = 0;
@@ -912,6 +845,7 @@ export class FacturasComponent {
           this.pageAlbaranesAdd = 0;
         },
         error: (err) => {
+          this.albaranesAdd = [];
           this.albaranesError = err.error.error ?? err.error;
           this.isLoadingAlbaranes = false;
           this.pageAlbaranesAdd = 0;
@@ -927,6 +861,7 @@ export class FacturasComponent {
           this.pageAlbaranesAdd = 0;
         },
         error: (err) => {
+          this.albaranesAdd = [];
           this.albaranesError = err.error.error ?? err.error;
           this.isLoadingAlbaranes = false;
           this.pageAlbaranesAdd = 0;
@@ -988,6 +923,7 @@ export class FacturasComponent {
         this.fetchAlbaranesDEtail(facnum);
         this.closeAlbaranesAdd();
         this.moreInfoMessageSuccess = 'albaranes añadido correctamente';
+        this.openAlbarnaes();
       },
       error: (err) => {
         this.isAddingAlbaranes = false;
@@ -1130,6 +1066,7 @@ export class FacturasComponent {
         this.pageFacturas = 0;
       },
       error: (err) => {
+        this.facturasWb = [];
         this.pageFacturas = 0;
         this.isLoadingFactura = false;
         this.facturasErrorMessage = err.error.error ?? err.error;
@@ -1170,6 +1107,7 @@ export class FacturasComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.facturasWb = [];
         this.filterFacturaMessage = err.error?.error ?? err.error;
         this.isLoading = false;
       }
@@ -1263,5 +1201,7 @@ export class FacturasComponent {
     this.dalbaranesDeleteMessage = '';
     this.facturaDetailSuccess = '';
     this.facturaDetailError = '';
+    this.albaranError = '';
+    this.descuentosError = '';
   }
 }

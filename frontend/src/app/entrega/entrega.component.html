@@ -168,17 +168,18 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    </div>
     <h3>¿Seguro que quieres eliminar este entrega?</h3>
     <div *ngIf="entregaToDelete">
-        
     </div>
     <div *ngIf="isDeleting" class="loading-message">
         <div class="spinner"></div>
         <span>borrando</span>
     </div>
     <h1 class="errorBtn">{{detallesMessageErrorDelete}}</h1>
-    <button class="red-btn" (click)="confirmDelete()">-</button>
-    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">Confirmar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showAddGrid" (click)="hideAdd()"></div>

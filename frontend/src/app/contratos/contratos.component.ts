@@ -78,6 +78,7 @@ export class ContratosComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.contratos = [];
         this.mainError = err.error.error ?? err.error;
         this.isLoading = false;
       }
@@ -307,6 +308,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -323,6 +325,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -339,6 +342,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -357,6 +361,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -373,6 +378,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -389,6 +395,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -407,6 +414,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -423,6 +431,7 @@ export class ContratosComponent {
             this.isLoading = false;
           },
           error: (err) => {
+            this.contratos = [];
             this.mainError = err.error.error ?? err.error;
             this.isLoading = false;
           }
@@ -466,6 +475,7 @@ export class ContratosComponent {
     this.articulos = [];
     this.showCentroGestorGrid = false;
     this.showArticulosGrid = false;
+    this.activeDetailTab = null;
   }
 
   closeDetailsSure() {if (this.isUpdate) {return;} 
@@ -567,6 +577,7 @@ export class ContratosComponent {
         this.updatePaginationPro();
       },
       error: (err) => {
+        this.proveedores = [];
         this.error = err.error.error ?? err.error;
         this.isLoading = false;
       }
@@ -599,192 +610,36 @@ export class ContratosComponent {
   }
 
   searchTerm: string = '';
-  filterOption: string = 'noBloqueados';
+  filterOption: string = 'Nobloqueado';
   searchProveedor() {
     this.limpiarMessages();
     this.isLoadingPro = true
-    if (this.searchTerm.trim() === '') {
-      if (this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/filter/${this.entcod}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error.error ?? err.error;
-            this.isLoadingPro = false;
-          }
-        })
-      } else if (this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/filter-no/${this.entcod}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error.error ?? err.error;
-            this.isLoadingPro = false;
-          }
-        })
-      }
-    }
+    const params = {
+      ent: this.entcod || '',
+      searchMode: this.filterOption,
+      term: this.searchTerm
+    };
 
-    if(/^\d+$/.test(this.searchTerm)) {
-      if(this.filterOption === 'noBloqueados') {
-        if ((this.searchTerm.length <= 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-tercod-no-bloqueado/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        } else if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-no-bloqueado/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        }
-      } else if(this.filterOption === 'Bloqueados') {
-        if ((this.searchTerm.length <= 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-tercod-bloqueado/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        } if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-bloquado/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        }
-      } else if(this.filterOption === 'Todos') {
-        if ((this.searchTerm.length <= 5)){
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/tercod/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        } else if ((this.searchTerm.length > 5)) {
-          this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/ternif/${this.searchTerm}`).subscribe({
-            next: (response) => {
-              this.proveedores = response;
-              this.page = 0;
-              this.isLoadingPro = false;
-            },
-            error: (err) => {
-              this.error = err.error || err.error.error;
-              this.isLoadingPro = false;
-            }
-          })
-        }
+    this.http.get<any[]>(`${environment.backendUrl}/api/ter/search-proveedores`, {params}).subscribe({
+      next: (response) => {
+        this.proveedores = response;
+        this.page = 0;
+        this.isLoadingPro = false;
+      },
+      error: (err) => {
+        this.proveedores = [];
+        this.error = err.error.error ?? err.error;
+        this.isLoadingPro = false;
       }
-    } else if (/^[a-zA-Z0-9]+$/.test(this.searchTerm)) {
-      if(this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nif-nom-ali-no-bloquado/${this.entcod}/search-by-term?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoadingPro = false;
-          }
-        })
-      } if(this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ternif-nom-ali-bloquado/${this.entcod}/search?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoadingPro = false;
-          }
-        })
-      } if(this.filterOption === 'Todos') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}/search-todos?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoadingPro = false;
-          }
-        })
-      }
-    } else {
-      if(this.filterOption === 'noBloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nom-ali-no-bloquado/${this.entcod}/findMatchingNomOrAli?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoadingPro = false;
-          }
-        })
-      }
-      if(this.filterOption === 'Bloqueados') {
-        this.http.get<any[]>(`${environment.backendUrl}/api/ter/by-nom-ali-bloquado/${this.entcod}/searchByNomOrAli?term=${this.searchTerm}`).subscribe({
-          next: (response) => {
-            this.proveedores = response;
-            this.page = 0;
-            this.isLoadingPro = false;
-          },
-          error: (err) => {
-            this.error = err.error || err.error.error;
-            this.isLoadingPro = false;
-          }
-        })
-      }
-    }
+    })
   }
 
   clearSearch() {
     this.limpiarMessages();
     this.fetchProveedores();
+    this.filterOption = 'Nobloqueado';
     this.page = 0;
     this.searchTerm = '';
-    this.filterOption = 'noBloqueados';
   }
 
   proveedorTercod: number | null = null
@@ -830,12 +685,14 @@ export class ContratosComponent {
   showArticulos(numero: number) {
     this.limpiarMessages();
     this.showArticulosGrid = true;
+    this.activeDetailTab = 'articulos';
     this.showCentroGestorGrid = false;
     this.centroGestor = [];
     this.fetchArticulos(numero);
   }
 
   isLoadingArticulos: boolean = false;
+  articuloError: string = '';
   fetchArticulos(numero: number) {
     this.isLoadingArticulos = true;
     const concod = numero;
@@ -847,6 +704,7 @@ export class ContratosComponent {
       },
       error: (err) => {
         this.isLoadingArticulos = false;
+        this.articuloError = err.error.error ?? err.error;
       }
     })
   }
@@ -1010,6 +868,7 @@ export class ContratosComponent {
           this.isLoadingArticulo = false;
         },
         error: (err) => {
+          this.articulosAdd = [];
           this.isLoadingArticulo = false;
           this.articulosAddError = err.error.error ?? err.error;
         }
@@ -1021,6 +880,7 @@ export class ContratosComponent {
           this.isLoadingArticulo = false;
         },
         error: (err) => {
+          this.articulosAdd = [];
           this.isLoadingArticulo = false;
           this.articulosAddError = err.error.error ?? err.error;
         }
@@ -1084,6 +944,7 @@ export class ContratosComponent {
         this.fetchArticulos(concod);
         this.isAddingArticulo = false;
         this.articulosSuccess = 'artículos añadidos con éxito';
+        this.showArticulos(concod);
       },
       error: (err) => {
         this.articulosAddError = err.error.error ?? err.error;
@@ -1102,6 +963,7 @@ export class ContratosComponent {
     this.limpiarMessages();
     this.showCentroGestorGrid = true;
     this.showArticulosGrid = false;
+    this.activeDetailTab = 'centroGestor';
     this.articulos = [];
     this.fetchCentroGestor(numero);
   }
@@ -1117,6 +979,8 @@ export class ContratosComponent {
         this.isLoadingCentroGestor = false;
       },
       error: (err) => {
+        this.centroGestor = [];
+        this.pageCNT = 0;
         this.isLoadingCentroGestor = false;
         this.cgeError = err.error.error ?? err.error;
       }
@@ -1215,6 +1079,7 @@ export class ContratosComponent {
         this.searchPageCentro = 0;
       },
       error: (err) => {
+        this.centroGestoresAdd = [];
         this.isLoadingCentroAdd = false;
         this.centroErrorMessage = err.error.error ?? err.error;
       }
@@ -1231,6 +1096,7 @@ export class ContratosComponent {
           this.searchPageCentro = 0;
         },
         error: (err) => {
+          this.centroGestoresAdd = [];
           this.isLoadingCentroAdd = false;
           this.centroErrorMessage = err.error.error ?? err.error;
         }
@@ -1243,6 +1109,7 @@ export class ContratosComponent {
           this.searchPageCentro = 0;
         },
         error: (err) => {
+          this.centroGestoresAdd = [];
           this.isLoadingCentroAdd = false;
           this.centroErrorMessage = err.error.error ?? err.error;
         }
@@ -1255,6 +1122,7 @@ export class ContratosComponent {
           this.searchPageCentro = 0;
         },
         error: (err) => {
+          this.centroGestoresAdd = [];
           this.isLoadingCentroAdd = false;
           this.centroErrorMessage = err.error.error ?? err.error;
         }
@@ -1310,6 +1178,7 @@ export class ContratosComponent {
         this.fetchCentroGestor(concod);
         this.isLoadingCentroAdd = false;
         this.cgeSuccess = 'artículos añadidos con éxito';
+        this.showcentroGestor(concod);
       },
       error: (err) => {
         this.centroErrorMessage = err.error.error ?? err.error;
@@ -1324,13 +1193,14 @@ export class ContratosComponent {
   programa: string = '';
   economica: string = '';
   cgecod: string = '';
+  DError: string = '';
   checkBeforeAdd(centro: any) {
     this.limpiarMessages();
     
     this.cogaip = centro.cogaip;
     
     if (this.cogaip > 0) {
-      this.cgeError = 'No se puede cambiar la D si ya hay pedidos'
+      this.DError = 'No se puede cambiar la D si ya hay pedidos'
     } else {
       this.cgecod = centro.cgecod;
       this.organica = centro.cge.cgeorg;
@@ -1432,5 +1302,7 @@ export class ContratosComponent {
     this.centroDeleteError = '';
     this.centroErrorMessage = '';
     this.DErrorMessage = '';
+    this.articuloError = '';
+    this.DError = '';
   }
 }

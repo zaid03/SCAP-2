@@ -30,7 +30,6 @@ export class SidebarComponent implements OnInit {
   proveedores = false;
   contabilidad = false;
   articulos = false;
-  temp = false;
   constructor(private router: Router) {}
 
   ngOnInit(): void {
@@ -120,15 +119,6 @@ export class SidebarComponent implements OnInit {
         break;
       case 'panel':
         this.router.navigate(['/dashboard']);
-        break;
-      case 'familia':
-        this.router.navigate(['/familia'])
-        break;
-      case 'almacenaje':
-        this.router.navigate(['/almacenaje']);
-        break;
-      case 'unidades':
-        this.router.navigate(['/unidades']);
         break;
       default:
         break;

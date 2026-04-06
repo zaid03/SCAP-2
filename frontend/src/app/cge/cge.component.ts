@@ -45,7 +45,6 @@ export class CgeComponent {
 
   ngOnInit() {
     this.limpiarMessages();
-    this.isLoading = true;
     const entidad = sessionStorage.getItem('Entidad');
     const eje = sessionStorage.getItem('EJERCICIO');
     const cge = sessionStorage.getItem('CENTROGESTOR');
@@ -77,6 +76,7 @@ export class CgeComponent {
 
   //main table functions
   fetchCentro() {
+    this.isLoading = true;
     this.http.get<any>(`${environment.backendUrl}/api/cge/fetch-all/${this.entcod}/${this.eje}`).subscribe({
       next: (res) => {
         this.centroGestores = Array.isArray(res) ? [...res] : [];
@@ -96,7 +96,7 @@ export class CgeComponent {
       }
     })
   }
-  get paginatedFamilias(): any[] {
+  get paginatedCentroGestor(): any[] {
     if (!this.centroGestores || this.centroGestores.length === 0) return [];
     const start = this.page * this.pageSize;
     return this.centroGestores.slice(start, start + this.pageSize);
@@ -280,16 +280,13 @@ export class CgeComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.backupCentroGestores.length ? this.backupCentroGestores : this.centroGestores;
+    const rows = this.paginatedCentroGestor;
     if (!rows || rows.length === 0) {
       this.SearchDownMessageError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
-      Entidad: row.ent ?? '',
-      EJE: row.eje ?? '',
       Código: row.cgecod ?? '',
       Descripción: row.cgedes ?? '',
       Orgánica: row.cgeorg ?? '',
@@ -300,18 +297,15 @@ export class CgeComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['Listado de Centros de gestor']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Entidad', 'EJE', 'Código', 'Descripción', 'Orgánica', 'Programa', 'Cierre_contable']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Código', 'Descripción', 'Orgánica', 'Programa', 'Cierre_contable']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 6 },
-      { wch: 12 },
-      { wch: 12 },
       { wch: 12 },
       { wch: 55 },
       { wch: 12 },
       { wch: 12 },
-      { wch: 16 }
+      { wch: 25 }
     ];
   
     const workbook = XLSX.utils.book_new();
@@ -325,16 +319,13 @@ export class CgeComponent {
 
   pdfDownload() {
     this.limpiarMessages();
-    const source = this.backupCentroGestores.length ? this.backupCentroGestores : this.centroGestores;
+    const source = this.paginatedCentroGestor;
     if (!source?.length) {
       this.SearchDownMessageError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
-      ent: row.ent ?? '',
-      eje: row.eje ?? '',
       cgecod: row.cgecod ?? '',
       cgedes: row.cgedes ?? '',
       cgeorg: row.cgeorg ?? '',
@@ -348,9 +339,6 @@ export class CgeComponent {
     doc.text('Listado de Centros de gestor', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
-      { header: 'Entidad', dataKey: 'ent' },
-      { header: 'Ejercicio', dataKey: 'eje' },
       { header: 'Código', dataKey: 'cgecod' },
       { header: 'Descripción', dataKey: 'cgedes' },
       { header: 'Orgánica', dataKey: 'cgeorg' },

@@ -80,6 +80,7 @@ export class CosteComponent {
         }
       },
       error: (err) => {
+        this.costes = [];
         this.isLoading = false;
         this.costeError = err.error.error ?? err.error;
       }
@@ -213,6 +214,7 @@ export class CosteComponent {
           this.isLoading = false
         },
         error: (err) => {
+          this.costes = [];
           this.costeError = err.error.error ?? err.error;
           this.isLoading = false
         }
@@ -225,6 +227,7 @@ export class CosteComponent {
           this.isLoading = false
         },
         error: (err) => {
+          this.costes = [];
           this.costeError = err.error.error ?? err.error;
           this.isLoading = false
         }
@@ -241,14 +244,13 @@ export class CosteComponent {
 
   downloadExcel() {
     this.emptyAllMessages();
-    const rows = this.backupCostes.length ? this.backupCostes : this.costes;
+    const rows = this.paginatedCostes;
     if (!rows || rows.length === 0) {
       this.costeError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
       Código: row.ccocod ?? '',
       Descripción: row.ccodes ?? '',
     }));
@@ -256,11 +258,10 @@ export class CosteComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['Listado de Centro de Coste']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Código', 'Descripción']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Código', 'Descripción']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 6 },
       { wch: 15 },
       { wch: 40 }
     ];
@@ -276,7 +277,7 @@ export class CosteComponent {
 
   exportPdf() {
     this.emptyAllMessages();
-    const source = this.backupCostes.length ? this.backupCostes : this.costes;
+    const source = this.paginatedCostes;
 
     if (!source?.length) {
       this.costeError = 'No hay datos para exportar.';
@@ -284,7 +285,6 @@ export class CosteComponent {
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       ccocod: row.ccocod ?? '',
       ccodes: row.ccodes ?? ''
     }));
@@ -295,7 +295,6 @@ export class CosteComponent {
     doc.text('Listado de Centro de Coste', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Código', dataKey: 'ccocod' },
       { header: 'Descripción', dataKey: 'ccodes' }
     ];

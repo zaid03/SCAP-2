@@ -54,6 +54,7 @@ export class EntregaComponent {
         }
       },
       error: (err) => {
+        this.entregas = [];
         this.isLoading = false;
         this.entregasError = err.error.error ?? err.error;
       }
@@ -187,18 +188,20 @@ export class EntregaComponent {
           this.isLoading = false;
         },
         error: (err) => {
+          this.entregas = [];
           this.entregasError = err.error.error ?? err.error;
           this.isLoading = false;
         }
       });
     }
-    if(isChar.test(this.searchText) || isAlphanumeric.test(this.searchText)) {
+    else {
       this.http.get<any[]>(`${environment.backendUrl}/api/Len/filter-lendes/${this.searchText}`).subscribe({
         next: (res) => {
           this.entregas = res;
           this.isLoading = false;
         },
         error: (err) => {
+          this.entregas = [];
           this.entregasError = err.error.error ?? err.error;
           this.isLoading = false;
         }
@@ -215,14 +218,13 @@ export class EntregaComponent {
 
   downloadExcel() {
     this.emptyAllMessages();
-    const rows = this.backupentregas.length ? this.backupentregas : this.entregas;
+    const rows = this.paginatedEntregas;
     if (!rows || rows.length === 0) {
       this.entregasError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
       Código: row.lencod ?? '',
       Descripción: row.lendes ?? '',
     }));
@@ -230,11 +232,10 @@ export class EntregaComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['Listado de Lugares de Entrega']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Código', 'Descripción']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Código', 'Descripción']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 6 },
       { wch: 15 },
       { wch: 40 }
     ];
@@ -250,7 +251,7 @@ export class EntregaComponent {
 
   exportPdf() {
     this.emptyAllMessages();
-    const source = this.backupentregas.length ? this.backupentregas : this.entregas;
+    const source = this.paginatedEntregas;
 
     if (!source?.length) {
       this.entregasError = 'No hay datos para exportar.';
@@ -258,10 +259,8 @@ export class EntregaComponent {
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       lencod: row.lencod ?? '',
       lendes: row.lendes ?? '',
-      lentxt: row.lentxt ?? ''
     }));
 
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
@@ -270,10 +269,8 @@ export class EntregaComponent {
     doc.text('Listado de Lugares de Entrega', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Código', dataKey: 'lencod' },
       { header: 'Descripción', dataKey: 'lendes' },
-      { header: 'Texto', dataKey: 'lentxt' }
     ];
 
     autoTable(doc, {

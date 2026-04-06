@@ -154,6 +154,9 @@
 
 <div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteConfirm()"></div>
 <div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <div class="btns">
+        <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    </div>
     <h3>¿Seguro que quieres eliminar este centro de coste?</h3>
     <div *ngIf="costeToDelete">
         <div *ngIf="isDeleting" class="loading-message">
@@ -162,8 +165,7 @@
     </div>
     </div>
     <h1 class="errorBtn">{{detallesMessageErrorDelete}}</h1>
-    <button class="red-btn space" (click)="confirmDelete()">-</button>
-    <button class="purple-btn" (click)="closeDeleteConfirm()">✖</button>
+    <button class="red-btn" (click)="confirmDelete()">Confirmar</button>
 </div>
 
 <div class="modal-backdrop" *ngIf="showAddGrid" (click)="hideAdd()"></div>

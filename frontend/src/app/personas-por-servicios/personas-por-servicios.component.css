@@ -19,3 +19,25 @@
 .main-table td:nth-child(7) {text-align: center;}
 .main-table tbody td input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
 /* main table */
+/* media querries */
+@media screen and (min-width: 1450px) and (max-width: 1600px) {
+    .search-form {width: 76%;}
+    .Widthy {width: 10%; }
+}
+@media screen and (min-width: 1601px) and (max-width: 1800px) {
+    .search-form {width: 68%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 1801px) and (max-width: 1900px) {
+    .search-form {width: 62%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 1901px) and (max-width: 2099px) {
+    .search-form {width: 58%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 2100px) {
+    .search-form {width: 52%;}
+    .Widthy {width: 8%;}
+}
+/* media querries */

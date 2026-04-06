@@ -47,7 +47,6 @@ export class PersonaComponent {
   isLoading: boolean = false;
 
   ngOnInit(): void {
-    this.isLoading = true;
     this.limpiarMessages();
     const entidad = sessionStorage.getItem('Entidad');
     const eje = sessionStorage.getItem('EJERCICIO');
@@ -67,6 +66,7 @@ export class PersonaComponent {
 
   //main table functions
   fetchPersonas() {
+    this.isLoading = true;
     this.http.get<any>(`${environment.backendUrl}/api/Per/fetch-all`).subscribe({
       next: (res) => {
         this.personas = res;
@@ -191,14 +191,13 @@ export class PersonaComponent {
 
   excelDownload() {
     this.limpiarMessages(); 
-    const rows = this.backuppersonas.length ? this.backuppersonas : this.personas;
+    const rows = this.paginatedPersonas;
     if (!rows || rows.length === 0) {
       this.personasMessageError = 'No hay datos para exportar.';
       return;
     }
   
     const exportRows = rows.map((row, index) => ({
-      '#': index + 1,
       Código: row.percod ?? '',
       Nombre: row.pernom ?? '',
       Correo_Electrónico: row.percoe ?? '',
@@ -210,11 +209,10 @@ export class PersonaComponent {
     const worksheet = XLSX.utils.aoa_to_sheet([]);
     XLSX.utils.sheet_add_aoa(worksheet, [['listas de Personas']], { origin: 'A1' });
     worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-    XLSX.utils.sheet_add_aoa(worksheet, [['#', 'Código', 'Nombre', 'Correo_Electrónico', 'Teléfono', 'Cargo', 'Observaciones']], { origin: 'A2' });
+    XLSX.utils.sheet_add_aoa(worksheet, [['Código', 'Nombre', 'Correo_Electrónico', 'Teléfono', 'Cargo', 'Observaciones']], { origin: 'A2' });
     XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
 
     worksheet['!cols'] = [
-      { wch: 15 },
       { wch: 30 },
       { wch: 40 },
       { wch: 35 },
@@ -234,14 +232,13 @@ export class PersonaComponent {
 
   exportPdf() {
     this.limpiarMessages();
-    const source = this.backuppersonas.length ? this.backuppersonas : this.personas;
+    const source = this.paginatedPersonas;
     if (!source?.length) {
       this.personasMessageError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       percod: row.percod ?? '',
       pernom: row.pernom ?? '',
       percoe: row.percoe ?? '',
@@ -257,7 +254,6 @@ export class PersonaComponent {
     doc.text('Listado de Personas', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Código', dataKey: 'percod' },
       { header: 'Nombre', dataKey: 'pernom' },
       { header: 'Correo electrónico', dataKey: 'percoe' },
@@ -358,7 +354,6 @@ export class PersonaComponent {
     this.selectedPersona = null
     this.personServicesOrigin = [];
     this.backupServices = [];
-    this.activeDetailTab = null;
     this.showSerivcesGrid = false;
   }
 
@@ -425,7 +420,6 @@ export class PersonaComponent {
   }
 
   //services grid functions
-  activeDetailTab: 'services' | null = null;
   showSerivcesGrid = false;
   personServicesOrigin: any = [];
   backupServices: any = [];
@@ -434,7 +428,6 @@ export class PersonaComponent {
   showServices(persona: any) {
     this.limpiarMessages();
     this.showSerivcesGrid = true;
-    this.activeDetailTab = 'services';
     const percod = persona.percod;
     this.fetchServices(percod);
   }
@@ -450,6 +443,9 @@ export class PersonaComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.personServicesOrigin = [];     
+        this.backupServices = [];          
+        this.pageServices = 0;              
         this.serviceErrorMessage = err.error.error ?? err.error;
         this.isLoading = false;
       }
@@ -713,22 +709,8 @@ export class PersonaComponent {
   personServices: any = [];
   showCopiar(percod: string) {
     this.limpiarMessages();
-    this.http.get<any>(`${environment.backendUrl}/api/depe/fetch-persona-service/${this.entcod}/${this.eje}/${percod}`).subscribe({
-      next: (res) => {
-        this.personServices = res;
-        if (!this.personServices || this.personServices.length === 0) {
-          this.compiarPersona = false;
-          this.detailMessageError = 'Esta persona no tiene servicios';
-          return;
-        }
-        this.gridMessag = 'La persona activa tiene servicios asignados. Se borrarán para añadir los de la persona seleccionada. ¿Quiere seguir?';
-        this.compiarPersona = true;
-      },
-      error: (err) => {
-        this.detailMessageError = err.error.error ?? err.error;
-        this.compiarPersona = false;
-      }
-    });
+    this.gridMessag = 'La persona activa tiene servicios asignados. Se borrarán para añadir los de la persona seleccionada. ¿Quiere seguir?';
+    this.compiarPersona = true;
   }
 
   closeCopiar() {

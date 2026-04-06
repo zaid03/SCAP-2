@@ -64,9 +64,9 @@
                             > 
                             <select [(ngModel)]="estadoTipo">
                                 <option value="contabilizadas">Contabilizadas</option>
-                                <option value="no-contabilizadas">No Contabilizadas</option>
-                                <option value="aplicadas">Ptes. Aplicadas</option>
-                                <option value="sin-aplicadas">Ptes. Sin aplicar</option>
+                                <option value="noContabilizadas">No Contabilizadas</option>
+                                <option value="ptApplidas">Ptes. Aplicadas</option>
+                                <option value="sinPtApplicar">Ptes. Sin aplicar</option>
                                 <option value="">Todas</option>
                             </select>
                         </div>
@@ -386,6 +386,12 @@
                     </div>
                     <div class="btns">
                         <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate" 
+	                        [ngClass]="{ 'disabled-btn': isUpdate }"
+                            (click)="openAlbaranesAdd()"
+                        >Añadir albaran</button>
+                        <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
                             (click)="cancelar()"
@@ -408,32 +414,32 @@
                             <button
                                 class="tab-btn"
                                 role="tab" 
-                                type="button"
-                                [class.active]="detailView === 'Albaranes'"
-                                (click)="detailView = 'Albaranes'"
+                                [attr.aria-selected]="detailView === 'Albaranes'"
+                                [class.active-tab]="detailView === 'Albaranes'"
+                                (click)="openAlbarnaes()"
                             >
                                 Albaranes
                             </button>
                             <button 
                                 class="tab-btn"
                                 role="tab" 
-                                type="button"
-                                [class.active]="detailView === 'Contabilización'"
-                                (click)="detailView = 'Contabilización'"
+                                [attr.aria-selected]="detailView === 'Contabilización'"
+                                [class.active-tab]="detailView === 'Contabilización'"
+                                (click)="openContabilizacion()"
                             >
                                 Datos Contabilización
                             </button>
                         </div>
                     </div>
                     <div class="more-details">
-                        <div class="detail-grid" *ngIf="detailView === 'Albaranes'">
+                        <div class="detail-grid" *ngIf="AlbaranesGrid">
                             <div class="more-detail-container">
                                 <div class="tabs" role="tablist" aria-label="Opciones de Albaranes">
                                     <button
                                         class="tab-btn"
                                         role="tab"
-                                        type="button"
-                                        [class.active]="albaranesOptio === 'albaranes'"
+                                        [attr.aria-selected]="albaranesOptio === 'albaranes'"
+                                        [class.active-tab]="albaranesOptio === 'albaranes'"
                                         (click)="setAlbaranesOptio('albaranes', selectedFacturas?.facnum)"
                                     >
                                         Albaranes
@@ -441,8 +447,8 @@
                                     <button
                                         class="tab-btn"
                                         role="tab"
-                                        type="button"
-                                        [class.active]="albaranesOptio === 'aplicaciones'"
+                                        [attr.aria-selected]="albaranesOptio === 'albaranes'"
+                                        [class.active-tab]="albaranesOptio === 'aplicaciones'"
                                         (click)="setAlbaranesOptio('aplicaciones', selectedFacturas?.facnum)"
                                     >
                                         Aplicaciones
@@ -450,8 +456,8 @@
                                     <button
                                         class="tab-btn"
                                         role="tab"
-                                        type="button"
-                                        [class.active]="albaranesOptio === 'descuentos'"
+                                        [attr.aria-selected]="albaranesOptio === 'albaranes'"
+                                        [class.active-tab]="albaranesOptio === 'descuentos'"
                                         (click)="setAlbaranesOptio('descuentos', selectedFacturas?.facnum)"
                                     >
                                         Descuentos
@@ -461,9 +467,6 @@
                             <div class="detail-switch-second-content">
                                 <ng-container [ngSwitch]="albaranesOptio">
                                     <ng-container *ngSwitchCase="'albaranes'">
-                                        <div class="albaranes-btns">
-                                            <button class="purple-btn" (click)="openAlbaranesAdd()">+</button>
-                                        </div>
                                         <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
                                         <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
                                         <div *ngIf="isLoading" class="loading-message">
@@ -499,6 +502,7 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <h1 class="errorBtn">{{albaranError}}</h1>
                                             <div class="pagination-controls alignment">
                                                 <button (click)="prevPageAlbaranes()" [disabled]="pageAlbaranes === 0">Anterior</button>
                                                 <span>Página</span>
@@ -555,6 +559,7 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <h1 class="errorBtn">{{descuentosError}}</h1>
                                             <div class="pagination-controls alignment">
                                                 <button (click)="prevPageAplicaiones()" [disabled]="pageAplicaiones === 0">Anterior</button>
                                                 <span>Página</span>
@@ -573,7 +578,6 @@
                                     </ng-container>
                                     <ng-container    *ngSwitchCase="'descuentos'">
                                         <h1 class="successBtn">{{moreInfoMessageSuccess}}</h1>
-                                        <h1 class="errorBtn">{{moreInfoMessageError}}</h1>
                                         <div *ngIf="isLoading" class="loading-message">
                                             <div class="spinner"></div>
                                             <span>Cargando</span>
@@ -605,6 +609,7 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <h1 class="errorBtn">{{descuentosError}}</h1>
                                             <div class="pagination-controls alignment">
                                                 <button (click)="prevPageDescuentos()" [disabled]="pageDescuentos === 0">Anterior</button>
                                                 <span>Página</span>
@@ -624,7 +629,7 @@
                                 </ng-container>
                             </div>
                         </div>
-                        <div class="detail-grid" *ngIf="detailView === 'Contabilización'">
+                        <div class="detail-grid" *ngIf="ContabilizacionGrid">
                             <div class="detail-card">
                                 <h4>Later</h4>
                             </div>
@@ -856,6 +861,9 @@
 
 <div class="modal-backdrop" *ngIf="deleteAlbaranGrid" (click)="closeDeleteAlbaran()"></div>
 <div class="delete-confirm-modal" *ngIf="deleteAlbaranGrid">
+    <div class="btns">
+        <button class="purple-btn margin" (click)="closeDeleteAlbaran()">✖</button>
+    </div>
     <h3>¿Quiere quitar el albarán de la factura?</h3>
     <div *ngIf="albaranToDelete">
         <div *ngIf="isDeletingAlbaranes" class="loading-message">
@@ -865,6 +873,5 @@
         <p class="p-style">Número albarán: {{albaranToDelete.albnun}}</p>
     </div>
     <h1 class="errorBtn">{{dalbaranesDeleteMessage}}</h1>
-    <button class="red-btn" (click)="quitarAlbaran()">-</button>
-    <button class="purple-btn margin" (click)="closeDeleteAlbaran()">✖</button>
+    <button class="red-btn" (click)="quitarAlbaran()">Confirmar</button>
 </div>

@@ -51,9 +51,6 @@
 .currenc {height: 20px; padding: 2px 4px; border-radius: 6px; color: #162a3a; border: 1px solid #bbb; width: 95%; font-weight: bold;}
 .fix {text-align: center;}
 /* articulo grid */
-/* delete grid */
-.margin {margin-left: 10px;}
-/* delete grid */
 /* add articulo grid  */
 .hello-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18), 0 1.5px 6px rgba(44,62,80,0.08); padding: 25px 30px; min-width: 600px; min-height: 120px; max-height: 80vh; z-index: 3000; display: flex; flex-direction: column; align-items: center;}
 .anadir-articulo-form {display: flex; flex-direction: column; align-items: stretch; gap: 18px; margin: 0 auto; padding: 0; width: 100%; overflow: hidden;}
@@ -92,3 +89,9 @@
 .info-D {display: flex; width: 100%; gap: 10px; justify-content: center; margin: 10px;}
 .info-content {display: flex; align-items: center; width: 30%; gap: 10px;}
 /* D grid for centro gestor */
+/* add contrato grid */
+.proveedor-grid-modal .search-holder {width: 99%;}
+.proveedor-grid-modal .main-list {width: 100% !important;}
+.proveedor-grid-modal .main-table th,
+.proveedor-grid-modal .main-table td {word-break: break-word;}
+/* add contrato grid */

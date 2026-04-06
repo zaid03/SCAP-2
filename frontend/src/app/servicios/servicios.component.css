@@ -30,7 +30,7 @@
 .chunk-three { width: 8%;}
 .chunk-four { width: 99%; margin-top: 10px; display: flex;}
 .on-two { display: flex; gap: 15px; align-items: center;}
-.left {width: 25%;display: flex; flex-direction: column; gap: 20px;}
+.left {width: 25%; display: flex; flex-direction: column; gap: 18px;}
 .right {width: 75%;display: flex; flex-direction: column; gap: 17px;}
 .first-det,
 .second-det {width: 50%; display: flex; gap: 10px;}
@@ -42,7 +42,6 @@
 .chunk-three input[type="checkbox"],
 .checkboxes input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none; }
 .name {margin-left: 5px; font-size: 16px;}
-.space-top {margin-top: 10px;}
 /* detail grid */
 /* detail grid's grids */
 .heighty { height: 50px !important;}
@@ -74,7 +73,6 @@
 .custom-grid-modal .delete-btn { margin-left: 10px;}
 .delete-confirm-modal { display: flex; flex-direction: column; align-items: center; gap: 2px;}
 .persona-details {width: 90%; display: flex; justify-content: center; gap: 10px;}
-.delete-confirm-modal .btns {justify-content: center;}
 /* add new service grid */
 /* add personas for a service */
 .proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72%; max-width: 95%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 4000; display: flex; flex-direction: column; gap: 12px;}
@@ -86,3 +84,25 @@
 .proveedor-grid-modal .title {width: 60%;}
 .selected-row {background-color: rgba(28, 93, 140, 0.2);}
 /* add personas for a service */
+/* media querries */
+@media screen and (min-width: 1450px) and (max-width: 1600px) {
+    .search-form {width: 68%;}
+    .Widthy {width: 10%; }
+}
+@media screen and (min-width: 1601px) and (max-width: 1800px) {
+    .search-form {width: 60%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 1801px) and (max-width: 1900px) {
+    .search-form {width: 53%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 1901px) and (max-width: 2099px) {
+    .search-form {width: 50%;}
+    .Widthy {width: 10%;}
+}
+@media screen and (min-width: 2100px) {
+    .search-form {width: 47%;}
+    .Widthy {width: 8%;}
+}
+/* media querries */

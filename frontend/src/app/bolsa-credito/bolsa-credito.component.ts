@@ -39,6 +39,7 @@ export class BolsaCreditoComponent {
   entcod: string | null = null;
   eje: number | null = null;
   cge: string = '';
+  backUpCge: string = '';
   creditos: any[] = [];
   private backupCreditos: any[] = [];
   private defaultCreditos: any[] = [];
@@ -58,7 +59,6 @@ export class BolsaCreditoComponent {
   isLoading: boolean = false;
   ngOnInit(): void {
     this.limpiarMessages();
-    this.isLoading = true;
     this.tableIsError = false;
 
     const ent = sessionStorage.getItem('Entidad');
@@ -66,7 +66,7 @@ export class BolsaCreditoComponent {
     const centroGestor = sessionStorage.getItem('CENTROGESTOR');
     if (ent) { const parsed = JSON.parse(ent); this.entcod = parsed.ENTCOD;}
     if (session) { const parsed = JSON.parse(session); this.eje = parsed.eje;}
-    if (centroGestor) { const parsed = JSON.parse(centroGestor); this.cge = parsed.value;}
+    if (centroGestor) { const parsed = JSON.parse(centroGestor); this.cge = parsed.value; this.backUpCge = this.cge;}
 
     if (!this.entcod ||  !this.eje || !this.cge) {
       sessionStorage.clear();
@@ -102,6 +102,7 @@ export class BolsaCreditoComponent {
   fetchBolsas() {
     this.fetchCancel$.next();
 
+    this.isLoading = true;
     this.http.get<any>(`${environment.backendUrl}/api/gbs/fetch-all/${this.entcod}/${this.eje}/${this.cge}`).subscribe({
       next: (response) => {
         this.creditos = Array.isArray(response) ? [...response] : [];
@@ -143,6 +144,7 @@ export class BolsaCreditoComponent {
         this.isLoading = false;
       },
       error: (err) => {
+        this.creditos = [];
         this.tableIsError = true;
         this.tableMessage = err.error.error ?? err.error;
         this.isLoading = false;
@@ -441,6 +443,7 @@ export class BolsaCreditoComponent {
     this.limpiarMessages();
     this.fetchBolsas();
     this.cgeSearch = '';
+    this.cge = this.backUpCge;
   }
 
   //main detail grid functions

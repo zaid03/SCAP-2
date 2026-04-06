@@ -18,9 +18,9 @@
                         <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm" (keyup.enter)="search()"/>
                         <div class="search-options">
                             <label>
-                                <input type="radio" name="optiones" value="Todos" [(ngModel)]="filterOption" /> Todos
-                                <input type="radio" name="optiones" value="noBloqueados" [(ngModel)]="filterOption" /> No Bloqueados
-                                <input type="radio" name="optiones" value="Bloqueados" [(ngModel)]="filterOption"  /> Bloqueados
+                                <input type="radio" name="optiones" value="todos" [(ngModel)]="filterOption" /> Todos
+                                <input type="radio" name="optiones" value="Nobloqueado" [(ngModel)]="filterOption" /> No Bloqueados
+                                <input type="radio" name="optiones" value="bloqueado" [(ngModel)]="filterOption"  /> Bloqueados
                             </label>
                         </div>
                         <div class="search-btns">
@@ -35,8 +35,8 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
+                    <button type="button" (click)="downloadExcel()">Exportar a Excel</button>
                     <button type="button" (click)="DownloadPDF()">Exportar a PDF</button>
-                    <button type="button" (click)="DownloadCSV()">Exportar a CSV</button>
                 </div>
             </div>
         </div>
@@ -256,7 +256,6 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showContactPersonsGrid">
-                        <h1 class="errorBtn">{{ personasContactoErrorMessage }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
                             <span>Cargando</span>
@@ -291,6 +290,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{ personasContactoErrorMessage }}</h1>
                         <div class="pagination-controls">
                             <button 
                                 class="pag-btn" 
@@ -318,7 +318,6 @@
                         </div>
                     </div>
                     <div class="custom-grid-modal" *ngIf="showArticulosGrid">
-                        <h1 class="errorBtn">{{ articuloError }}</h1>
                         <div *ngIf="isLoading" class="loading-message">
                             <div class="spinner"></div>
                             <span>Cargando</span>
@@ -372,6 +371,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <h1 class="errorBtn">{{ articuloError }}</h1>
                         <div class="pagination-controls">
                             <button 
                                 class="pag-btn" 

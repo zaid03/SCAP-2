@@ -21,11 +21,8 @@
 .estado-inputs input[type="radio"]:focus { outline: none; }
 .long-text { width: 50%; display: flex; flex-direction: column; gap: 10px; }
 .long-text textarea { width: 80%; max-width: 95%; height: 80px;}
-/* detail grid */
-/* delete grid */
-.delete-confirm-modal .red-btn { margin-right: 10px; }
 .marginBtns {margin-top: 10px;}
-/* delete grid */
+/* detail grid */
 /* add grid */
 .add-confirm-modal { top: 15%; width: 45%;}
 .more-chunk { width: 100%;}

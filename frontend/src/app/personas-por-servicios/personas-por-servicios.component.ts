@@ -8,6 +8,8 @@ import { environment } from '../../environments/environment';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-personas-por-servicios',
@@ -75,6 +77,10 @@ export class PersonasPorServiciosComponent {
         this.defaultServices = [...this.backupServices];
         this.page = 0;
         this.updatePagination();
+
+        if (this.sortField) {
+          this.applySort();
+        }
       },
       error: (err) => {
         this.isLoading = false;
@@ -218,39 +224,98 @@ export class PersonasPorServiciosComponent {
   }
 
   excelDownload() {
-    this.http.get(`${environment.backendUrl}/api/depe/personas-servicios/excel/${this.entcod}/${this.eje}`, { responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'personas_por_servicios.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        this.personasServicesError = err.error.error ?? err.error;
-      }
-    });
+    this.limpiarMessages(); 
+    const rows = this.paginatedServices;
+    if (!rows || rows.length === 0) {
+      this.personasServicesError = 'No hay datos para exportar.';
+      return;
+    }
+  
+    const exportRows = rows.map((row, index) => ({
+      Cód_Persona: row.percod ?? '',
+      Nombre: row.per?.pernom ?? '',
+      Cód_Servicio: row.depcod ?? '',
+      Servicio: row.dep.depdes ?? '',
+      Almacén_Farmacia: this.checkIfChecked(row.dep.depalm) ?? '',
+      Comprador: this.checkIfChecked(row.dep.depcom) ?? '',
+      Contable: this.checkIfChecked(row.dep.depint) ?? '',
+      Cód_C_G: row.dep.cge.cgecod ?? '',
+      Centro_Gestor: row.dep.cge.cgedes ?? ''
+    }));
+  
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['listas de personas de servicios']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['Cód. Persona', 'Nombre', 'Cód. Servicio', 'Servicio', 'Almacén / Farmacia', 'Comprador', 'Contable', 'Cód. C.G', 'Centro Gestor']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
+
+    worksheet['!cols'] = [
+      { wch: 20 },
+      { wch: 45 },
+      { wch: 10 },
+      { wch: 20 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 45 }
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Personas por servicios');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'Personas_por_servicios.xlsx'
+    );
   }
 
   toPrint() {
-    this.http.get(`${environment.backendUrl}/api/depe/personas-servicios/pdf/${this.entcod}/${this.eje}`,{ responseType: 'blob' }).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'personas_por_servicios.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        this.personasServicesError = err.error.error ?? err.error;
-      }
+    this.limpiarMessages();
+    const source = this.paginatedServices;
+    if (!source?.length) {
+      this.personasServicesError = 'No hay datos para exportar.';
+      return;
+    }
+
+    const rows = source.map((row: any, index: number) => ({
+      Cód_Persona: row.percod ?? '',
+      Nombre: row.per?.pernom ?? '',
+      Cód_Servicio: row.depcod ?? '',
+      Servicio: row.dep.depdes ?? '',
+      Almacén_Farmacia: this.checkIfChecked(row.dep.depalm) ?? '',
+      Comprador: this.checkIfChecked(row.dep.depcom) ?? '',
+      Contable: this.checkIfChecked(row.dep.depint) ?? '',
+      Cód_C_G: row.dep.cge.cgecod ?? '',
+      Centro_Gestor: row.dep.cge.cgedes ?? ''
+    }));
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Listado de Personas por servicios', 40, 40);
+
+    const columns = [
+      { header: 'Cód. Persona', dataKey: 'Cód_Persona' },
+      { header: 'Nombre', dataKey: 'Nombre' },
+      { header: 'Cód. Servicio', dataKey: 'Cód_Servicio' },
+      { header: 'Servicio', dataKey: 'Servicio' },
+      { header: 'Almacén / Farmacia', dataKey: 'Almacén_Farmacia' },
+      { header: 'Comprador', dataKey: 'Comprador' },
+      { header: 'Contable', dataKey: 'Contable' },
+      { header: 'Cód. C.G', dataKey: 'Cód_C_G' },
+      { header: 'Centro Gestor', dataKey: 'Centro_Gestor' }
+    ];
+
+    autoTable(doc, {
+      startY: 60,
+      head: [columns.map(col => col.header)],
+      body: rows.map(row => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' }
     });
+
+    doc.save('personas_por_servicios.pdf');
   }
 
   servicio: string = '';
@@ -258,10 +323,30 @@ export class PersonasPorServiciosComponent {
   centroGestor: string = '';
   perfilServicio: 'almacen' | 'comprador' | 'contabilidad' | 'peticionario' | 'todos'  = 'todos';
   inSearch: boolean = false;
+
+  handleSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = (input.value ?? '').toUpperCase();
+    if(value.length > 4) {
+      value = value.slice(0, 4);
+    }
+    this.centroGestor = value;
+    input.value = value;
+  }
+
+  serviceUpper(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = (input.value ?? '').toUpperCase();
+
+    this.servicio = value;
+    input.value = value;
+  }
+
   search() {
     this.limpiarMessages();
     this.isNotSearch = false;
 
+    this.services = [];
     if (this.perfilServicio === 'todos' && this.servicio === '' && this.persona === '' && this.centroGestor === '') {
       this.fetchServices();
       return;
@@ -284,7 +369,6 @@ export class PersonasPorServiciosComponent {
 
       this.http.get<any>(`${environment.backendUrl}/api/depe/personas-servicios/search?${params}`).subscribe({
         next: (res) => {
-          this.services = [];
           this.services = res;
           this.pageSearch = 0;
           this.updatePagination();
@@ -292,6 +376,7 @@ export class PersonasPorServiciosComponent {
           this.inSearch = true;
         },
         error: (err) => {
+          this.services = [];
           this.personasServicesError = err.error.error ?? err.error;
           this.isLoading = false;
         }
@@ -331,5 +416,4 @@ export class PersonasPorServiciosComponent {
     this.personasServicesSuccess = '';
     this.personasServicesError = '';
   }
-
 }

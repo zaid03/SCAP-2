@@ -38,6 +38,7 @@ export class ConsultaBolsasComponent {
   entcod: string | null = null;
   eje: number | null = null;
   cge: string = '';
+  backUpCge: string = '';
   creditos: any[] = [];
   private backupCreditos: any[] = [];
   private defaultCreditos: any[] = [];
@@ -64,7 +65,7 @@ export class ConsultaBolsasComponent {
     const centroGestor = sessionStorage.getItem('CENTROGESTOR');
     if (ent) { const parsed = JSON.parse(ent); this.entcod = parsed.ENTCOD;}
     if (session) { const parsed = JSON.parse(session); this.eje = parsed.eje;}
-    if (centroGestor) { const parsed = JSON.parse(centroGestor); this.cge = parsed.value;}
+    if (centroGestor) { const parsed = JSON.parse(centroGestor); this.cge = parsed.value; this.backUpCge = this.cge;}
 
     if (!this.entcod ||  !this.eje || !this.cge) {
       sessionStorage.clear();
@@ -437,6 +438,7 @@ export class ConsultaBolsasComponent {
   limpiarSearch() {
     this.limpiarMessages();
     this.fetchBolsas();
+    this.cge = this.backUpCge;
   }
   
   //main detail grid functions
