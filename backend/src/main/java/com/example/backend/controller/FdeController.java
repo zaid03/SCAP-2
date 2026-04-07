@@ -10,6 +10,7 @@ import com.example.backend.sqlserver2.model.Fde;
 import com.example.backend.sqlserver2.model.FdeId;
 import com.example.backend.sqlserver2.repository.FdeRepository;
 import com.example.backend.sqlserver2.repository.FacRepository;
+import com.example.backend.dto.FdeFacTerProjection;
 import com.example.backend.dto.FdeResumeDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,33 @@ public class FdeController {
             facRepository.save(factura);
 
             return ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //selecting all facturas in consulta de del contabilizado
+    @GetMapping("/fetch-contabilizado/{ent}/{eje}")
+    public ResponseEntity<?> fetchContabilizado (
+        @PathVariable Integer ent,
+        @PathVariable String eje
+    ) {
+        try {
+            List<FdeFacTerProjection> facturasToFilter = fdeRepository.findByENTAndEJEAndFac_FACFCOIsNotNull(ent, eje);
+
+            if (facturasToFilter.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            List<FdeFacTerProjection> filtered = facturasToFilter.stream()
+            .filter(f -> {
+                Double fdeimp = f.getFDEIMP() != null ? f.getFDEIMP() : 0.0;
+                Double fdedif = f.getFDEDIF() != null ? f.getFDEDIF() : 0.0;
+                return (fdeimp + fdedif) > 0;
+            })
+            .collect(Collectors.toList());
+
+            return ResponseEntity.ok(filtered);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
