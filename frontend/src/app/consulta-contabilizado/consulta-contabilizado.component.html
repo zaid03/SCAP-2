@@ -14,29 +14,33 @@
             <div class="search-holder">
                 <div class="search-container">
                     <div class="search-form">
-                        <span>Proveedor</span>
+                        <!-- <span>Proveedor</span> -->
                         <input 
                             type="text" 
                             class="search-bar" 
                             name="search"
+                            placeholder="Proveedor"
                         >
-                        <span>C.Gestor</span>
+                        <!-- <span>C.Gestor</span> -->
                         <input 
                             type="text" 
                             name="factura" 
                             class="search-bar smallWidth"
+                            placeholder="C.Gestor"
                         />
-                        <span>Económica</span>
+                        <!-- <span>Económica</span> -->
                         <input 
                             type="text" 
                             name="Gestor" 
                             class="search-bar smallWidth"
+                            placeholder="Económica"
                         />  
-                        <span>Ano Fact</span>
+                        <!-- <span>Ano Fact</span> -->
                         <input 
                             type="text" 
                             name="Gestor" 
                             class="search-bar smallWidth"
+                            placeholder="Ano Fact"
                         />                         
                     </div>
                     <div class="btns">
@@ -55,8 +59,8 @@
                 </div>
             </div>
         </div>
-        <h1 class="successBtn">{{facturaError}}</h1>
-        <h1 class="errorBtn">{{facturaSuccess}}</h1>
+        <h1 class="errorBtn">{{facturaError}}</h1>
+        <h1 class="successBtn">{{facturaSuccess}}</h1>
         <div class="main-list">
             <div *ngIf="isLoading" class="loading-message">
                 <div class="spinner"></div>
@@ -133,8 +137,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>              
+                    <tr *ngFor="let p of paginatedFacturas">
+                        <td>{{p.facnum}}</td>
+                        <td>{{p.fac.facann}}</td>
+                        <td>{{p.fac.facfac}}</td>
+                        <td>{{p.fac.facdoc}}</td>
+                        <td>{{p.fac.facdat | date:'dd-MM-yyyy'}}</td>
+                        <td>{{p.fac.facfco | date:'dd-MM-yyyy'}}</td>
+                        <td>{{p.fdeorg}}</td>
+                        <td>{{p.fdefun}}</td>
+                        <td>{{p.fdeeco}}</td>
+                        <td>{{importe(p.fdeimp, p.fdedif)}}</td>
+                        <td>{{p.fac.ter.ternif}}</td>
+                        <td>{{p.fac.ter.ternom}}</td>
+                        <td>{{p.fac.cgecod}}</td>              
                     </tr>
                 </tbody>
             </table>

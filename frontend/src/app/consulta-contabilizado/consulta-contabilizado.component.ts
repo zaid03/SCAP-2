@@ -9,6 +9,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { environment } from '../../environments/environment';
+import { subscribeOn } from 'rxjs';
 
 @Component({
   selector: 'app-consulta-contabilizado',
@@ -64,45 +65,41 @@ export class ConsultaContabilizadoComponent {
   }
 
   fetchFacturas() {
+    this.isLoading = true;
+    this.limpiarMEssages();
 
+    this.http.get<any>(`${environment.backendUrl}/api/fde/fetch-contabilizado/${this.entcod}/${this.eje}`).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.facturas = res;
+        this.backupFacturas = [...this.facturas];
+        this.updatePagination;
+      },
+      error: (err) => {
+        this.facturaError = err.error.error || err.error;
+        this.isLoading = false;
+      }
+    })
   }
-  private updatePagination(): void {
-    const total = this.totalPages;
-    if (total === 0) {
-      this.page = 0;
-      return;
-    }
-    if (this.page >= total) {
-      this.page = total - 1;
-    }
+  private updatePagination(): void {const total = this.totalPages;
+    if (total === 0) {this.page = 0; return;}
+    if (this.page >= total) {this.page = total - 1;}
   }
+  get paginatedFacturas(): any[] {if (!this.facturas || this.facturas.length === 0) return []; const start = this.page * this.pageSize; return this.facturas.slice(start, start + this.pageSize);}
+  get totalPages(): number {return Math.max(1, Math.ceil((this.facturas?.length ?? 0) / this.pageSize));}
+  prevPage(): void {if (this.page > 0) this.page--;}
+  nextPage(): void {if (this.page < this.totalPages - 1) this.page++;}
+  goToPage(event: any): void {const inputPage = Number(event.target.value); if (inputPage >= 1 && inputPage <= this.totalPages) {this.page = inputPage - 1;}}
 
-  get paginatedFacturas(): any[] {
-    if (!this.facturas || this.facturas.length === 0) return [];
-    const start = this.page * this.pageSize;
-    return this.facturas.slice(start, start + this.pageSize);
-  }
-  get totalPages(): number {
-    return Math.max(1, Math.ceil((this.facturas?.length ?? 0) / this.pageSize));
-  }
-  prevPage(): void {
-    if (this.page > 0) this.page--;
-  }
-  nextPage(): void {
-    if (this.page < this.totalPages - 1) this.page++;
-  }
-  goToPage(event: any): void {
-    const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.totalPages) {
-      this.page = inputPage - 1;
-    }
+  importe(fdeimp: number, fdedif: number) {
+    if (!fdeimp || !fdedif) {return}
+    return fdeimp + fdedif;
   }
 
   //main table functions
   sortField: 'facnum' | 'facann' | 'facfac' | 'facdoc' | 'facdat' | 'facfco' | 'fdeorg' | 'fdefun' | 'fdeeco' | 'limporte' | 'ternif' | 'ternom' |'cgecod' | 'cgecod' | null = null;
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
-  private defaultProveedores: any[] = [];
   toggleSort(column: string) {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -112,39 +109,60 @@ export class ConsultaContabilizadoComponent {
     }
     this.applySort();
     this.page = 0;
-    // this.updatePagination();
+    this.updatePagination();
   }
 
   private applySort(): void {
-    if (!this.sortColumn) return;
-    this.facturas.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+  if (!this.sortColumn) return;
+  this.facturas.sort((a, b) => {
+    let aValue: any;
+    let bValue: any;
 
-      // if (this.sortColumn === 'getPendingApply(p)') {
-      //   aValue = this.getPendingApply(a);
-      //   bValue = this.getPendingApply(b);
-      // } else if (this.sortColumn === 'getStaus(p.facado, p.facimp, p.faciec, p.facidi)') {
-      //   aValue = this.getStaus(a.facado, a.facimp, a.faciec, a.facidi);
-      //   bValue = this.getStaus(b.facado, b.facimp, b.faciec, b.facidi);
-      // } else {
-      //   aValue = a[this.sortColumn];
-      //   bValue = b[this.sortColumn];
-      // }
+    if (this.sortColumn === 'limporte') {
+      aValue = (a.fdeimp || 0) + (a.fdedif || 0);
+      bValue = (b.fdeimp || 0) + (b.fdedif || 0);
+    } else if (this.sortColumn === 'ternif') {
+      aValue = a.fac?.ter?.ternif;
+      bValue = b.fac?.ter?.ternif;
+    } else if (this.sortColumn === 'ternom') {
+      aValue = a.fac?.ter?.ternom;
+      bValue = b.fac?.ter?.ternom;
+    } else if (this.sortColumn === 'cgecod') {
+      aValue = a.fac?.cgecod;
+      bValue = b.fac?.cgecod;
+    } else if (this.sortColumn === 'facann') {
+      aValue = a.fac?.facann;
+      bValue = b.fac?.facann;
+    } else if (this.sortColumn === 'facfac') {
+      aValue = a.fac?.facfac;
+      bValue = b.fac?.facfac;
+    } else if (this.sortColumn === 'facdat') {
+      aValue = a.fac?.facdat;
+      bValue = b.fac?.facdat;
+    } else if (this.sortColumn === 'facfco') {
+      aValue = a.fac?.facfco;
+      bValue = b.fac?.facfco;
+    } else if (this.sortColumn === 'facdoc') {
+      aValue = a.fac?.facdoc;
+      bValue = b.fac?.facdoc;
+    } else {
+      aValue = a[this.sortColumn];
+      bValue = b[this.sortColumn];
+    }
 
-      const aNum = Number(aValue);
-      const bNum = Number(bValue);
-      if (!isNaN(aNum) && !isNaN(bNum)) {
-        return this.sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
-      }
+    const aNum = Number(aValue);
+    const bNum = Number(bValue);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return this.sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+    }
 
-      aValue = (aValue ?? '').toString().toUpperCase();
-      bValue = (bValue ?? '').toString().toUpperCase();
-      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
+    aValue = (aValue ?? '').toString().toUpperCase();
+    bValue = (bValue ?? '').toString().toUpperCase();
+    if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
   private startX: number = 0;
   private startWidth: number = 0;
   private resizingColIndex: number | null = null;

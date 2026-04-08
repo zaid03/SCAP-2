@@ -3,8 +3,6 @@ package com.example.backend.dto;
 import java.time.LocalDateTime;
 
 public interface FdeFacTerProjection {
-    Integer getENT();
-    String getEJE();
     Integer getFACNUM();
     String getFDEREF();
     String getFDEOPE();

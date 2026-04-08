@@ -21,7 +21,7 @@ public class ContabilizadoSearch {
         String economica,
         Integer ano
     ) {
-        List<FdeFacTerProjection> facturas = fdeRepository.findByENTAndEJEAndFac_FACFCOIsNotNullAndFDEIMPGreaterThanOrFDEDIFGreaterThan(ent, eje, 0.0, 0.0);
+        List<FdeFacTerProjection> facturas = fdeRepository.findByENTAndEJEAndFac_FACFCOIsNotNull(ent, eje).stream().filter(f -> (f.getFDEIMP() != null && f.getFDEIMP() > 0) || (f.getFDEDIF() != null && f.getFDEDIF() > 0)).toList();
 
         if (facturas != null && !facturas.isEmpty()) {
             if (proveedor != null && !proveedor.isEmpty()) {

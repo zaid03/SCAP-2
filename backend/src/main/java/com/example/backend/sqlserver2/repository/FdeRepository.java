@@ -20,5 +20,5 @@ public interface FdeRepository extends JpaRepository<Fde, FdeId> {
     Optional<Fde> findByENTAndEJEAndFACNUMAndFDEECO(Integer ent, String eje, Integer facnum, String fdeeco);
 
     //selecting all facturas in consulta de del contabilizado
-    List<FdeFacTerProjection> findByENTAndEJEAndFac_FACFCOIsNotNullAndFDEIMPGreaterThanOrFDEDIFGreaterThan(Integer ent, String eje, Double fdeimp, Double fdedif);
+    List<FdeFacTerProjection> findByENTAndEJEAndFac_FACFCOIsNotNull(Integer ent, String eje);
 }

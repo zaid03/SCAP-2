@@ -113,7 +113,7 @@ public class FdeController {
         @PathVariable String eje
     ) {
         try {
-            List<FdeFacTerProjection> facturas = fdeRepository.findByENTAndEJEAndFac_FACFCOIsNotNullAndFDEIMPGreaterThanOrFDEDIFGreaterThan(ent, eje, 0.0, 0.0);
+            List<FdeFacTerProjection> facturas = fdeRepository.findByENTAndEJEAndFac_FACFCOIsNotNull(ent, eje).stream().filter(f -> (f.getFDEIMP() != null && f.getFDEIMP() > 0) || (f.getFDEDIF() != null && f.getFDEDIF() > 0)).toList();
 
             if (facturas.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
