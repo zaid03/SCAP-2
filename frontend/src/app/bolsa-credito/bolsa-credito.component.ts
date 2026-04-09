@@ -261,7 +261,7 @@ export class BolsaCreditoComponent {
   DownloadPDF() {
     this.limpiarMessages();
 
-    const source = this.backupCreditos.length ? this.backupCreditos : this.creditos;
+    const source = this.paginatedBolsas;
     if (!source?.length) {
       this.tableIsError = true;
       this.tableMessage = 'No hay datos para exportar.';
@@ -359,7 +359,7 @@ export class BolsaCreditoComponent {
       { header: 'Disponible', dataKey: 'getkdispon'}
     ];
 
-    const rows = (this.creditos || []).map((f: any) => ({
+    const rows = (this.paginatedBolsas || []).map((f: any) => ({
       aplicacion: `${f.gbsorg ?? ''} - ${f.gbsfun ?? ''} - ${f.gbseco ?? ''}`,
       desc: f.partidas[0]?.desc,
       gbsope: f.gbsope,
@@ -399,7 +399,7 @@ export class BolsaCreditoComponent {
     return Math.round(a - b).toString();
   }
 
-  get paginatedFacturas(): any[] {
+  get paginatedBolsas(): any[] {
     if (!this.creditos || this.creditos.length === 0) return [];
     const start = this.page * this.pageSize;
     return this.creditos.slice(start, start + this.pageSize);

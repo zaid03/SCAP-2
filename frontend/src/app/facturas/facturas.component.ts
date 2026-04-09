@@ -247,7 +247,7 @@ export class FacturasComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.backupFacturas.length ? this.backupFacturas : this.facturas;
+    const source = this.paginatedFacturas;
     if (!source?.length) {
       this.filterFacturaMessage = 'No hay datos para exportar.';
       return;
@@ -360,7 +360,7 @@ export class FacturasComponent {
       { header: 'Estado', dataKey: 'estado'}
     ];
 
-    const rows = (this.facturas || []).map((p: any) => ({
+    const rows = (this.paginatedFacturas || []).map((p: any) => ({
       facnum: p.facnum,
       tercod: p.tercod,
       ternom: p.ternom,

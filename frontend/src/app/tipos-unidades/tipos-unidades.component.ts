@@ -198,7 +198,7 @@ export class TiposUnidadesComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.unidades;
+    const rows = this.paginatedUnidades;
     if (!rows || rows.length === 0) {
       this.unidadesError = 'No hay datos para exportar.';
       return;
@@ -235,7 +235,7 @@ export class TiposUnidadesComponent {
 
   pdfDownload() {
     this.limpiarMessages();
-    const source = this.unidades;
+    const source = this.paginatedUnidades;
     if (!source?.length) {
       this.unidadesError = 'No hay datos para exportar.';
       return;

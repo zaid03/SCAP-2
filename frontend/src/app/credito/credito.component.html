@@ -118,7 +118,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let p of paginatedFacturas">
+                    <tr *ngFor="let p of paginatedBolsas">
                         <td (click)="showDetails(p)" style="cursor: pointer;">{{ p.gbsorg }} - {{ p.gbsfun }} - {{ p.gbseco}}</td>
                         <td>{{ p.partidas?.[0]?.desc }}</td>
                         <td>{{ p.gbsope }}</td>

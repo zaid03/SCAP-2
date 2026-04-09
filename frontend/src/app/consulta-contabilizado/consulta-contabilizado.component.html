@@ -14,7 +14,7 @@
             <div class="search-holder">
                 <div class="search-container">
                     <div class="search-form">
-                        <!-- <span>Proveedor</span> -->
+                        <span>Proveedor</span>
                         <input 
                             type="text" 
                             class="search-bar" 
@@ -22,7 +22,7 @@
                             placeholder="Proveedor"
                             [(ngModel)]="proveedor"
                         >
-                        <!-- <span>C.Gestor</span> -->
+                        <span>C.Gestor</span>
                         <input 
                             type="text" 
                             name="factura" 
@@ -30,7 +30,7 @@
                             placeholder="C.Gestor"
                             [(ngModel)]="centroGestor"
                         />
-                        <!-- <span>Económica</span> -->
+                        <span>Económica</span>
                         <input 
                             type="text" 
                             name="Gestor" 
@@ -38,7 +38,7 @@
                             placeholder="Económica"
                             [(ngModel)]="economica"
                         />  
-                        <!-- <span>Ano Fact</span> -->
+                        <span>Ano Fact</span>
                         <input 
                             type="text" 
                             name="Gestor" 
@@ -58,7 +58,7 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="purple-btn" (click)="DownloadPDF">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="DownloadPDF()">Exportar a PDF</button>
                     <button class="purple-btn" (click)="downloadExcel()">Exportar a EXCEL</button>
                 </div>
             </div>

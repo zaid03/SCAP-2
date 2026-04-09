@@ -197,7 +197,7 @@ export class ContratosComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.backupContratos.length ? this.backupContratos : this.contratos;
+    const rows = this.paginatedContratos;
     if (!rows || rows.length === 0) {
       this.mainError = 'No hay datos para exportar.';
       return;
@@ -244,7 +244,7 @@ export class ContratosComponent {
 
   exportPdf() {
     this.limpiarMessages();
-    const source = this.backupContratos.length ? this.backupContratos : this.contratos;
+    const source = this.paginatedContratos;
     if (!source?.length) {
       this.mainError = 'No hay datos para exportar.';
       return;

@@ -231,7 +231,7 @@ export class ConsultaContabilizadoComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.backupFacturas.length ? this.backupFacturas : this.facturas;
+    const source = this.paginatedFacturas;
     if (!source?.length) {
       this.facturaError = 'No hay datos para exportar.';
       return;

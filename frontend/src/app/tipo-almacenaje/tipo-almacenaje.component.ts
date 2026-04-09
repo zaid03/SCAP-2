@@ -199,7 +199,7 @@ export class TipoAlmacenajeComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.almacenajes;
+    const rows = this.paginatedAlmacenajes;
     if (!rows || rows.length === 0) {
       this.almacenajesError = 'No hay datos para exportar.';
       return;
@@ -236,7 +236,7 @@ export class TipoAlmacenajeComponent {
 
   pdfDownload() {
     this.limpiarMessages();
-    const source = this.almacenajes;
+    const source = this.paginatedAlmacenajes;
     if (!source?.length) {
       this.almacenajesError = 'No hay datos para exportar.';
       return;
