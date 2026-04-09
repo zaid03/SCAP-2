@@ -20,6 +20,7 @@
                             class="search-bar" 
                             name="search"
                             placeholder="Proveedor"
+                            [(ngModel)]="proveedor"
                         >
                         <!-- <span>C.Gestor</span> -->
                         <input 
@@ -27,6 +28,7 @@
                             name="factura" 
                             class="search-bar smallWidth"
                             placeholder="C.Gestor"
+                            [(ngModel)]="centroGestor"
                         />
                         <!-- <span>Económica</span> -->
                         <input 
@@ -34,6 +36,7 @@
                             name="Gestor" 
                             class="search-bar smallWidth"
                             placeholder="Económica"
+                            [(ngModel)]="economica"
                         />  
                         <!-- <span>Ano Fact</span> -->
                         <input 
@@ -41,11 +44,12 @@
                             name="Gestor" 
                             class="search-bar smallWidth"
                             placeholder="Ano Fact"
+                            [(ngModel)]="ano"
                         />                         
                     </div>
                     <div class="btns">
-                        <button type="button" class="purple-btn" >Buscar</button>
-                        <button type="button" class="purple-btn" >Limpiar</button>
+                        <button type="button" class="purple-btn" (click)="search()">Buscar</button>
+                        <button type="button" class="purple-btn" (click)="limpiarSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -54,8 +58,8 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="purple-btn" >Exportar a PDF</button>
-                    <button class="purple-btn" >Exportar a CSV</button>
+                    <button class="purple-btn" (click)="DownloadPDF">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="downloadExcel()">Exportar a EXCEL</button>
                 </div>
             </div>
         </div>
@@ -70,67 +74,67 @@
                 <thead>
                     <tr>
                         <th class="sortable resizable" (click)="toggleSort('facnum')">
-                            Número Registro 
+                            Número 
                             <span class="sort-indicator" *ngIf="sortColumn === 'facnum'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 0)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('facann')">
-                            Año
+                            Año Factura
                             <span class="sort-indicator" *ngIf="sortColumn === 'facann'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 1)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('facfac')">
-                            R.C.F
+                            Nº Registro C.F
                             <span class="sort-indicator" *ngIf="sortColumn === 'facfac'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 2)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('facdoc')">
-                            Núm. Factura
+                            Referencia Fact
                             <span class="sort-indicator" *ngIf="sortColumn === 'facdoc'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 3)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('facdat')">
-                            F.Factura
+                            Fecha Factura
                             <span class="sort-indicator" *ngIf="sortColumn === 'facdat'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 4)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('facfco')">
-                            F.contable
+                            Fecha Contable
                             <span class="sort-indicator" *ngIf="sortColumn === 'facfco'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 5)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('fdeorg')">
-                            F.contable
+                            Orgánica
                             <span class="sort-indicator" *ngIf="sortColumn === 'fdeorg'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 6)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('fdefun')">
-                            F.contable
+                            Programa
                             <span class="sort-indicator" *ngIf="sortColumn === 'fdefun'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 7)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('fdeeco')">
-                            F.contable
+                            Económica
                             <span class="sort-indicator" *ngIf="sortColumn === 'fdeeco'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 8)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('limporte')">
-                            F.contable
+                            Importe
                             <span class="sort-indicator" *ngIf="sortColumn === 'limporte'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 9)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('ternif')">
-                            NIF Prov
+                            NIF
                             <span class="sort-indicator" *ngIf="sortColumn === 'ternif'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 10)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('ternom')">
-                            Nombre Proveedor
+                            Nombre
                             <span class="sort-indicator" *ngIf="sortColumn === 'ternom'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 11)"></div>
                         </th>
                         <th class="sortable resizable" (click)="toggleSort('cgecod')">
-                            C.Gestor
+                            Centro Gestor
                             <span class="sort-indicator" *ngIf="sortColumn === 'cgecod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 12)"></div>
                         </th>
