@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.backend.dto.AlmacenbyDep;
 import com.example.backend.dto.ConsultaAlmacenes;
 import com.example.backend.dto.DepWithCgeView;
 import com.example.backend.sqlserver2.model.Dep;
@@ -20,4 +21,7 @@ public interface DepRepository  extends JpaRepository<Dep, DepId> {
 
     //selecing services for consulta de almcenes 
     List<ConsultaAlmacenes> findByENTAndEJEAndDEPALM(Integer ent, String eje, Integer depalm);
+
+    //selecting almacen for consulta de articulos por almacen
+    List<AlmacenbyDep> findByENTAndEJEAndDEPALMAndDpes_PERCODAndCge_CGECOD(Integer ent, String eje, Integer depalm, String percod, String cgecod);
 }
