@@ -73,4 +73,10 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
         @Param("bloqueado") String bloqueado,
         Pageable pageable
     );
+
+    //delete a familia check
+    Long countByENTAndAFACOD(Integer ent, String afacod);
+
+    //delete a subfamilia check
+    Long countByENTAndASUCOD(Integer ent, String asucod);
 }

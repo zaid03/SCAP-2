@@ -23,6 +23,8 @@ public class FdeController {
     private FdeRepository fdeRepository;
     @Autowired
     private ContabilizarSearch contabilizarSearch;
+    @Autowired
+    private ContabilizadoSearch contabilizadoSearch;
 
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";

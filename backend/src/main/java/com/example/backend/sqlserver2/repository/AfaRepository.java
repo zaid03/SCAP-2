@@ -12,7 +12,6 @@ import com.example.backend.sqlserver2.model.AfaId;
 
 @Repository
 public interface AfaRepository extends JpaRepository<Afa, AfaId> {
-
     // Method to find Afa records by ENT and AFACOD
     List<Afa> findByENTAndAFACOD(int ent, String afacod);
 

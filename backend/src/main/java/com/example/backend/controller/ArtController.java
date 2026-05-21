@@ -2,6 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.AnaliticaArticulosProjectin;
 import com.example.backend.sqlserver2.repository.ArtRepository;
+import com.example.backend.sqlserver2.repository.AsuRepository;
+import com.example.backend.sqlserver2.repository.AfaRepository;
 import com.example.backend.dto.ArticleProjection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/art")
 public class ArtController {
-
     @Autowired
     private ArtRepository artRepository;
+    @Autowired
+    private AfaRepository afaRepository;
+    @Autowired
+    private AsuRepository asuRepository;
     
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";
@@ -97,6 +102,56 @@ public class ArtController {
             return ResponseEntity.ok(articles.getContent());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMessage());
+        }
+    }
+
+    //deleting a familia
+    @DeleteMapping("/delete-familia/{ent}/{afacod}")
+    public ResponseEntity<?> deleteFamilia(
+        @PathVariable Integer ent,
+        @PathVariable String afacod
+    ) {
+        try {
+            long articulos = artRepository.countByENTAndAFACOD(ent, afacod);
+            if (articulos > 0) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("No se puede borrar una familia con artículos asociados");
+            }
+
+            asuRepository.deleteByENTAndAFACOD(ent, afacod);
+            int removed = afaRepository.deleteByENTAndAFACOD(ent, afacod);
+            return removed == 0
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Sin resultado")
+                : ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Error: " + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //to delete a subfamilia
+    @DeleteMapping("/delete-sub-familia/{ent}/{afacod}/{asucod}")
+    public ResponseEntity<?> deleteSubFamilia(
+        @PathVariable Integer ent,
+        @PathVariable String afacod,
+        @PathVariable String asucod
+    ) {
+        try {
+            long articulos = artRepository.countByENTAndASUCOD(ent, asucod);
+            if (articulos > 0) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("No se puede borrar una subfamilia con artículos asociados");
+            }
+
+            int removed = asuRepository.deleteByENTAndAFACODAndASUCOD(ent, afacod, asucod);
+            return removed == 0
+                ? ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Sin resultado")
+                : ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Error: " + ex.getMostSpecificCause().getMessage());
         }
     }
 }
