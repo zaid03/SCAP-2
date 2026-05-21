@@ -12,7 +12,6 @@ import com.example.backend.sqlserver2.model.AsuId;
 
 @Repository
 public interface AsuRepository extends JpaRepository<Asu, AsuId> {
-
     //fetching subfamilias and search them
     List<Asu> findByENTAndAFACOD(int ent, String afacod);
     List<Asu> findByENTAndASUCOD(int ent, String asucod);
@@ -32,4 +31,7 @@ public interface AsuRepository extends JpaRepository<Asu, AsuId> {
     @Modifying
     @Transactional
     int deleteByENTAndAFACODAndASUCOD(Integer ENT, String AFACOD, String ASUCOD);
+
+    //needed for deleting an almacenaje
+    int countByENTAndMTACOD(Integer ent, Integer mtacod);
 }

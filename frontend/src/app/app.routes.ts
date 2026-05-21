@@ -13,6 +13,7 @@ import { ConsultaPendienteContabilizarComponent } from './consulta-pendiente-con
 import { ConsultaGeneralArticulosComponent } from './consulta-general-articulos/consulta-general-articulos.component';
 import { ConsultaContabilizadoComponent } from './consulta-contabilizado/consulta-contabilizado.component';
 import { FamiliaComponent } from './familia/familia.component';
+import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
     { path: 'CGArticulos', component: ConsultaGeneralArticulosComponent},
     { path: 'Ccontabilizado', component: ConsultaContabilizadoComponent},
     { path: 'familia', component: FamiliaComponent},
+    { path: 'almacenaje', component: TipoAlmacenajeComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 
