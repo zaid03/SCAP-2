@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.backend.dto.ConsultaAlmacenes;
 import com.example.backend.dto.DepWithCgeView;
 import com.example.backend.sqlserver2.repository.DepRepository;
 
@@ -38,6 +39,26 @@ public class DepController {
             }
 
             return ResponseEntity.ok(services);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //selecing services for consulta de almcenes 
+    @GetMapping("/fetch-consulta-almacenes/{ent}/{eje}")
+    public ResponseEntity<?> fetchConsultaAlmacenes (
+        @PathVariable Integer ent,
+        @PathVariable String eje
+    ) {
+        try {
+            List<ConsultaAlmacenes> almacenes = depRepository.findByENTAndEJEAndDEPALM(ent, eje, 1);
+
+            if (almacenes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            return ResponseEntity.ok(almacenes);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ERROR + ex.getMostSpecificCause().getMessage());
