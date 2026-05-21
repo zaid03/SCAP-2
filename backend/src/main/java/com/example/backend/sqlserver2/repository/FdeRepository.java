@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.example.backend.dto.ProjectionContabilizar;
 import com.example.backend.sqlserver2.model.Fde;
 import com.example.backend.sqlserver2.model.FdeId;
+import com.example.backend.dto.FdeFacTerProjection;
 
 @Repository
 public interface FdeRepository extends JpaRepository<Fde, FdeId> {
@@ -34,4 +35,7 @@ public interface FdeRepository extends JpaRepository<Fde, FdeId> {
         AND (T1.FDEIMP > 0 OR T1.FDEDIF > 0)
         """, nativeQuery = true)
     List<ProjectionContabilizar> findPendienteContabilizar(Integer ent, String eje);
+
+    //selecting all facturas in consulta de del contabilizado
+    List<FdeFacTerProjection> findByENTAndEJEAndFac_FACFCOIsNotNull(Integer ent, String eje);
 }
