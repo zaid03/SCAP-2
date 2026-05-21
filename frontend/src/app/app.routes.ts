@@ -10,6 +10,7 @@ import { ConsultaAnalticaDeArticulosComponent } from './consulta-analtica-de-art
 import { ConsultaAnalticaDeFamiliasComponent } from './consulta-analtica-de-familias/consulta-analtica-de-familias.component';
 import { ConsultaArticulosAlmacenComponent } from './consulta-articulos-almacen/consulta-articulos-almacen.component';
 import { ConsultaPendienteContabilizarComponent } from './consulta-pendiente-contabilizar/consulta-pendiente-contabilizar.component';
+import { ConsultaGeneralArticulosComponent } from './consulta-general-articulos/consulta-general-articulos.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: 'Cfamilia', component: ConsultaAnalticaDeFamiliasComponent},
     { path: 'CAlmacen', component:ConsultaArticulosAlmacenComponent},
     { path: 'Ccontabilizar', component: ConsultaPendienteContabilizarComponent},
+    { path: 'CGArticulos', component: ConsultaGeneralArticulosComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 

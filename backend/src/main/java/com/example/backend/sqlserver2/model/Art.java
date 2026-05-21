@@ -39,10 +39,27 @@ public class Art {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumns({
         @JoinColumn(name = "ENT", referencedColumnName = "ENT", insertable = false, updatable = false),
+        @JoinColumn(name = "AFACOD", referencedColumnName = "AFACOD", insertable = false, updatable = false),
+        @JoinColumn(name = "ASUCOD", referencedColumnName = "ASUCOD", insertable = false, updatable = false)
+    })
+    private Asu asu;
+    public Asu getAsu() { return asu; }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns({
+        @JoinColumn(name = "ENT", referencedColumnName = "ENT", insertable = false, updatable = false),
         @JoinColumn(name = "AFACOD", referencedColumnName = "AFACOD", insertable = false, updatable = false)
     })
     private Afa afa;
     public Afa getAfa() { return afa; }
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumns({
+        @JoinColumn(name = "ENT", referencedColumnName = "ENT", insertable = false, updatable = false),
+        @JoinColumn(name = "AUNCOD", referencedColumnName = "AUNCOD", insertable = false, updatable = false)
+    })
+    private Aun aun;
+    public Aun getAun() { return aun; }
 
     public Integer getENT() {return ENT;}
     public void setENT(Integer ENT) {this.ENT = ENT;}
