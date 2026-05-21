@@ -94,12 +94,6 @@
                 [class.disabled]="isDisabled('acRCon')"
                 (click)="navigateTo('Fcontabilizadas')"
               >Gestión de facturas contabilizadas</a>
-              <a class="#" 
-                (click)="navigateTo('Ccontabilizado')"
-              >Consult del contabilizado</a>
-              <a class="#" 
-                (click)="navigateTo('Ccontabilizar')"
-              >Consulta del pendiente de contabilizar</a>
               <a class="acCoGBSM"
                 [class.disabled]="isDisabled('acCoGBSM')"
                 (click)="navigateTo('Ccredito')"
@@ -120,7 +114,7 @@
           <a class="choice">Artículos</a>
           <div class="menu-content" [class.open]="articulos">
             <div class="menu-item">
-              <a class="acAFA margin" 
+              <a class="acAFA" 
                 [class.disabled]="isDisabled('acAFA')"
                 (click)="navigateTo('familia')"
               >Familias y subfamilias</a>
@@ -129,33 +123,31 @@
         </div>
 
         <div class="menu" (click)="temp = !temp" tabindex="0">
-          <a class="choice">Tipos</a>
+          <a class="choice">componentes no clasificados</a>
           <div class="menu-content" [class.open]="temp">
             <div class="menu-item">
-              <a class="" 
+              <a class="#" 
                 (click)="navigateTo('almacenaje')"
               >Tipos de almacenaje</a>
-              <a class="margin" 
+              <a class="#" 
                 (click)="navigateTo('unidades')"
               >tipos de unidades</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="menu" (click)="temp2 = !temp2" tabindex="0">
-          <a class="choice">Consultas</a>
-          <div class="menu-content" [class.open]="temp2">
-            <div class="menu-item">
-              <a class="" 
+              <a class="#" 
+                (click)="navigateTo('Ccontabilizado')"
+              >Consult del contabilizado</a>
+              <a class="#" 
+                (click)="navigateTo('Ccontabilizar')"
+              >Consulta del pendiente de contabilizar</a>
+              <a class="#" 
                 (click)="navigateTo('almacenes')"
               >Consulta analitica de almacenes</a>
-              <a class="" 
+              <a class="#" 
                 (click)="navigateTo('Cfamilia')"
               >Consulta analitica de familias</a>
-              <a class="" 
+              <a class="#" 
                 (click)="navigateTo('Carticulos')"
               >Consulta analitica de articulos</a>
-              <a class=""
+              <a class="#"
                 (click)="navigateTo('CGArticulos')"
               >Consulta General de artículos</a>
               <a class="margin"

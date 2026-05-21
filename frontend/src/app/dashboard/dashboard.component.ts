@@ -36,7 +36,6 @@ export class DashboardComponent implements OnInit {
   contabilidad = false;
   articulos = false;
   temp = false;
-  temp2 = false;
   constructor(private http: HttpClient, private router: Router) {}
 
   //main functions

@@ -31,7 +31,6 @@ export class SidebarComponent implements OnInit {
   contabilidad = false;
   articulos = false;
   temp = false;
-  temp2 = false;
   constructor(private router: Router) {}
 
   ngOnInit(): void {
