@@ -141,6 +141,29 @@
             </div>
           </div>
         </div>
+
+        <div class="menu" (click)="temp2 = !temp2" tabindex="0">
+          <a class="choice">Consultas</a>
+          <div class="menu-content" [class.open]="temp2">
+            <div class="menu-item">
+              <a class="" 
+                (click)="navigateTo('almacenes')"
+              >Consulta analitica de almacenes</a>
+              <a class="" 
+                (click)="navigateTo('Cfamilia')"
+              >Consulta analitica de familias</a>
+              <a class="" 
+                (click)="navigateTo('Carticulos')"
+              >Consulta analitica de articulos</a>
+              <a class=""
+                (click)="navigateTo('CGArticulos')"
+              >Consulta General de artículos</a>
+              <a class="margin"
+                (click)="navigateTo('CAlmacen')"
+              >Consulta de artículos por almacén</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div> 
@@ -207,11 +230,11 @@
     <div class="title">
       <h3>Servicios asociados del usario</h3>
     </div>
-    <button class="delete-btn" (click)="closeShowServices()">✖</button>
+    <button class="red-btn" (click)="closeShowServices()">✖</button>
   </div>
   <h1 class="errorBtn">{{servicesError}}</h1>
   <div class="detail-services">
-    <table class="user-services-table">
+    <table class="main-table">
       <thead>
         <tr>
           <th>Código</th>

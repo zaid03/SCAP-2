@@ -47,9 +47,6 @@ public class Dpe {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PERCOD", referencedColumnName = "PERCOD", insertable = false, updatable = false)
-    private Per per;
-    public Per getPer() { return per; }
-    public void setPer(Per per) { this.per = per; }
 
     public Integer getENT() { return ENT; }
     public void setENT(Integer ENT) { this.ENT = ENT; }
