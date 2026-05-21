@@ -14,6 +14,7 @@ import { ConsultaGeneralArticulosComponent } from './consulta-general-articulos/
 import { ConsultaContabilizadoComponent } from './consulta-contabilizado/consulta-contabilizado.component';
 import { FamiliaComponent } from './familia/familia.component';
 import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
+import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -30,6 +31,7 @@ export const routes: Routes = [
     { path: 'Ccontabilizado', component: ConsultaContabilizadoComponent},
     { path: 'familia', component: FamiliaComponent},
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
+    { path: 'unidades', component: TiposUnidadesComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 
