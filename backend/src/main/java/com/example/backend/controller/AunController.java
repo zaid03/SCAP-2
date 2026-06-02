@@ -167,4 +167,25 @@ public class AunController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMostSpecificCause().getMessage());
         }
     }
+
+    //needed for select lists in mantinimiento general de articulos
+    @GetMapping("/get-all/{ent}")
+    public ResponseEntity<?> allGet (
+        @PathVariable Integer ent
+    ) {
+        try {
+            if (ent == null) {
+                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+            }
+
+            List<Aun> tipos = aunRepository.findByENT(ent);
+            if (tipos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            }
+
+            return ResponseEntity.ok(tipos);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMessage());
+        }
+    }
 }

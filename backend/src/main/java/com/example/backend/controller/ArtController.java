@@ -1,6 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.AnaliticaArticulosProjectin;
+import com.example.backend.sqlserver2.model.ArtId;
+import com.example.backend.sqlserver2.model.Art;
 import com.example.backend.sqlserver2.repository.ArtRepository;
 import com.example.backend.sqlserver2.repository.AsuRepository;
 import com.example.backend.sqlserver2.repository.AfaRepository;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/art")
@@ -152,6 +155,73 @@ public class ArtController {
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Error: " + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //updating an articulo
+    public record updateArticulo (String ARTDES, String ARTREF, Integer ARTBLO, String AUNCOD, Double ARTUCO, Double ARTUEM, Double ARTMIN, Double ARTOPT) {}
+    @PatchMapping("/update-art/{ent}/{afacod}/{asucod}/{artcod}")
+    public ResponseEntity<?> updateArticle(
+        @PathVariable Integer ent,
+        @PathVariable String afacod,
+        @PathVariable String asucod,
+        @PathVariable String artcod,
+        @RequestBody updateArticulo payload
+    ) {
+        try {
+            if (payload == null || ent == null || afacod == null || asucod == null || artcod == null) {
+                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+            }
+
+            ArtId id = new ArtId(ent, afacod, asucod, artcod);
+            Optional<Art> artUpdate = artRepository.findById(id);
+            if (artUpdate.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            }
+
+            Art articulo = artUpdate.get();
+            articulo.setARTDES(payload.ARTDES());
+            articulo.setARTREF(payload.ARTREF());
+            articulo.setARTBLO(payload.ARTBLO());
+            articulo.setAUNCOD(payload.AUNCOD());
+            articulo.setARTUCO(payload.ARTUCO());
+            articulo.setARTUEM(payload.ARTUEM());
+            articulo.setARTMIN(payload.ARTMIN());
+            articulo.setARTOPT(payload.ARTOPT());
+            artRepository.save(articulo);
+
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMessage());
+        }
+    }
+
+    //deleting an articulo
+    @DeleteMapping("/delete-art/{ent}/{afacod}/{asucod}/{artcod}")
+    public ResponseEntity<?> artDelete (
+        @PathVariable Integer ent,
+        @PathVariable String afacod,
+        @PathVariable String asucod,
+        @PathVariable String artcod
+    ) {
+        try {
+            if (ent == null || afacod == null || asucod == null || artcod == null) {
+                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+            }
+
+            ArtId id = new ArtId(ent, afacod, asucod, artcod);
+            Optional<Art> artDelete = artRepository.findById(id);
+            if (artDelete.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sin resultado");
+            }
+
+            Art articulo = artDelete.get();
+            articulo.setARTBLO(1);
+            artRepository.save(articulo);
+
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMessage());
         }
     }
 }

@@ -9,7 +9,7 @@
     <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
-                <h2 class="margin-title">Consulta analîtica de artículos</h2>  
+                <h2 class="margin-title">Consulta analîtica de familias</h2>  
             </div>
             <div class="search-holder">
                 <div class="search-container">
@@ -18,12 +18,14 @@
                         <input 
                             type="text"   
                             class="search-bar" 
+                            placeholder="Buscar"
                             [(ngModel)]="search"
                         />
                         <span>Familia</span>
                         <input 
                             type="text" 
                             class="search-bar smallWidth" 
+                            placeholder="Familia"
                             name="familia"
                             [(ngModel)]="afacod"
                             (input)="afacod = checkUpperFour(afacod)"
@@ -34,6 +36,7 @@
                             type="text" 
                             name="subfamilia" 
                             class="search-bar smallWidth"
+                            placeholder="Subfamilia"
                             [(ngModel)]="asucod"
                             (input)="asucod = checkUpperFour(asucod)"
                             maxlength="4"
@@ -177,43 +180,37 @@
                                 <div class="on-two">
                                     <textarea
                                         [(ngModel)]="tempArticulo.afacod"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
                                         class="textArea-style smallTextArea" 
+                                        disabled
                                     ></textarea>
                                     <textarea
                                         [(ngModel)]="tempArticulo.afa_AFADES"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
                                         class="textArea-style tallText" 
+                                        disabled
                                     ></textarea>
                                 </div>
                                 <div class="on-two">
                                     <textarea
                                         [(ngModel)]="tempArticulo.asucod"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
                                         class="textArea-style smallTextArea" 
+                                        disabled
                                     ></textarea>
                                     <textarea
                                         [(ngModel)]="tempArticulo.asu_ASUDES"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
                                         class="textArea-style tallText" 
+                                        disabled
                                     ></textarea>
                                 </div>
                                 <div class="on-two">
                                     <textarea
                                         [(ngModel)]="tempArticulo.artcod"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
+                                        class="textArea-style smallTextArea"
+                                        disabled 
                                     ></textarea>
                                     <textarea
                                         [(ngModel)]="tempArticulo.artdes"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
                                         class="textArea-style tallText" 
+                                        disabled
                                     ></textarea>
                                 </div>
                             </div>
@@ -227,21 +224,18 @@
                             <div class="right">
                                 <textarea
                                     [(ngModel)]="tempArticulo.artuni"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
                                     class="textArea-style smallTextArea" 
+                                    disabled
                                 ></textarea>
                                 <textarea
                                     [(ngModel)]="tempArticulo.artsol"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style smallTextArea" 
+                                    class="textArea-style smallTextArea"
+                                    disabled 
                                 ></textarea>
                                 <textarea
                                     [(ngModel)]="tempArticulo.artrec"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style smallTextArea" 
+                                    class="textArea-style smallTextArea"
+                                    disabled 
                                 ></textarea>
                             </div>
                         </div>
@@ -254,9 +248,8 @@
                             <div class="right">
                                 <textarea
                                     [ngModel]="calculateKEstVir(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec)"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style smallTextArea" 
+                                    class="textArea-style smallTextArea"
+                                    disabled 
                                 ></textarea>
                                 <textarea
                                     [(ngModel)]="tempArticulo.artuco"
@@ -280,76 +273,81 @@
                                 (input)="allowToUpdate = true"
                             /> <span class="p-style">Bloqueado</span>
                         </div>
-                        <div class="chunk-four">
-                            <p class="p-style">Referencia virtual</p>
-                            <textarea
-                                [(ngModel)]="tempArticulo.artref"
-                                [disabled]="!isUpdate"
-                                (input)="allowToUpdate = true"
-                                class="textArea-style tallText" 
-                            ></textarea>
-                            <p class="p-style">Tipo unidades</p>
-                            <textarea
-                                [(ngModel)]="tempArticulo.aun_AUNDES"
-                                [disabled]="!isUpdate"
-                                (input)="allowToUpdate = true"
-                                class="textArea-style smallTextArea" 
-                            ></textarea>
-                        </div>
-                        <div class="wrapper">
-                            <div class="chunk-five adjustedWidthSecond">
-                                <div class="left">
-                                    <p class="p-style">Pedido mínimo</p>
-                                    <p class="p-style">Precio Medio</p>
-                                    <p class="p-style">Valor existencia</p>
-                                </div>
-                                <div class="right">
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.artpmi"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.artpmp"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [ngModel]="calculateKvalExi(tempArticulo.artuni, tempArticulo.artpmp)"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                </div>
+                        <div class="chunk-four adjustdSpecial">
+                            <div class="left">
+                                <p class="p-style">Pedido mínimo</p>
+                                <p class="p-style">Mínimo</p>
                             </div>
-                            <div class="chunk-five adjustedWidthSecond">
-                                <div class="left">
-                                    <p class="p-style">Mínimo</p>
-                                    <p class="p-style">Óptimo</p>
-                                    <p class="p-style">Solicitar</p>
-                                </div>
-                                <div class="right">
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.artmin"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.artopt"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [ngModel]="calculateKUniSol(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec, tempArticulo.artmin, tempArticulo.artopt)"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                </div>
+                            <div class="right">
+                                <textarea
+                                    [(ngModel)]="tempArticulo.artpmi"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                    class="textArea-style smallTextArea" 
+                                ></textarea>
+                                <textarea
+                                    [(ngModel)]="tempArticulo.artmin"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                    class="textArea-style smallTextArea" 
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div class="chunk-five adjustdSpecial">
+                            <div class="left">
+                                <p class="p-style">Valor existencia</p>
+                                <p class="p-style">Precio Medio</p>
+                            </div>
+                            <div class="right">
+                                <textarea
+                                    [ngModel]="calculateKvalExi(tempArticulo.artuni, tempArticulo.artpmp)"
+                                    class="textArea-style smallTextArea" 
+                                    disabled
+                                ></textarea>
+                                <textarea
+                                    [(ngModel)]="tempArticulo.artpmp"
+                                    class="textArea-style smallTextArea"
+                                    disabled 
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div class="chunk-six adjustdSpecial">
+                            <div class="left">
+                                <p class="p-style">Óptimo</p>
+                                <p class="p-style">Solicitar</p>
+                            </div>
+                            <div class="right">
+                                <textarea
+                                    [(ngModel)]="tempArticulo.artopt"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                    class="textArea-style smallTextArea" 
+                                ></textarea>
+                                <textarea
+                                    [ngModel]="calculateKUniSol(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec, tempArticulo.artmin, tempArticulo.artopt)"
+                                    class="textArea-style smallTextArea" 
+                                    disabled
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div class="chunk-seven lastOne">
+                            <div class="left">
+                                <p class="p-style">Referencia virtual</p>
+                                <p class="p-style">Tipo unidades</p>
+                            </div>
+                            <div class="right">
+                                <textarea
+                                    [(ngModel)]="tempArticulo.artref"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                    class="textArea-style tallText" 
+                                ></textarea>
+                                <textarea
+                                    [(ngModel)]="tempArticulo.aun_AUNDES"
+                                    [disabled]="!isUpdate"
+                                    (input)="allowToUpdate = true"
+                                    class="textArea-style smallTextArea" 
+                                ></textarea>
                             </div>
                         </div>
                     </div> 
@@ -370,6 +368,11 @@
                             [disabled]="!isUpdate" 
 	                        *ngIf="isUpdate" 
                         >Guardar</button>
+                        <button 
+                            class="red-btn" 
+                            [disabled]="isUpdate" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                        >Borrar</button>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">

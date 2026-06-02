@@ -19,10 +19,13 @@ tr.bloqueado {background-color: #aaa;}
 .chunk-two,
 .chunk-three,
 .chunk-four,
-.chunk-five {width: 40%; display: flex; gap: 10px;}
+.chunk-five,
+.chunk-six,
+.chunk-seven {width: 40%; display: flex; gap: 10px;}
 .chunk-three {width: 10%; align-items: center;}
-.chunk-four {width: 100%; justify-content: center; gap: 20px;}
-.adjustedWidth {width: 18%;}
+.adjustdSpecial .left {width: 80%;}
+.adjustdSpecial {width: 20%;}
+.adjustedWidth {width: 20%;}
 .adjustedWidth .left,
 .adjustedWidthSecond .left {width: 65%;}
 .adjustedWidthSecond {width: 22%;}
@@ -32,4 +35,6 @@ tr.bloqueado {background-color: #aaa;}
 .checkbox {margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
 .wrapper {width: 100%;  display: flex; justify-content: center; gap: 20px;}
 .margin {margin-top: 10px;}
+.lastOne {width: 37%;}
+.lastOne .left {width: 40%;}
 /* detail style */
