@@ -34,6 +34,29 @@ public class Art {
     @Column(nullable = true)
     private String ARTDES;
 
+    private String ARTREF;
+
+    private Integer ARTBLO;
+    
+    private Double ARTUNI;
+
+    private Double ARTSOL;
+
+    private Double ARTREC;
+
+    private Double ARTUCO;
+
+    private Double ARTUEM;
+
+    private Double ARTPMI;
+
+    private Double ARTPMP;
+
+    private Double ARTMIN;
+
+    private Double ARTOPT;
+
+
     private String AUNCOD;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -78,4 +101,37 @@ public class Art {
 
     public String getAUNCOD() {return AUNCOD;}
     public void setAUNCOD(String AUNCOD) {this.AUNCOD = AUNCOD;}
+
+    public String getARTREF() {return ARTREF;}
+    public void setARTREF(String ARTREF) {this.ARTREF = ARTREF;}
+
+    public Integer getARTBLO() {return ARTBLO;}
+    public void setARTBLO(Integer ARTBLO) {this.ARTBLO = ARTBLO;}
+
+    public Double getARTUNI() {return ARTUNI;}
+    public void setARTUNI(Double ARTUNI) {this.ARTUNI = ARTUNI;}
+
+    public Double getARTSOL() {return ARTSOL;}
+    public void setARTSOL(Double ARTSOL) {this.ARTSOL = ARTSOL;}
+
+    public Double getARTREC() {return ARTREC;}
+    public void setARTREC(Double ARTREC) {this.ARTREC = ARTREC;}
+
+    public Double getARTUCO() {return ARTUCO;}
+    public void setARTUCO(Double ARTUCO) {this.ARTUCO = ARTUCO;}
+
+    public Double getARTUEM() {return ARTUEM;}
+    public void setARTUEM(Double ARTUEM) {this.ARTUEM = ARTUEM;}
+
+    public Double getARTPMI() {return ARTPMI;}
+    public void setARTPMI(Double ARTPMI) {this.ARTPMI = ARTPMI;}
+
+    public Double getARTPMP() {return ARTPMP;}
+    public void setARTPMP(Double ARTPMP) {this.ARTPMP = ARTPMP;}
+
+    public Double getARTMIN() {return ARTMIN;}
+    public void setARTMIN(Double ARTMIN) {this.ARTMIN = ARTMIN;}
+
+    public Double getARTOPT() {return ARTOPT;}
+    public void setARTOPT(Double ARTOPT) {this.ARTOPT = ARTOPT;}
 }

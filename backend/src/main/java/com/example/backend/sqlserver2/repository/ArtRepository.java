@@ -79,4 +79,7 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
 
     //delete a subfamilia check
     Long countByENTAndASUCOD(Integer ent, String asucod);
+
+    //needed for deleting a tipo de unidades
+    int countByENTAndAUNCOD(Integer ent, String auncod);
 }

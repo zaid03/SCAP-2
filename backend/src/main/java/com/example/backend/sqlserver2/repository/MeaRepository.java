@@ -3,6 +3,7 @@ package com.example.backend.sqlserver2.repository;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -85,4 +86,8 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
         String almacen,
         Pageable pageable
     );
+
+    //selecting existencias for articles with eager loading of relationships
+    @EntityGraph(attributePaths = {"mag", "mag.dep"})
+    List<Mea> findByENTAndAFACODAndASUCODAndARTCOD(Integer ent, String afacod, String asucod, String artcod);
 }

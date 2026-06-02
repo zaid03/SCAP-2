@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.backend.dto.ExistenciasMeaProjection;
+import com.example.backend.dto.ExistenciasMeaProjectionDTO;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
 import com.example.backend.sqlserver2.repository.MeaRepository;
+import com.example.backend.sqlserver2.model.Mea;
 
 @RestController
 @RequestMapping("/api/mea")
@@ -87,6 +91,37 @@ public class MeaController {
             }
 
             return ResponseEntity.ok(articulos);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+
+    //selecting existencias for articles
+    @GetMapping("/existencias-por-articulo/{ent}/{afacod}/{asucod}/{artcod}")
+    public ResponseEntity<?> existenciasPorArticulo(
+        @PathVariable Integer ent,
+        @PathVariable String afacod,
+        @PathVariable String asucod,
+        @PathVariable String artcod
+    ) {
+        try {
+            List<Mea> existencias = meaRepository.findByENTAndAFACODAndASUCODAndARTCOD(ent, afacod, asucod, artcod);
+
+            if (existencias.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            List<ExistenciasMeaProjection> result = existencias.stream()
+            .map(mea -> new ExistenciasMeaProjectionDTO(
+                mea.getMAGCOD(),
+                mea.getMag() != null ? mea.getMag().getDEPCOD() : null,
+                mea.getMag() != null && mea.getMag().getDep() != null ? mea.getMag().getDep().getDEPDES() : null,
+                mea.getMEAUNI(),
+                mea.getMEALOC()
+            ))
+            .collect(Collectors.toList());
+
+            return ResponseEntity.ok(result);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
         }
