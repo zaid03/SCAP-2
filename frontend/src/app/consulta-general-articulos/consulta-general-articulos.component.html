@@ -270,7 +270,8 @@
                                 class="checkbox" 
                                 type="checkbox" 
                                 [disabled]="!isUpdate"
-                                (input)="allowToUpdate = true"
+                                [checked]="tempArticulo.artblo === 1"
+                                (change)="tempArticulo.artblo = (tempArticulo.artblo === 1 ? 0 : 1); allowToUpdate = true"
                             /> <span class="p-style">Bloqueado</span>
                         </div>
                         <div class="chunk-four adjustdSpecial">
@@ -342,12 +343,16 @@
                                     (input)="allowToUpdate = true"
                                     class="textArea-style tallText" 
                                 ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.aun_AUNDES"
+                                <select 
+                                    class="select-style selectSpecial tallText"
                                     [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
+                                    [(ngModel)]="auncodMod"
+                                    (change)="allowToUpdate = true"
+                                >
+                                    <option *ngFor="let t of tipos" [value]="t.auncod">
+                                        {{t.aundes}}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                     </div> 
@@ -367,6 +372,7 @@
                             class="purple-btn" 
                             [disabled]="!isUpdate" 
 	                        *ngIf="isUpdate" 
+                            (click)="isUpdateAllowed()"
                         >Guardar</button>
                         <button 
                             class="red-btn" 
