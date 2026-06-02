@@ -154,7 +154,7 @@
                 <div class="modal" *ngIf="selectedArticulo">
                     <div class="btns">
                         <div class="title-detail">
-                            <h3>Detalles de Articulo</h3>
+                            <h3>Detalles de Artículo</h3>
                         </div>
                         <button 
                             class="red-btn"
@@ -355,7 +355,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="btns margin">
                         <button 
                             class="red-btn" 
@@ -378,6 +378,7 @@
                             class="red-btn" 
                             [disabled]="isUpdate" 
                             [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="openDeleteConfirm()"
                         >Borrar</button>
                     </div>
                     <div class="more-detail-container">
@@ -490,4 +491,16 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="closeDeleteGrid()"></div>
+<div class="delete-confirm-modal" *ngIf="showDeleteConfirm">
+    <h3>¿Seguro que quieres eliminar este Artículo?</h3>
+    <h1 class="errorBtn">{{delErr}}</h1>
+    <div *ngIf="isDeleting" class="loading-message">
+        <div class="spinner"></div>
+        <span>borrando</span>
+    </div>
+    <button class="red-btn margin-btn" (click)="confirmDelete()">-</button>
+    <button class="purple-btn" (click)="closeDeleteGrid()">✖</button>
 </div>

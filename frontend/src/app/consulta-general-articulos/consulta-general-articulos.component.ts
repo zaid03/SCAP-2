@@ -454,6 +454,46 @@ export class ConsultaGeneralArticulosComponent {
     this.auncodMod = '';
   }
   
+  showDeleteConfirm: boolean = false;
+  openDeleteConfirm() {
+    this.showDeleteConfirm = true;
+  }
+
+  closeDeleteGrid() {
+    this.showDeleteConfirm = false;
+  }
+
+  confirmDelete(): void {
+    if (this.selectedArticulo) {
+      this.deleteArticulo();
+    }
+  }
+
+  isDeleting: boolean = false;
+  delErr: string = '';
+  deleteArticulo() {
+    this.limpiarMessages();
+    this.isDeleting = true;
+
+    const afacod = this.selectedArticulo.afacod;
+    const subfamilia = this.selectedArticulo.asucod;
+    const articulo = this.selectedArticulo.artcod;
+
+    this.http.delete(`${environment.backendUrl}/api/art/delete-art/${this.entcod}/${afacod}/${subfamilia}/${articulo}`).subscribe({
+      next: (res) => {
+        this.isDeleting = false;
+        this.articuloDetailSuccess = 'Artículo eliminado correctamente';
+        this.fetchArticulos();
+        this.closeDeleteGrid();
+        this.closeDetails();
+      },
+      error: (err) => {
+        this.isDeleting = false;
+        this.delErr = err.error.error ?? err.error
+      }
+    })
+  }
+
   // sub details functions
   activeDetailTab: 'proveedores' | 'existencias' | null = null;
   proveedoresError: string = '';
@@ -552,5 +592,6 @@ export class ConsultaGeneralArticulosComponent {
     this.articuloDetailSuccess = '';
     this.proveedoresError = '';
     this.existenciasError = '';
+    this.delErr = '';
   }
 }
