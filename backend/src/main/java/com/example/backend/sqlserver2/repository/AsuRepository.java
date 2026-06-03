@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.backend.dto.magcodOnly;
 import com.example.backend.sqlserver2.model.Asu;
 import com.example.backend.sqlserver2.model.AsuId;
 
@@ -34,4 +35,6 @@ public interface AsuRepository extends JpaRepository<Asu, AsuId> {
 
     //needed for deleting an almacenaje
     int countByENTAndMTACOD(Integer ent, Integer mtacod);
+    //needed to add an articulo for consulta general
+    List<magcodOnly> findAllByENTAndAFACODAndASUCOD(Integer ent, String afacod, String asucod);
 }
