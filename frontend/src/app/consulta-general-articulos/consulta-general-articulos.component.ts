@@ -356,8 +356,6 @@ export class ConsultaGeneralArticulosComponent {
   kestvir: number | null = null;
   calculateKEstVir(artuni: number, artsol: number, artrec: number) {
     this.kestvir = artuni - artsol + artrec;
-    
-    console.log(this.kestvir)
     return this.kestvir;
   }
   calculateKvalExi(artuni: number, artpmp: number) {
@@ -593,6 +591,7 @@ export class ConsultaGeneralArticulosComponent {
     this.limpiarMessages();
     this.showAddGrid = true;
     this.fetchTipos();
+    this.fetchFamilias();
   }
 
   closeAdd() {
@@ -601,6 +600,8 @@ export class ConsultaGeneralArticulosComponent {
     this.clearTipos();
   }
 
+  familiaAdd: string = '';
+  subfamiliasAdd: string = '';
   codigoAdd: string ='';
   bloqAdd: number = 0;
   existenciasAdd: number = 0;
@@ -631,6 +632,63 @@ export class ConsultaGeneralArticulosComponent {
     this.estoOptimo = 0;
     this.pteEntrada = 0;
     this.uniDeCon = 0;
+    this.familiaAdd = '';
+    this.subfamiliasAdd = '';
+    this.familias = [];
+    this.subfamilias = [];
+  }
+
+  familias: any = [];
+  fetchFamilias() {
+    this.http.get(`${environment.backendUrl}/api/afa/fetching-fams/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.familias = res;
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
+  subfamilias: any = [];
+  fetchSubFamilias(afacod: string) {
+    this.http.get(`${environment.backendUrl}/api/asu/fetching-subs/${this.entcod}/${afacod}`).subscribe({
+      next: (res) => {
+        this.subfamilias = res;
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
+  addArticulos() {
+    this.limpiarMessages();
+
+    if (this.familiaAdd === '' || this.subfamiliasAdd === '' || this.codigoAdd === '' || this.descriptionAdd === '') {
+      this.addArticuloError = 'Rellene todos los campos obligatorios.';
+      return;
+    }
+
+    const payload = {
+      "AFACOD": this.familiaAdd,
+      "ASUCOD": this.subfamiliasAdd,
+      "ARTCOD": this.codigoAdd,
+      "ARTDES": this.descriptionAdd,
+      "ARTREF": this.refUni,
+      "ARTBLO": this.bloqAdd,
+      "bloqAdd": this.existenciasAdd,
+      "ARTSOL": this.pteServir,
+      "ARTREC": this.pteEntrada,
+      "AUNCOD": this.auncodMod,
+      "ARTUCO": this.uniDeCon,
+      "ARTUEM": this.uniEmbalaje,
+      "ARTPMP": this.preMePon,
+      "ARTMIN": this.estoMinimo,
+      "ARTOPT": this.estoOptimo 
+    }
+    
+    
   }
 
   //misc

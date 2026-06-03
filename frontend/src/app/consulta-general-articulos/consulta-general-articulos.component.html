@@ -512,7 +512,7 @@
         <div class="title">
             <h3>Añadir una Artículo</h3>  
         </div>
-        <button class="purple-btn" >+</button>
+        <button class="purple-btn" (click)="addArticulos()">+</button>
         <button class="red-btn" (click)="closeAdd()">✖</button>
     </div>
     <h1 class="errorBtn">{{addArticuloError}}</h1>
@@ -531,12 +531,14 @@
                 <p class="p-style">Estocaje mínimo</p>
             </div>
             <div class="right-left-row">
-                <select
+                <select 
                     class="select-style selectAdd"
+                    [(ngModel)]="familiaAdd"
+                    (ngModelChange)="fetchSubFamilias($event)"
                 >
-                    <option>test</option>
-                    <option>test</option>
-                    <option>test</option>
+                    <option *ngFor="let t of familias" [value]="t.afacod">
+                        {{t.afades}}
+                    </option>
                 </select>
                 <textarea
                     class="textArea-style textAdd"
@@ -576,12 +578,13 @@
                 <p class="p-style">Estocaje óptimo</p>
             </div>
             <div class="right-center-row">
-                <select
+                <select 
                     class="select-style selectAdd"
+                    [(ngModel)]="subfamiliasAdd"
                 >
-                    <option>test</option>
-                    <option>test</option>
-                    <option>test</option>
+                    <option *ngFor="let t of subfamilias" [value]="t.asucod">
+                        {{t.asudes}}
+                    </option>
                 </select>
                 <textarea
                     class="textArea-style textAdd"
@@ -626,7 +629,7 @@
                 <textarea
                     class="textArea-style textAdd"
                     [(ngModel)]="codigoAdd"
-                    (input)="toUpperCase($event)"
+                    (ngModelChange)="codigoAdd = $event.toUpperCase()"
                 >
                 </textarea>
                 <input 
