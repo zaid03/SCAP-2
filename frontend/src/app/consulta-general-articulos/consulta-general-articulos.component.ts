@@ -355,12 +355,12 @@ export class ConsultaGeneralArticulosComponent {
 
   kestvir: number | null = null;
   calculateKEstVir(artuni: number, artsol: number, artrec: number) {
-    if (!artuni || !artsol || !artrec) {return;}
-    this.kestvir = artuni - artsol + artrec 
+    this.kestvir = artuni - artsol + artrec;
+    
+    console.log(this.kestvir)
     return this.kestvir;
   }
   calculateKvalExi(artuni: number, artpmp: number) {
-    if (!artuni || !artpmp) {return;}
     return artuni * artpmp;
   }
   calculateKUniSol(artuni: number, artsol: number, artrec: number, artmin: number, artopt: number): number {
@@ -438,10 +438,11 @@ export class ConsultaGeneralArticulosComponent {
     this.http.get(`${environment.backendUrl}/api/aun/get-all/${this.entcod}`).subscribe({
       next: (res) => {
         this.tipos = res;
-        if (this.tempArticulo && Array.isArray(this.tipos)) {
-          const found = this.tipos.find((t: any) => t.aundes === this.tempArticulo.aun_AUNDES);
-          this.auncodMod = found ? found.auncod : '';
-        }
+        const found = this.tipos.find(
+          (t: any) => t.aundes === this.tempArticulo?.aun_AUNDES
+        );
+
+        this.auncodMod = found?.auncod ?? this.tipos[0]?.auncod ?? '';
       },
       error: (err) => {
         console.warn(err.error.error ?? err.error);
@@ -584,6 +585,54 @@ export class ConsultaGeneralArticulosComponent {
     if (inputPage >= 1 && inputPage <= this.totalPages) {this.pageExistencia = inputPage - 1;}
   }
 
+  //add articulo grid funtions
+  showAddGrid: boolean = false;
+  addArticuloError: string = '';
+  isAdding: boolean =false;
+  openAdd() {
+    this.limpiarMessages();
+    this.showAddGrid = true;
+    this.fetchTipos();
+  }
+
+  closeAdd() {
+    this.showAddGrid = false;
+    this.clearAdd();
+    this.clearTipos();
+  }
+
+  codigoAdd: string ='';
+  bloqAdd: number = 0;
+  existenciasAdd: number = 0;
+  descriptionAdd: string = '';
+  uniEmbalaje: number = 0;
+  estoMinimo: number = 0;
+  refUni: string = '';
+  pteServir: number = 0;
+  preMePon: number = 0;
+  estoOptimo: number = 0;
+  pteEntrada: number = 0;
+  uniDeCon: number = 0;
+  toUpperCase(event: Event) {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.toLocaleUpperCase();
+  }
+
+  clearAdd() {
+    this.codigoAdd = '';
+    this.bloqAdd = 0;
+    this.existenciasAdd = 0;
+    this.descriptionAdd = '';
+    this.uniEmbalaje = 0;
+    this.estoMinimo = 0;
+    this.refUni = '';
+    this.pteServir = 0;
+    this.preMePon = 0;
+    this.estoOptimo = 0;
+    this.pteEntrada = 0;
+    this.uniDeCon = 0;
+  }
+
   //misc
   limpiarMessages() {
     this.articuloError = '';
@@ -593,5 +642,6 @@ export class ConsultaGeneralArticulosComponent {
     this.proveedoresError = '';
     this.existenciasError = '';
     this.delErr = '';
+    this.addArticuloError = '';
   }
 }

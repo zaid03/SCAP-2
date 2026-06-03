@@ -77,6 +77,7 @@
                 <div class="menu-panel" *ngIf="showMenu">
                     <button class="purple-btn" (click)="DownloadPDF()">Exportar a PDF</button>
                     <button class="purple-btn" (click)="downloadExcel()">Exportar a EXCEL</button>
+                    <button class="purple-btn" (click)="openAdd()">Añadir artículo</button>
                 </div>
             </div>
         </div>
@@ -503,4 +504,160 @@
     </div>
     <button class="red-btn margin-btn" (click)="confirmDelete()">-</button>
     <button class="purple-btn" (click)="closeDeleteGrid()">✖</button>
+</div>
+
+<div class="modal-backdrop" *ngIf="showAddGrid" (click)="closeAdd()"></div>
+<div class="add-confirm-modal addArt" *ngIf="showAddGrid">
+    <div class="btns">
+        <div class="title">
+            <h3>Añadir una Artículo</h3>  
+        </div>
+        <button class="purple-btn" >+</button>
+        <button class="red-btn" (click)="closeAdd()">✖</button>
+    </div>
+    <h1 class="errorBtn">{{addArticuloError}}</h1>
+    <div *ngIf="isAdding" class="loading-message">
+        <div class="spinner"></div>
+        <span>añadiendo</span>
+    </div>
+    <div class="add-content">
+        <div class="left-row">
+            <div class="left-left-row specialGapSecond">
+                <p class="p-style">Familia*</p>
+                <p class="p-style">Descripción*</p>
+                <p class="p-style">Existencias</p>
+                <p class="p-style">Estocaje virtual</p>
+                <p class="p-style">Unidades en embalaje</p>
+                <p class="p-style">Estocaje mínimo</p>
+            </div>
+            <div class="right-left-row">
+                <select
+                    class="select-style selectAdd"
+                >
+                    <option>test</option>
+                    <option>test</option>
+                    <option>test</option>
+                </select>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="descriptionAdd"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="existenciasAdd"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [value]="calculateKEstVir(existenciasAdd, pteServir, pteEntrada)"
+                    disabled
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="uniEmbalaje"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="estoMinimo"
+                >
+                </textarea>
+            </div>
+        </div>
+        <div class="center-row">
+            <div class="left-center-row specialGap">
+                <p class="p-style">Subfamilia*</p>
+                <p class="p-style">Referencia universal</p>
+                <p class="p-style">Pte. Servir</p>
+                <p class="p-style">Tipo Unidades</p>
+                <p class="p-style">Precio medio ponderado</p>
+                <p class="p-style">Estocaje óptimo</p>
+            </div>
+            <div class="right-center-row">
+                <select
+                    class="select-style selectAdd"
+                >
+                    <option>test</option>
+                    <option>test</option>
+                    <option>test</option>
+                </select>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="refUni"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="pteServir"
+                >
+                </textarea>
+                <select 
+                    class="select-style selectAdd"
+                    [(ngModel)]="auncodMod"
+                >
+                    <option *ngFor="let t of tipos" [value]="t.auncod">
+                        {{t.aundes}}
+                    </option>
+                </select>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="preMePon"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="estoOptimo"
+                >
+                </textarea>
+            </div>
+        </div>
+        <div class="right-row">
+            <div class="left-right-row">
+                <p class="p-style">Código*</p>
+                <p class="p-style">Bloqueado</p>
+                <p class="p-style">Pte. Entrada</p>
+                <p class="p-style">Unidades de consumo</p>
+                <p class="p-style">Valor existencias</p>
+                <p class="p-style">Solicitar</p>
+            </div>
+            <div class="right-right-row">
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="codigoAdd"
+                    (input)="toUpperCase($event)"
+                >
+                </textarea>
+                <input 
+                    type="checkbox" 
+                    class="checkbox" 
+                    [(ngModel)]="bloqAdd"
+                    (change)="bloqAdd = (bloqAdd === 1 ? 0 : 1);"
+                /> 
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="pteEntrada"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [(ngModel)]="uniDeCon"
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [value]="calculateKvalExi(existenciasAdd, preMePon)"
+                    disabled
+                >
+                </textarea>
+                <textarea
+                    class="textArea-style textAdd"
+                    [value]="calculateKUniSol(existenciasAdd, pteServir, pteEntrada, estoMinimo, estoOptimo)"
+                    disabled
+                >
+                </textarea>
+            </div>
+        </div>
+    </div>
 </div>

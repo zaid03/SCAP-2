@@ -39,3 +39,26 @@ tr.bloqueado {background-color: #aaa;}
 .lastOne .left {width: 40%;}
 .selectSpecial {height: 30px; width: 260px;}
 /* detail style */
+/* delete grid */
+.margin-btn {margin-right: 10px;}
+/* delete grid */
+/* add grid */
+.addArt {width: 90%; top: 15%;}
+.addArt .btns .title {width: 90%;}
+.add-content {display: flex; gap: 10px; justify-content: center;}
+.left-row,
+.center-row,
+.right-row {width: 35%; display: flex; align-items: center;}
+.left-left-row,
+.left-center-row,
+.left-right-row {height: 100%; display: flex; flex-direction: column; gap: 12px; width: 45% !important; text-align: left;}
+.right-left-row,
+.right-center-row,
+.right-right-row {height: 100%; display: flex; flex-direction: column; gap: 10px; width: 55% !important;}
+.selectAdd {height: 30px; width: 190px; font-size: 15px;}
+.textAdd {width: 180px; max-width: 200px;}
+.specialGap {gap: 14px;}
+.specialGapSecond {gap: 13px;}
+.addArt input[type="checkbox"],
+.detail-container input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 16px; height: 25px; vertical-align: middle; outline: none; box-shadow: none;}
+/* add grid */
