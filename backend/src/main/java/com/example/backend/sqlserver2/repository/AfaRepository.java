@@ -18,7 +18,7 @@ public interface AfaRepository extends JpaRepository<Afa, AfaId> {
     // Method to find afa records by ent and afacod using like
     List<Afa> findByENTAndAFADESContaining(int ent, String afades);
 
-    //find familias by ent
+    //find familias by ent and needed to add an articulo for consulta general
     List<Afa> findByENT(int ent);
 
     //deleting a familia

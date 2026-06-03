@@ -12,7 +12,7 @@ import com.example.backend.sqlserver2.model.AsuId;
 
 @Repository
 public interface AsuRepository extends JpaRepository<Asu, AsuId> {
-    //fetching subfamilias and search them
+    //fetching subfamilias and search them and needed to add an articulo for consulta general
     List<Asu> findByENTAndAFACOD(int ent, String afacod);
     List<Asu> findByENTAndASUCOD(int ent, String asucod);
 

@@ -160,4 +160,25 @@ public class AfaController {
         afaRepository.save(nueva);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    //needed to add an articulo for consulta general
+    @GetMapping("/fetching-fams/{ent}")
+    public ResponseEntity<?> famsFetching (
+        @PathVariable Integer ent
+    ) {
+        try {
+            if (ent == null) {
+                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+            }
+
+            List<Afa> familias = afaRepository.findByENT(ent);
+            if (familias.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            return ResponseEntity.ok(familias);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
 }
