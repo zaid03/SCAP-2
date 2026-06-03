@@ -2,11 +2,14 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.AnaliticaArticulosProjectin;
 import com.example.backend.sqlserver2.model.ArtId;
+import com.example.backend.sqlserver2.model.Mea;
 import com.example.backend.sqlserver2.model.Art;
 import com.example.backend.sqlserver2.repository.ArtRepository;
 import com.example.backend.sqlserver2.repository.AsuRepository;
+import com.example.backend.sqlserver2.repository.MeaRepository;
 import com.example.backend.sqlserver2.repository.AfaRepository;
 import com.example.backend.dto.ArticleProjection;
+import com.example.backend.dto.magcodOnly;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -28,6 +31,8 @@ public class ArtController {
     private AfaRepository afaRepository;
     @Autowired
     private AsuRepository asuRepository;
+    @Autowired
+    private MeaRepository meaRepository;
     
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";
@@ -225,5 +230,68 @@ public class ArtController {
         }
     }
 
-    
+    //adding an articulo
+    public record addArt (Integer ENT, String AFACOD, String ASUCOD, String ARTCOD, String ARTDES, String ARTREF, Integer ARTBLO, Double ARTUNI, Double ARTSOL, Double ARTREC, String AUNCOD, Double ARTUCO, Double ARTUEM, Double ARTPMP, Double ARTMIN, Double ARTOPT) {}
+    @PostMapping("/add-art")
+    public ResponseEntity<?> artAdd (
+        @RequestBody addArt payload
+    ) {
+        try {
+            if (payload == null || payload.ENT() == null || payload.AFACOD() == null || payload.ASUCOD() == null || payload.ARTCOD() == null || payload.ARTDES() == null) {
+                return ResponseEntity.badRequest().body("Faltan datos obligatorios.");
+            }
+
+            ArtId id = new ArtId(payload.ENT(), payload.AFACOD(), payload.ASUCOD(), payload.ARTCOD());
+            Optional<Art> articuloCheck = artRepository.findById(id);
+
+            if (!articuloCheck.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El artículo ya existe.");
+            }
+
+            Art articulo = new Art();
+            articulo.setENT(payload.ENT());
+            articulo.setAFACOD(payload.AFACOD());
+            articulo.setASUCOD(payload.ASUCOD());
+            articulo.setARTCOD(payload.ARTCOD());
+            articulo.setARTDES(payload.ARTDES());
+            articulo.setARTREF(payload.ARTREF());
+            articulo.setARTBLO(payload.ARTBLO());
+            articulo.setARTUNI(payload.ARTUNI());
+            articulo.setARTSOL(payload.ARTSOL());
+            articulo.setARTREC(payload.ARTREC());
+            articulo.setAUNCOD(payload.AUNCOD());
+            articulo.setARTUCO(payload.ARTUCO());
+            articulo.setARTUEM(payload.ARTUEM());
+            articulo.setARTPMP(payload.ARTPMP());
+            articulo.setARTMIN(payload.ARTMIN());
+            articulo.setARTOPT(payload.ARTOPT());
+            artRepository.save(articulo);
+
+            List<magcodOnly> magcods = asuRepository.findAllByENTAndAFACODAndASUCOD(payload.ENT(), payload.AFACOD, payload.ASUCOD);
+
+            if (!magcods.isEmpty()) {
+                for (magcodOnly magcod: magcods) {
+                    Mea meaAdd = new Mea();
+                    meaAdd.setENT(payload.ENT());
+                    meaAdd.setMAGCOD(magcod.getMat_MAGCOD());
+                    meaAdd.setAFACOD(payload.AFACOD());
+                    meaAdd.setASUCOD(payload.ASUCOD());
+                    meaAdd.setARTCOD(payload.ARTCOD());
+                    meaAdd.setMEAUNI(payload.ARTUNI());
+                    meaAdd.setMEAMIN(payload.ARTMIN());
+                    meaAdd.setMEASOL(payload.ARTSOL());
+                    meaAdd.setMEAOPT(payload.ARTOPT());
+                    meaAdd.setMEAPMP(payload.ARTPMP());
+                    meaAdd.setMEAPMI(0.00);
+                    meaAdd.setMEAREC(payload.ARTREC());
+                    meaAdd.setMEAIND(0);
+                    meaRepository.save(meaAdd);
+                }
+            }
+
+            return ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
 }
