@@ -2,13 +2,9 @@ package com.example.backend.sqlserver2.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 @IdClass(AsuId.class)
@@ -33,14 +29,6 @@ public class Asu {
     private String ASUECO;
 
     private Integer MTACOD;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumns({
-        @JoinColumn(name = "ENT", referencedColumnName = "ENT", insertable = false, updatable = false),
-        @JoinColumn(name = "MTACOD", referencedColumnName = "MTACOD", insertable = false, updatable = false)
-    })
-    private Mat mat;
-    public Mat getMat() { return mat; }
 
     public Integer getENT() { return ENT; }
     public void setENT(Integer ENT) { this.ENT = ENT; }

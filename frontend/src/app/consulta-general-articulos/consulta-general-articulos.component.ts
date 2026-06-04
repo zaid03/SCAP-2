@@ -671,13 +671,14 @@ export class ConsultaGeneralArticulosComponent {
     }
 
     const payload = {
+      "ENT": this.entcod,
       "AFACOD": this.familiaAdd,
       "ASUCOD": this.subfamiliasAdd,
       "ARTCOD": this.codigoAdd,
       "ARTDES": this.descriptionAdd,
       "ARTREF": this.refUni,
       "ARTBLO": this.bloqAdd,
-      "bloqAdd": this.existenciasAdd,
+      "ARTUNI": this.existenciasAdd,
       "ARTSOL": this.pteServir,
       "ARTREC": this.pteEntrada,
       "AUNCOD": this.auncodMod,
@@ -688,7 +689,18 @@ export class ConsultaGeneralArticulosComponent {
       "ARTOPT": this.estoOptimo 
     }
     
-    
+    this.isDeleting = true
+    this.http.post(`${environment.backendUrl}/api/art/add-art`, payload).subscribe({
+      next: (res) => {
+        this.isDeleting = false;
+        this.closeAdd();
+        this.fetchArticulos();
+      },
+      error: (err) => {
+        this.addArticuloError = err.error.error ?? err.error;
+        this.isDeleting = false;
+      }
+    })
   }
 
   //misc

@@ -267,13 +267,13 @@ public class ArtController {
             articulo.setARTOPT(payload.ARTOPT());
             artRepository.save(articulo);
 
-            List<magcodOnly> magcods = asuRepository.findAllByENTAndAFACODAndASUCOD(payload.ENT(), payload.AFACOD, payload.ASUCOD);
+            List<magcodOnly> magcods = asuRepository.findMagcods(payload.ENT(), payload.AFACOD, payload.ASUCOD);
 
             if (!magcods.isEmpty()) {
                 for (magcodOnly magcod: magcods) {
                     Mea meaAdd = new Mea();
                     meaAdd.setENT(payload.ENT());
-                    meaAdd.setMAGCOD(magcod.getMat_MAGCOD());
+                    meaAdd.setMAGCOD(magcod.getMAGCOD());
                     meaAdd.setAFACOD(payload.AFACOD());
                     meaAdd.setASUCOD(payload.ASUCOD());
                     meaAdd.setARTCOD(payload.ARTCOD());

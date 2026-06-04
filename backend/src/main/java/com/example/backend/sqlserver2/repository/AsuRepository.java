@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,17 @@ public interface AsuRepository extends JpaRepository<Asu, AsuId> {
 
     //needed for deleting an almacenaje
     int countByENTAndMTACOD(Integer ent, Integer mtacod);
+
     //needed to add an articulo for consulta general
-    List<magcodOnly> findAllByENTAndAFACODAndASUCOD(Integer ent, String afacod, String asucod);
+     @Query("""
+        SELECT m.MAGCOD AS MAGCOD
+        FROM Asu a
+        JOIN Mat m
+            ON a.ENT = m.ENT
+        AND a.MTACOD = m.MTACOD
+        WHERE a.ENT = :ent
+        AND a.AFACOD = :afacod
+        AND a.ASUCOD = :asucod
+        """)
+    List<magcodOnly> findMagcods(Integer ent, String afacod, String asucod);
 }
