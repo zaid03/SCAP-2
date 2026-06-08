@@ -602,6 +602,101 @@ export class ConsultaGeneralArticulosComponent {
     })
   }
 
+  showProveedorGrid: boolean = false;
+  error: string = '';
+  openProveedores() {
+    this.limpiarMessages();
+    this.showProveedorGrid = true;
+    this.fetchProveedoresAdd();
+  }
+
+  closeProveedores() {
+    this.showProveedorGrid = false;
+    this.proveedores = null;
+    this.searchTerm = '';
+    this.filterOption = 'noBloqueados';
+    this.proveedoresToAdd = null;
+  }
+
+  proveedoresAdd: any = [];
+  isLoadingPro: boolean = false;
+  fetchProveedoresAdd() {
+    this.isLoadingPro = true;
+    this.http.get<any>(`${environment.backendUrl}/api/ter/by-ent/${this.entcod}`).subscribe({
+      next: (response) => {
+        this.proveedoresAdd = response;
+        this.pagePro = 0;
+        this.isLoadingPro = false;
+        this.updatePaginationPro();
+      },
+      error: (err) => {
+        this.proveedoresAdd = [];
+        this.error = err.error.error ?? err.error;
+        this.isLoading = false;
+      }
+    });
+  }
+  pagePro = 0;
+  pageSizePro = 20;
+  get totalPagesPro(): number {
+    return Math.max(1, Math.ceil((this.proveedoresAdd?.length ?? 0) / this.pageSizePro));
+  }
+  get paginatedProveedoresAdd() {
+    if (!this.proveedoresAdd || this.proveedoresAdd.length === 0) return [];
+    const start = this.pagePro * this.pageSizePro;
+    return this.proveedoresAdd.slice(start, start + this.pageSizePro);
+  }
+  nextPagePro() {if (this.pagePro < this.totalPagesPro - 1) {this.pagePro++;}}
+  prevPagePro() {if (this.pagePro > 0) {this.pagePro--;}}
+  goToPagePro(event: any) {const inputPage = Number(event.target.value); if (inputPage >= 1 && inputPage <= this.totalPagesPro) {this.pagePro = inputPage - 1;}}
+  private updatePaginationPro(): void {const total = this.totalPagesPro;
+    if (total === 0) {this.pagePro = 0; return;}
+    if (this.pagePro >= total) {this.pagePro = total - 1;}
+  }
+
+  searchTerm: string = '';
+  filterOption: string = 'Nobloqueado';
+  searchProveedor() {
+    this.limpiarMessages();
+    this.isLoadingPro = true
+    const params = {
+      ent: this.entcod || '',
+      searchMode: this.filterOption,
+      term: this.searchTerm
+    };
+    this.http.get<any[]>(`${environment.backendUrl}/api/ter/search-proveedores`, {params}).subscribe({
+      next: (response) => {
+        this.proveedoresAdd = response;
+        this.page = 0;
+        this.isLoadingPro = false;
+      },
+      error: (err) => {
+        this.proveedoresAdd = [];
+        this.error = err.error.error ?? err.error;
+        this.isLoadingPro = false;
+      }
+    })
+  }
+
+  clearSearch() {
+    this.limpiarMessages();
+    this.fetchProveedores();
+    this.filterOption = 'Nobloqueado';
+    this.page = 0;
+    this.searchTerm = '';
+  }
+
+  proveedoresToAdd: any = [];
+  selectProveedor(tercod: any) {
+    if (this.proveedoresToAdd.includes(tercod)) {
+      this.proveedoresToAdd = this.proveedoresToAdd.filter((item: any) => item !== tercod);
+    } else {
+      this.proveedoresToAdd = [...this.proveedoresToAdd, tercod];
+    }
+
+    console.log(this.proveedoresToAdd);
+  }
+
   showExistenciasGrid: boolean = false;
   existenciasError: string = '';
   isLoadingExtencias: boolean = false;

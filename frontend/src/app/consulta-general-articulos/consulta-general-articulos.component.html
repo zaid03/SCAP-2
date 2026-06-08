@@ -362,7 +362,7 @@
                             class="purple-btn" 
                             [disabled]="isUpdate"
                             [ngClass]="{ 'disabled-btn': isUpdate }" 
-                            (click)="cancelar()"
+                            (click)="openProveedores()"
                         >Añadir proveedores</button>
                         <button 
                             class="red-btn" 
@@ -710,4 +710,86 @@
     </div>
     <button class="red-btn margin-btn" (click)="deleteProveedor()">-</button>
     <button class="purple-btn" (click)="closeDeleteProv()">✖</button>
+</div>
+
+<div class="modal-backdrop" *ngIf="showProveedorGrid"></div>
+<div class="proveedor-grid-modal" *ngIf="showProveedorGrid">
+    <div class="btns">
+        <div class="title">
+            <h1>Seleccione un proveedor</h1>
+        </div>
+        <button class="red-btn" (click)="closeProveedores()">✖</button>
+    </div>
+    <div class="search-holder">
+        <div class="search-container">
+            <form class="search-form">
+                <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm"/>
+                <div class="search-options">
+                    <label>
+                        <input type="radio" name="optiones" value="todos" [(ngModel)]="filterOption" /> Todos
+                        <input type="radio" name="optiones" value="Nobloqueado" [(ngModel)]="filterOption" /> No Bloqueados
+                        <input type="radio" name="optiones" value="bloqueado" [(ngModel)]="filterOption"  /> Bloqueados
+                    </label>
+                </div>
+                <div class="search-btns">
+                    <button type="button" class="purple-btn" (click)="searchProveedor()">Buscar</button>
+                    <button type="button" class="purple-btn" (click)="clearSearch()">Limpiar</button>
+                </div>
+            </form>
+        </div> 
+    </div>
+    <h1 class="errorBtn">{{error}}</h1>
+    <div *ngIf="isLoadingPro" class="loading-message">
+        <div class="spinner"></div>
+        <span>Cargando</span>
+    </div>
+    <div class="main-list">
+        <table  class="main-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>NIF</th>
+                    <th>Alias</th>
+                    <th>Teléfono</th>
+                    <th>Domicilio</th>
+                    <th>Código Postal</th>
+                    <th>Municipio</th>
+                    <th>Correo electrónico</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of paginatedProveedoresAdd" [class.grey-row]="p.terblo == 1">
+                    <td style="cursor: pointer;" (click)="selectProveedor(p.tercod)">{{ p.tercod }}</td>
+                    <td>{{ p.ternom }}</td>
+                    <td>{{ p.ternif }}</td>
+                    <td>{{ p.terali }}</td>
+                    <td>{{ p.tertel }}</td>
+                    <td>{{ p.terdom }}</td>
+                    <td>{{ p.tercpo }}</td>
+                    <td>{{ p.terpob }}</td>
+                    <td>{{ p.tercoe }}</td>
+                    <td>{{ p.terobs }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="container-pag-wrap">
+        <div class="pagination-controls">
+            <button class="pag-btn" (click)="prevPagePro()" [disabled]="pagePro === 0">Anterior</button>
+            <span>Página</span>
+            <input
+            type="number"
+            min="1"
+            [max]="totalPagesPro"
+            [value]="pagePro + 1"
+            (change)="goToPagePro($event)"
+            class="pagination-input"
+            />
+            <span>de {{ totalPagesPro }}</span>
+            <button class="pag-btn" (click)="nextPagePro()" [disabled]="pagePro + 1 >= totalPagesPro">Siguiente</button>
+        </div>
+    </div>
 </div>
