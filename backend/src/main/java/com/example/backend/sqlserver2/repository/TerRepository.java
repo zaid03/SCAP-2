@@ -7,7 +7,10 @@ import org.springframework.stereotype.Repository;
 import com.example.backend.sqlserver2.model.Ter;
 import com.example.backend.sqlserver2.model.TerId;
 
+import java.util.List;
+
 @Repository
 public interface TerRepository extends JpaRepository<Ter, TerId>, JpaSpecificationExecutor<Ter> {
-  
+  //for the main list
+  List<Ter> findByENT(int ent);
 }
