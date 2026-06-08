@@ -539,6 +539,69 @@ export class ConsultaGeneralArticulosComponent {
     if (inputPage >= 1 && inputPage <= this.totalPages) {this.pageProv = inputPage - 1;}
   }
 
+  updateProveedor(tercodUp: number, aprref: string, apruem: any, aprobs: string) {
+    this.limpiarMessages();
+
+    const afacod = this.selectedArticulo.afacod;
+    const asucod = this.selectedArticulo.asucod;
+    const artcod = this.selectedArticulo.artcod;
+    const tercod = tercodUp;
+
+    const payload = {
+      "APRREF": aprref,
+      "APROBS": aprobs,
+      "APRUEM": apruem
+    }
+
+    this.isUpdating = true;
+    this.http.patch(`${environment.backendUrl}/api/more/update-prov-info/${this.entcod}/${afacod}/${asucod}/${artcod}/${tercod}`, payload).subscribe({
+      next: (res) => {
+        this.isUpdating = false;
+        this.fetchProveedores();
+        this.articuloDetailSuccess = 'Proveedor actualizado correctamente';
+      },
+      error: (err) => {
+        this.proveedoresError = err.error.error ?? err.error;
+        this.isUpdating = false;
+      }
+    })
+  }
+
+  deleteProveedorGrid: boolean = false;
+  delErrProv: string = '';
+  delTercod: number | null = null;
+  showdeleteProv(tercodUp: number) {
+    this.deleteProveedorGrid = true;
+    this.delTercod = tercodUp;
+  }
+
+  closeDeleteProv() {
+    this.limpiarMessages();
+    this.deleteProveedorGrid = false;
+    this.delTercod = null;
+  }
+
+  deleteProveedor() {
+    const afacod = this.selectedArticulo.afacod;
+    const asucod = this.selectedArticulo.asucod;
+    const artcod = this.selectedArticulo.artcod;
+    const tercod = this.delTercod;
+
+    this.isDeleting = true;
+    this.http.delete(`${environment.backendUrl}/api/more/delete-proveedor-art/${this.entcod}/${afacod}/${asucod}/${artcod}/${tercod}`).subscribe({
+      next: (res) => {
+        this.isDeleting = false;
+        this.fetchProveedores();
+        this.closeDeleteProv();
+        this.articuloDetailSuccess = 'Proveedor eliminada exitosamente';
+      },
+      error: (err) => {
+        this.delErrProv = err.error.error ?? err.error;
+        this.isDeleting = false;
+      }
+    })
+  }
+
   showExistenciasGrid: boolean = false;
   existenciasError: string = '';
   isLoadingExtencias: boolean = false;
@@ -689,16 +752,16 @@ export class ConsultaGeneralArticulosComponent {
       "ARTOPT": this.estoOptimo 
     }
     
-    this.isDeleting = true
+    this.isAdding = true
     this.http.post(`${environment.backendUrl}/api/art/add-art`, payload).subscribe({
       next: (res) => {
-        this.isDeleting = false;
+        this.isAdding = false;
         this.closeAdd();
         this.fetchArticulos();
       },
       error: (err) => {
         this.addArticuloError = err.error.error ?? err.error;
-        this.isDeleting = false;
+        this.isAdding = false;
       }
     })
   }
@@ -713,5 +776,6 @@ export class ConsultaGeneralArticulosComponent {
     this.existenciasError = '';
     this.delErr = '';
     this.addArticuloError = '';
+    this.delErrProv = '';
   }
 }

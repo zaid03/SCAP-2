@@ -9,7 +9,7 @@
     <div class="main-container" [class.blurred]="!sidebar.collapsed">
         <div class="title-menu">
             <div class="title-area">
-                <h2 class="margin-title">Consulta analîtica de familias</h2>  
+                <h2 class="margin-title">Consulta General de artículos</h2>  
             </div>
             <div class="search-holder">
                 <div class="search-container">
@@ -435,25 +435,32 @@
                                         <textarea 
                                             [(ngModel)]="p.aprref"
                                             class="textArea-style tallTextDetail"    
+                                            #refernciaUpdate
                                         ></textarea>
                                     </td>
                                     <td>
                                         <textarea 
                                             [(ngModel)]="p.apruem"
                                             class="textArea-style tallTextDetail"    
+                                            #numberUpdate
                                         ></textarea>
                                     </td>
                                     <td>
                                         <textarea 
                                             [(ngModel)]="p.aprobs"
-                                            class="textArea-style tallTextDetail"    
+                                            class="textArea-style tallTextDetail"  
+                                            #descUpdate  
                                         ></textarea>
                                     </td>
                                     <td class="gap">
                                         <button
+                                            (click)="updateProveedor(p.tercod, refernciaUpdate.value, numberUpdate.value, descUpdate.value)"
                                             class="purple-btn margin-btn" 
                                         > ✔ </button>
-                                        <button class="red-btn">-</button>
+                                        <button 
+                                            class="red-btn"
+                                            (click)="showdeleteProv(p.tercod)"
+                                        >-</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -691,4 +698,16 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="deleteProveedorGrid"></div>
+<div class="delete-confirm-modal" *ngIf="deleteProveedorGrid">
+    <h3>¿Seguro que quieres eliminar este proveedor?</h3>
+    <h1 class="errorBtn">{{delErrProv}}</h1>
+    <div *ngIf="isDeleting" class="loading-message">
+        <div class="spinner"></div>
+        <span>borrando</span>
+    </div>
+    <button class="red-btn margin-btn" (click)="deleteProveedor()">-</button>
+    <button class="purple-btn" (click)="closeDeleteProv()">✖</button>
 </div>
