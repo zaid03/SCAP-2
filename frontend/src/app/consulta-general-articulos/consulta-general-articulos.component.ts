@@ -87,7 +87,7 @@ export class ConsultaGeneralArticulosComponent {
   getPagination() {
     this.http.get<any>(`${environment.backendUrl}/api/art/get-pag/${this.entcod}`).subscribe({
       next: (res) => {
-        this.pagination = this.Math.ceil(res) / 20;
+        this.pagination = this.Math.ceil(res/20);
       },
       error: (err) => {
         console.warn(err.error.error || err.error);

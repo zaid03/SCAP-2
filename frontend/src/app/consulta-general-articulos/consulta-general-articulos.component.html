@@ -359,6 +359,12 @@
                     </div>
                     <div class="btns margin">
                         <button 
+                            class="purple-btn" 
+                            [disabled]="isUpdate"
+                            [ngClass]="{ 'disabled-btn': isUpdate }" 
+                            (click)="cancelar()"
+                        >Añadir proveedores</button>
+                        <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
                             (click)="cancelar()"
@@ -418,15 +424,37 @@
                                     <th>Referencia Prov.</th>
                                     <th>Unid.Embalaje</th>
                                     <th>Observaciones</th>
+                                    <th>Accíon</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let p of paginatedProveedores">
                                     <td>{{p.tercod}}</td>
                                     <td>{{p.ter_TERNOM}}</td>
-                                    <td>{{p.apref}}</td>
-                                    <td>{{p.apruem}}</td>
-                                    <td>{{p.aprobs}}</td>
+                                    <td>
+                                        <textarea 
+                                            [(ngModel)]="p.apref"
+                                            class="textArea-style tallTextDetail"    
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea 
+                                            [(ngModel)]="p.apruem"
+                                            class="textArea-style tallTextDetail"    
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea 
+                                            [(ngModel)]="p.aprobs"
+                                            class="textArea-style tallTextDetail"    
+                                        ></textarea>
+                                    </td>
+                                    <td class="gap">
+                                        <button
+                                            class="purple-btn margin-btn" 
+                                        > ✔ </button>
+                                        <button class="red-btn">-</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

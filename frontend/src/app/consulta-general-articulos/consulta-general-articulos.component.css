@@ -38,6 +38,8 @@ tr.bloqueado {background-color: #aaa;}
 .lastOne {width: 37%;}
 .lastOne .left {width: 40%;}
 .selectSpecial {height: 30px; width: 260px;}
+.gap {display: flex; justify-content: center;}
+.tallTextDetail {width: 180px;}
 /* detail style */
 /* delete grid */
 .margin-btn {margin-right: 10px;}
