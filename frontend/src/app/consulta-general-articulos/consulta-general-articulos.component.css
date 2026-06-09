@@ -66,7 +66,6 @@ tr.bloqueado {background-color: #aaa;}
 /* add grid */
 /* proveedores grid in add */
 .proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 94%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 5001; display: flex; flex-direction: column; gap: 12px;}
-.proveedor-grid-modal .title {font-size: 10px; color: #38249b; text-align: center; width: 95%;}
 .container-pag-wrap {display: flex; flex-direction: column; align-items: center;}
 .provs-add {justify-content: center;}
 .provs-add-search {width: 99%;}
@@ -77,4 +76,10 @@ tr.bloqueado {background-color: #aaa;}
 .provs-table thead th:nth-child(8) {width: 150px !important;}
 .provs-table thead th:last-child,
 .provs-table thead th:nth-child(9) {width: 50px !important;}
+.grey-row {background-color: #f2f2f2;}
+.selected-row {background-color: #cce6ff !important;}
+.size {font-size: 15px;}
+.sizeTitle {font-size: 20px !important;}
+.btnsGrid .title {text-align: center; width: 50%;}
+.btnsGrid .info {width: 25%; display: flex; gap: 10px; justify-content: right;}
 /* proveedores grid in add */

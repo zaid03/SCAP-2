@@ -714,11 +714,15 @@
 
 <div class="modal-backdrop" *ngIf="showProveedorGrid"></div>
 <div class="proveedor-grid-modal" *ngIf="showProveedorGrid">
-    <div class="btns">
+    <div class="btns btnsGrid">
         <div class="title">
-            <h1>Seleccione un proveedor</h1>
+            <p class="p-style sizeTitle">Seleccione un proveedor</p>
         </div>
-        <button class="red-btn" (click)="closeProveedores()">✖</button>
+        <div class="info">
+            <p class="p-style" *ngIf="provsNumber > 0">Se seleccionan {{provsNumber}} proveedores</p>
+            <button class="purple-btn size" (click)="addProveedorToArticulo()">+</button>
+            <button class="red-btn" (click)="closeProveedores()">✖</button>
+        </div>
     </div>
     <div class="search-holder provs-add-search">
         <div class="search-container">
@@ -760,7 +764,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let p of paginatedProveedoresAdd" [class.grey-row]="p.terblo == 1">
+                <tr *ngFor="let p of paginatedProveedoresAdd" [class.grey-row]="p.terblo == 1" [class.selected-row]="isSelected(p.tercod)">
                     <td style="cursor: pointer;" (click)="selectProveedor(p.tercod)">{{ p.tercod }}</td>
                     <td>{{ p.ternom }}</td>
                     <td>{{ p.ternif }}</td>

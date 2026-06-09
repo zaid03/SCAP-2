@@ -616,6 +616,7 @@ export class ConsultaGeneralArticulosComponent {
     this.searchTerm = '';
     this.filterOption = 'noBloqueados';
     this.proveedoresToAdd = null;
+    this.provsNumber = 0;
   }
 
   proveedoresAdd: any = [];
@@ -687,6 +688,7 @@ export class ConsultaGeneralArticulosComponent {
   }
 
   proveedoresToAdd: any = [];
+  provsNumber: number = 0;
   selectProveedor(tercod: any) {
     if (this.proveedoresToAdd.includes(tercod)) {
       this.proveedoresToAdd = this.proveedoresToAdd.filter((item: any) => item !== tercod);
@@ -694,7 +696,43 @@ export class ConsultaGeneralArticulosComponent {
       this.proveedoresToAdd = [...this.proveedoresToAdd, tercod];
     }
 
-    console.log(this.proveedoresToAdd);
+    this.provsNumber = this.proveedoresToAdd.length;
+  }
+
+  isSelected(tercod: number) {
+    if (this.proveedoresToAdd.includes(tercod)) {
+      return true;
+    }
+    return false;
+  }
+
+  addProveedorToArticulo() {
+    const afacod = this.selectedArticulo.afacod;
+    const asucod = this.selectedArticulo.asucod;
+    const artcod = this.selectedArticulo.artcod;
+    const tercod = this.proveedoresToAdd;
+
+    const payload = {
+      "ENT": this.entcod,
+      "AFACOD": afacod,
+      "ASUCOD": asucod,
+      "ARTCOD": artcod,
+      "tercods": tercod
+    }
+
+    this.isLoadingPro = true;
+    this.http.post(`${environment.backendUrl}/api/more/add-terceros`, payload, { responseType: 'text' as const }).subscribe({
+       next: (res: string) => {
+        this.isLoadingPro = false;
+        this.closeProveedores();
+        this.fetchProveedores();
+        this.articuloDetailSuccess = res;
+      },
+      error: (err) => {
+        this.isLoadingPro = false;
+        this.delErrProv = err.error.error ?? err.error;
+      }
+    })
   }
 
   showExistenciasGrid: boolean = false;
