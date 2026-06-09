@@ -64,3 +64,17 @@ tr.bloqueado {background-color: #aaa;}
 .addArt input[type="checkbox"],
 .detail-container input[type="checkbox"] { margin: 0; accent-color: #25176b; width: 16px; height: 25px; vertical-align: middle; outline: none; box-shadow: none;}
 /* add grid */
+/* proveedores grid in add */
+.proveedor-grid-modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 94%; max-height: 80vh; overflow: auto; background: #ffffff; border-radius: 12px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); z-index: 5001; display: flex; flex-direction: column; gap: 12px;}
+.proveedor-grid-modal .title {font-size: 10px; color: #38249b; text-align: center; width: 95%;}
+.container-pag-wrap {display: flex; flex-direction: column; align-items: center;}
+.provs-add {justify-content: center;}
+.provs-add-search {width: 99%;}
+.provs-add-btns {gap: 10px; display: flex;}
+.provs-table thead th:nth-child(2) {width: 170px !important;}
+.provs-table thead th:nth-child(4),
+.provs-table thead th:nth-child(6),
+.provs-table thead th:nth-child(8) {width: 150px !important;}
+.provs-table thead th:last-child,
+.provs-table thead th:nth-child(9) {width: 50px !important;}
+/* proveedores grid in add */

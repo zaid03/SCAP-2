@@ -720,9 +720,9 @@
         </div>
         <button class="red-btn" (click)="closeProveedores()">✖</button>
     </div>
-    <div class="search-holder">
+    <div class="search-holder provs-add-search">
         <div class="search-container">
-            <form class="search-form">
+            <form class="search-form provs-add">
                 <input type="text" class="search-bar" placeholder="Buscar proveedor" name="search" [(ngModel)]="searchTerm"/>
                 <div class="search-options">
                     <label>
@@ -731,7 +731,7 @@
                         <input type="radio" name="optiones" value="bloqueado" [(ngModel)]="filterOption"  /> Bloqueados
                     </label>
                 </div>
-                <div class="search-btns">
+                <div class="search-btns provs-add-btns">
                     <button type="button" class="purple-btn" (click)="searchProveedor()">Buscar</button>
                     <button type="button" class="purple-btn" (click)="clearSearch()">Limpiar</button>
                 </div>
@@ -744,7 +744,7 @@
         <span>Cargando</span>
     </div>
     <div class="main-list">
-        <table  class="main-table">
+        <table  class="provs-table main-table">
             <thead>
                 <tr>
                     <th>Código</th>
