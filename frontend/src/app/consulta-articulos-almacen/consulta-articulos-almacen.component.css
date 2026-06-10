@@ -37,10 +37,6 @@ tr.bloqueado {background-color: #aaa;}
 .right {width: 80%; display: flex; flex-direction: column; gap: 18px;}
 .on-two {display: flex; gap: 10px;}
 .checkbox {margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
-.wrapper {width: 100%;  display: flex; justify-content: center; gap: 20px;}
-.margin {margin-top: 10px;}
-.fix {width: 50%;}
-.fixx {width: 50%;}
 /* detail style */
 
 @media (min-width: 1700px) {.search-form {flex-direction: row;} 
