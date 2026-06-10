@@ -10,6 +10,7 @@ import autoTable from 'jspdf-autotable';
 import { environment } from '../../environments/environment';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+
 @Component({
   selector: 'app-consulta-articulos-almacen',
   standalone: true,
@@ -391,30 +392,7 @@ export class ConsultaArticulosAlmacenComponent {
 
   tempAlmacen: any = {};
   isUpdate: boolean = false;
-  backupData: any = [];
-  modificar() {
-    this.isUpdate = true;
-    this.backupData = this.selectedAlmacen ? { ...this.selectedAlmacen } : {};
-  }
-
-  cancelar() {
-    this.isUpdate = false;
-    this.tempAlmacen = { ...this.backupData };
-  }
-
-  // updateSuccess() {
-  //   this.isUpdate = false;
-  //   this.allowToUpdate = false;
-  // }
-
   allowToUpdate: boolean = false;
-  // isUpdateAllowed(afacod: string, afades: string) {
-  //   if (this.allowToUpdate) {
-  //     // this.updateFamilia(afacod, afades);
-  //   } else {
-  //     return;
-  //   }
-  // }
 
   // sub details functions
   activeDetailTab: 'proveedores' | null = null;

@@ -16,6 +16,7 @@ tr.bloqueado {background-color: #aaa;}
 /* detail style */
 .smallTextArea {width: 80px; max-width: 85px;}
 .tallText {width: 250px;}
+.tallSecond {width: 200px;}
 .detail-container {display: flex; gap: 10px; flex-wrap: wrap;}
 .chunk-one,
 .chunk-two,
@@ -23,11 +24,15 @@ tr.bloqueado {background-color: #aaa;}
 .chunk-four,
 .chunk-five {width: 40%; display: flex; gap: 10px;}
 .chunk-three {width: 10%; align-items: center;}
-.chunk-four {width: 100%; justify-content: center; gap: 20px;}
 .adjustedWidth {width: 18%;}
 .adjustedWidth .left,
 .adjustedWidthSecond .left {width: 70%;}
 .adjustedWidthSecond {width: 28%;}
+.adjustedWidthFour .left {width: 25%;}
+.adjustedWidthFour {width: 45%;}
+.adjustedWidthFive {width: 50%;}
+.slight {margin-right: 25px;}
+.slightSecond {margin-right: 70px;}
 .left {width: 20%; display: flex; flex-direction: column; gap: 20px;}
 .right {width: 80%; display: flex; flex-direction: column; gap: 18px;}
 .on-two {display: flex; gap: 10px;}
