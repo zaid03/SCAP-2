@@ -164,7 +164,7 @@
                     <div class="modal" *ngIf="selectedAlmacen" (click)="$event.stopPropagation()">
                         <div class="btns">
                             <div class="title-detail">
-                                <h3>Detalles de Almacen</h3>
+                                <h3>Detalles de artículo</h3>
                             </div>
                             <button 
                                 class="red-btn"
@@ -366,24 +366,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="btns margin">
-                            <button 
-                                class="red-btn" 
-                                *ngIf="isUpdate" 
-                                (click)="cancelar()"
-                            >Cancelar</button>
-                            <button 
-                                class="purple-btn"
-                                [disabled]="isUpdate" 
-                                *ngIf="!isUpdate" 
-                                (click)="modificar()"
-                            >Modificar</button>
-                            <button 
-                                class="purple-btn" 
-                                [disabled]="!isUpdate" 
-                                *ngIf="isUpdate" 
-                            >Guardar</button>
                         </div>
                         <div class="more-detail-container">
                             <div class="tabs" role="tablist" aria-label="Detalle tabs">

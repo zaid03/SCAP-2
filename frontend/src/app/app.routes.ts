@@ -11,6 +11,7 @@ import { ConsultaAnalticaDeFamiliasComponent } from './consulta-analtica-de-fami
 import { ConsultaArticulosAlmacenComponent } from './consulta-articulos-almacen/consulta-articulos-almacen.component';
 import { ConsultaPendienteContabilizarComponent } from './consulta-pendiente-contabilizar/consulta-pendiente-contabilizar.component';
 import { ConsultaGeneralArticulosComponent } from './consulta-general-articulos/consulta-general-articulos.component';
+import { MantenimientoGeneralArticulosComponent } from './mantenimiento-general-articulos/mantenimiento-general-articulos.component';
 import { ConsultaContabilizadoComponent } from './consulta-contabilizado/consulta-contabilizado.component';
 import { FamiliaComponent } from './familia/familia.component';
 import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
@@ -28,6 +29,7 @@ export const routes: Routes = [
     { path: 'CAlmacen', component:ConsultaArticulosAlmacenComponent},
     { path: 'Ccontabilizar', component: ConsultaPendienteContabilizarComponent},
     { path: 'CGArticulos', component: ConsultaGeneralArticulosComponent},
+    { path: 'MGArticulos', component: MantenimientoGeneralArticulosComponent},
     { path: 'Ccontabilizado', component: ConsultaContabilizadoComponent},
     { path: 'familia', component: FamiliaComponent},
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
