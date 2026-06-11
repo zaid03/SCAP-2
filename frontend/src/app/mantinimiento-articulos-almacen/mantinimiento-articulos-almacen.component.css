@@ -29,10 +29,10 @@ tr.bloqueado {background-color: #aaa;}
 .second-check {display: flex; gap: 10px; align-items: center;}
 .chunk-five {width: 50%;}
 .chunk-six {width: 100%; display: flex; justify-content: center; gap: 10px; align-items: center;}
-.adjustedWidth {width: 18%;}
+.adjustedWidth {width: 15%;}
 .adjustedWidth .left,
 .adjustedWidthSecond .left {width: 70%;}
-.adjustedWidthSecond {width: 28%;}
+.adjustedWidthSecond {width: 25%;}
 .adjustedWidthFour .left {width: 50%;}
 .slight {margin-right: 25px;}
 .slightSecond {margin-right: 70px;}
@@ -43,8 +43,16 @@ tr.bloqueado {background-color: #aaa;}
 /* detail style */
 @media (min-width: 1700px) {.search-form {flex-direction: row;} 
     .title-area {align-items: center;}
-    .adjustedWidthFour .left {width: 42%;}
+    .chunk-one,
+    .chunk-four {width: 32%;}
+    .adjustedWidth {width: 19%;}
+    .fix {margin-left: 20px;}
 }
 @media (max-width: 1500px) {
   .tallTextFour {margin-left: 10px;}
+  .fix {margin-left: 12px;}
+  .adjustedWidth {width: 19%;}
+  .adjustedWidthSecond .left {width: 65%;}
+  .adjustedWidthSecond .right {width: 35%;}
+  .fix2 {margin-left: 25px;}
 }
