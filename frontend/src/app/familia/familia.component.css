@@ -18,7 +18,6 @@
 .right { width: 95%; display: flex; flex-direction: column; gap: 10px;}
 .on-two { display: flex; gap: 10px; align-items: center;}
 .tallText { width: 450px; max-width: 625px;}
-.space {margin-top: 10px;}
 /* detail grid */
 .margin-btn { margin-right: 5px;}
 .sft tbody option,
@@ -28,15 +27,21 @@
 /* detail grid */
 /* modals */
 .add-sub-modal { width: 45%; display: flex; flex-direction: column; top: 35%;}
-.add-content { display: flex; }
+.add-content { display: flex;}
 .left-add { width: 30%; text-align: left; display: flex; flex-direction: column; gap: 20px;}
 .right-add { display: flex; flex-direction: column; gap: 15px;}
 .right-add select { margin-top: 5px;}
-.title { width: 90%;}
+.title { width: 80%;}
 .add-confirm-modal{ width: 40%; }
 .addTallText { width: 220px; max-width: 450px;}
 .addSmallText { width: 80px; max-width: 200px;}
+.details-table {text-align: left;}
+.align {top: 20%;}
 /* modals */
 @media (max-width: 1299px), (min-width: 1350px) {
   .delete-confirm-modal {top: 40%;}
+}
+@media (min-width: 1600px) {
+  .align {top: 25%;}
+  .fix {top: 20%;}
 }

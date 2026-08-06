@@ -85,7 +85,7 @@
             </div>
             <div class="modal-backdrop" *ngIf="selectedFamilias" (click)="closeDetailsSure()"></div>
             <div class="display" >
-                <div class="modal" *ngIf="selectedFamilias">
+                <div class="modal fix" *ngIf="selectedFamilias">
                     <div class="btns">
                         <div class="title-detail">
                             <h3>Detalles de Familia</h3>
@@ -125,6 +125,11 @@
                     </div>
                     <div class="btns">
                         <button 
+                            class="purple-btn" 
+                            [ngClass]="{ 'disabled-btn': isUpdate }"
+                            (click)="launchAddSubFamilia()"
+                        >Añadir subfamilia</button>
+                        <button 
                             class="red-btn" 
                             *ngIf="isUpdate" 
                             (click)="cancelar()"
@@ -151,7 +156,7 @@
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
                            <button
-                                class="tab-btn"
+                                class="tab-like-btn p-style"
                                 role="tab"
                                 [attr.aria-selected]="activeDetailTab === 'subfamilia'"
                                 [class.active-tab]="activeDetailTab === 'subfamilia'"
@@ -159,14 +164,10 @@
                             >
                                 Subfamilia
                             </button>
-
                         </div>
                     </div>
                     <div class="subfamilias">
                         <div class="custom-grid-modal" *ngIf="showSubfamiliasGrid">
-                            <div class="butt">
-                                <button class="purple-btn space" (click)="launchAddSubFamilia()">+</button>
-                            </div>
                             <h4 class="successBtn">{{ successUpdateMEssage }}</h4>
                             <h4 class="errorBtn">{{ afacodError }}</h4>
                             <div *ngIf="isDeleting" class="loading-message">
@@ -256,50 +257,72 @@
 </div>
 
 <div class="modal-backdrop" *ngIf="showAddConfirmSub" (click)="closeAddConfirmSub()"></div>
-<div class="add-sub-modal" *ngIf="showAddConfirmSub">
+<div class="add-sub-modal align" *ngIf="showAddConfirmSub">
     <div class="btns">
         <div class="title">
             <h3>Añadir una Subfamilia</h3>    
         </div>
-        <button class="purple-btn" (click)="addSub(subfamiliaInput.value, descripcionInput.value, economicaInput.value, almacenajeInput.value)">+</button>
+        <button class="purple-btn" (click)="addSub(subfamiliaInput.value, descripcionInput.value, economicaInput.value, almacenajeInput.value)">+ Cargar</button>
         <button class="red-btn" (click)="closeAddConfirmSub()">✖</button>
     </div>
     <h1 class="errorBtn">{{ subAddError }}</h1>
     <div class="add-content">
-        <div class="left-add">
-            <p class="p-style">Subfamilia</p>
-            <p class="p-style">Descripción</p>
-            <p class="p-style">Económica</p>
-            <p class="p-style">Tipo de almacenaje</p>
-        </div>
-        <div class="right-add">
-            <textarea 
-                class="textArea-style tallText"
-                name="subfamilia" 
-                maxlength="4"
-                (input)="forceUppercase($event)"
-                #subfamiliaInput
-            ></textarea>
-            <textarea
-                class="textArea-style tallText"
-                name="Descripción" 
-                #descripcionInput
-            ></textarea>
-            <textarea
-                class="textArea-style tallText"
-                #economicaInput
-                (input)="allowOnlyDigits($event)"
-            ></textarea>
-            <select
-                name="almacenaje"
-                #almacenajeInput
-                class="select-style mta-list"
-            >
-                <option *ngFor="let almacen of almacenajes" [value]="almacen.mtacod">
-                    {{ almacen.mtacod }} - {{ almacen.mtades }}
-                </option>
-            </select>
-        </div>
+        <table class="details-table">
+            <tr>
+                <td>
+                    <p class="p-style">Subfamilia</p>
+                </td>
+                <td>
+                    <textarea 
+                        class="textArea-style tallText"
+                        name="subfamilia" 
+                        maxlength="4"
+                        (input)="forceUppercase($event)"
+                        #subfamiliaInput
+                    ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="p-style">Descripción</p>
+                </td>
+                <td>
+                    <textarea
+                        class="textArea-style tallText"
+                        name="Descripción" 
+                        #descripcionInput
+                    ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="p-style">Económica</p>
+                </td>
+                <td>
+                    <textarea
+                        class="textArea-style tallText"
+                        #economicaInput
+                        (input)="allowOnlyDigits($event)"
+                    ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="p-style">Tipo de almacenaje</p>
+                </td>
+                <td>
+                    <select
+                        name="almacenaje"
+                        #almacenajeInput
+                        class="select-style mta-list"
+                    >
+                        <option *ngFor="let almacen of almacenajes" [value]="almacen.mtacod">
+                            {{ almacen.mtacod }} - {{ almacen.mtades }}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 
@@ -309,7 +332,7 @@
         <div class="title">
             <h3>Añadir una Familia</h3>  
         </div>
-        <button class="purple-btn" (click)="addFamilia(familiaInput.value, descripcionInput.value)">+</button>
+        <button class="purple-btn" (click)="addFamilia(familiaInput.value, descripcionInput.value)">+ Cargar</button>
         <button class="red-btn" (click)="closeAddConfirm()">✖</button>
     </div>
     <h1 class="errorBtn">{{ familiaAddError }}</h1>
@@ -317,23 +340,33 @@
         <div class="spinner"></div>
         <span>añadiendo</span>
     </div>
-    <div class="add-content">
-        <div class="left-add">
-            <p class="p-style">Familia*</p>
-            <p class="p-style">Descripción*</p>
-        </div>
-        <div class="right-add">
-            <textarea
-                class="textArea-style addSmallText"
-                maxlength="4"
-                (input)="familiaInput.value = familiaInput.value.toUpperCase()"
-                #familiaInput
-            ></textarea>
-            <textarea
-                class="textArea-style addTallText"  
-                #descripcionInput
-            ></textarea>
-        </div>
+    <div class="details-table">
+        <table class="details-table">
+            <tr>
+                <td >
+                    <p class="p-style">Familia*</p>
+                </td>
+                <td>
+                    <textarea
+                        class="textArea-style addSmallText"
+                        maxlength="4"
+                        (input)="familiaInput.value = familiaInput.value.toUpperCase()"
+                        #familiaInput
+                    ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="p-style">Descripción*</p>
+                </td>
+                <td>
+                    <textarea
+                        class="textArea-style addTallText"  
+                        #descripcionInput
+                    ></textarea>
+                </td>
+            </tr>
+        </table>
     </div>
 </div>
 
