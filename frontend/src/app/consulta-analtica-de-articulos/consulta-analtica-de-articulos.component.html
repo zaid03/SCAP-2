@@ -88,10 +88,10 @@
                 <tbody>
                     <tr *ngFor="let p of paginatedArticulos">
                         <td>{{currentMonth +"/" + eje}}</td>
-                        <td>{{p.artcod}}</td>
-                        <td>{{p.artdes}}</td>
-                        <td>{{p.afacod}}</td>
-                        <td>{{p.afa.afades}}</td>
+                        <td>{{p?.artcod}}</td>
+                        <td>{{p?.artdes}}</td>
+                        <td>{{p?.afacod}}</td>
+                        <td>{{p?.afa?.afades}}</td>
                     </tr>
                 </tbody>
             </table>

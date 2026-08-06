@@ -41,12 +41,19 @@ tr.bloqueado {background-color: #aaa;}
 .on-two {display: flex; gap: 10px;}
 .checkbox {margin: 0; accent-color: #25176b; width: 14px !important; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
 /* detail style */
+@media (max-width: 1500px) {
+  .title-area {width: 27%; justify-content: flex-end; align-items: flex-start;}
+  .search-holder {width: 72%;}
+  .search-container {width: 100%;}
+  .search-container .btns {width: 10%;}
+  .search-form {width: 89%; display: flex; flex-direction: column;}
+}
 @media (min-width: 1700px) {.search-form {flex-direction: row;} 
-    .title-area {align-items: center;}
-    .chunk-one,
-    .chunk-four {width: 32%;}
-    .adjustedWidth {width: 19%;}
-    .fix {margin-left: 20px;}
+  .title-area {align-items: center;}
+  .chunk-one,
+  .chunk-four {width: 32%;}
+  .adjustedWidth {width: 19%;}
+  .fix {margin-left: 20px;}
 }
 @media (max-width: 1500px) {
   .tallTextFour {margin-left: 10px;}
