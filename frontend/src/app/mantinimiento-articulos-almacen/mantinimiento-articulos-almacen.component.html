@@ -180,122 +180,264 @@
                             <span>actualizando</span>
                         </div>  
                         <div class="detail-container">
-                            <div class="chunk-one">
-                                <div class="left">
-                                    <p class="p-style">Familia</p>
-                                    <p class="p-style">Subfamilia</p>
-                                    <p class="p-style">Código</p>
-                                </div>
-                                <div class="right">
-                                    <div class="on-two">
+                            <table class="details-table">
+                                <tr>
+                                    <td>
+                                        <p class="p-style">Familia</p>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_Afa_AFACOD"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style smallTextArea" 
+                                            ></textarea>
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_Afa_AFADES"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style averageTextArea" 
+                                            ></textarea>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Existencias</p>
+                                    </td>
+                                    <td>
                                         <textarea
-                                            [(ngModel)]="tempAlmacen.art_Afa_AFACOD"
+                                            [(ngModel)]="tempAlmacen.meauni"
                                             [disabled]="!isUpdate"
                                             (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
+                                            class="textArea-style numerTextArea" 
                                         ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Pte. Servir</p>
+                                    </td>
+                                    <td>
                                         <textarea
-                                            [(ngModel)]="tempAlmacen.art_Afa_AFADES"
+                                            [(ngModel)]="tempAlmacen.measol"
                                             [disabled]="!isUpdate"
                                             (input)="allowToUpdate = true"
-                                            class="textArea-style tallText" 
+                                            class="textArea-style numerTextArea" 
                                         ></textarea>
-                                    </div>
-                                    <div class="on-two">
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Pte. Entrada</p>
+                                    </td>
+                                    <td>
                                         <textarea
-                                            [(ngModel)]="tempAlmacen.art_Asu_ASUCOD"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
-                                        ></textarea>
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.art_Asu_ASUDES"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style tallText" 
-                                        ></textarea>
-                                    </div>
-                                    <div class="on-two">
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.art_ARTCOD"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
-                                        ></textarea>
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.art_ARTDES"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style tallText" 
-                                        ></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chunk-two adjustedWidth">
-                                <div class="left">
-                                    <p class="p-style">Existencias</p>
-                                    <p class="p-style">Pte. Servir</p>
-                                    <p class="p-style">Pte. Entrada</p>
-                                </div>
-                                <div class="right">
-                                    <textarea
-                                        [(ngModel)]="tempAlmacen.meauni"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea fix" 
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempAlmacen.measol"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea fix" 
-                                    ></textarea>
-                                    <textarea
                                         [(ngModel)]="tempAlmacen.mearec"
                                         [disabled]="!isUpdate"
                                         (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea fix" 
+                                        class="textArea-style numerTextArea" 
                                     ></textarea>
-                                </div>
-                            </div>
-                            <div class="chunk-two adjustedWidthSecond">
-                                <div class="left">
-                                    <p class="p-style">Estocaje virtual</p>
-                                    <p class="p-style">Tipo unidades</p>
-                                    <p class="p-style">Unidades de consumo</p>
-                                </div>
-                                <div class="right">
-                                    <textarea
-                                        [ngModel]="calculateKEstVir(tempAlmacen.meauni, tempAlmacen.measol, tempAlmacen.mearec)"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempAlmacen.art_Aun_AUNDES"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempAlmacen.art_ARTUCO"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        class="textArea-style smallTextArea" 
-                                    ></textarea>
-                                </div>
-                            </div>
-                            <div class="chunk-three">
-                                <div class="first-check">
-                                    <input 
-                                        class="checkbox" 
-                                        type="checkbox" 
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                        [checked]="tempAlmacen.art_ARTBLO === 1"
-                                    /> <span class="p-style">Bloqueado</span>
-                                </div>
-                                <div class="second-check">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="p-style">Subfamilia</p>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_Asu_ASUCOD"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style smallTextArea" 
+                                            ></textarea>
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_Asu_ASUDES"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style averageTextArea" 
+                                            ></textarea>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Pedido mínimo</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.art_ARTPMI"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Valor existencia</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [ngModel]="calculateKvalExi(tempAlmacen.meauni, tempAlmacen.meapmp)"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Estocaje mínimo</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.meamin"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>                                    
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="p-style">Código</p>
+                                    </td>
+                                    <td>
+                                        <div class="cell-content">
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_ARTCOD"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style smallTextArea" 
+                                            ></textarea>
+                                            <textarea
+                                                [(ngModel)]="tempAlmacen.art_ARTDES"
+                                                [disabled]="!isUpdate"
+                                                (input)="allowToUpdate = true"
+                                                class="textArea-style averageTextArea" 
+                                            ></textarea>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Tipo unidades</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.art_Aun_AUNDES"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Unidades de consumo</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.art_ARTUCO"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style slight">Unidades en embalaje</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.art_ARTUEM"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="p-style">Informacíon del almacén</p>
+                                    </td>
+                                    <td>
+                                        <textarea 
+                                            class="textArea-style tallTextArea"
+                                            [(ngModel)]="selectedAlmacenNombreSearch"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Precio Medio ponoderado</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.meapmp"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style slightSecond">Estocaje óptimo</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.meaopt"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Estocaje virtual</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [ngModel]="calculateKEstVir(tempAlmacen.meauni, tempAlmacen.measol, tempAlmacen.mearec)"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="p-style">Mensaje al solicitante</p>
+                                    </td>
+                                    <td>
+                                        <textarea 
+                                            class="textArea-style tallTextArea"
+                                            [(ngModel)]="tempAlmacen.meamen"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Ubicacíon</p>
+                                    </td>
+                                    <td>
+                                        <textarea 
+                                            class="textArea-style averageTextArea"
+                                            [(ngModel)]="tempAlmacen.mealoc"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Referencia virtual</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [(ngModel)]="tempAlmacen.art_ARTREF"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style averageTextArea" 
+                                        ></textarea>
+                                    </td>
+                                    <td>
+                                        <p class="p-style">Solicitar</p>
+                                    </td>
+                                    <td>
+                                        <textarea
+                                            [ngModel]="calculateKUniSol(tempAlmacen.meauni, tempAlmacen.measol, tempAlmacen.mearec, tempAlmacen.meamin, tempAlmacen.meaopt)"
+                                            [disabled]="!isUpdate"
+                                            (input)="allowToUpdate = true"
+                                            class="textArea-style numerTextArea" 
+                                        ></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="misc">
+                                <div class="inputs">
                                     <input 
                                         class="checkbox" 
                                         type="checkbox" 
@@ -304,103 +446,15 @@
                                         [checked]="tempAlmacen.meaind === 1"
                                     /> <span class="p-style">Solicitud individual</span>
                                 </div>
-                            </div>
-                            <div class="chunk-four adjustedWidthFour">
-                                <div class="left">
-                                    <p class="p-style">Informacíon del almacén</p>
-                                    <p class="p-style">Ubicacíon</p>
-                                    <p class="p-style">Mensaje al solicitante</p>
-                                </div>
-                                <div class="right">
-                                    <textarea 
-                                        class="textArea-style tallTextFour"
-                                        [(ngModel)]="selectedAlmacenNombreSearch"
+                                <div class="inputs">
+                                    <input 
+                                        class="checkbox" 
+                                        type="checkbox" 
                                         [disabled]="!isUpdate"
                                         (input)="allowToUpdate = true"
-                                    ></textarea>
-                                    <textarea 
-                                        class="textArea-style tallTextFour"
-                                        [(ngModel)]="tempAlmacen.mealoc"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                    ></textarea>
-                                    <textarea 
-                                        class="textArea-style tallTextFour"
-                                        [(ngModel)]="tempAlmacen.meamen"
-                                        [disabled]="!isUpdate"
-                                        (input)="allowToUpdate = true"
-                                    ></textarea>
+                                        [checked]="tempAlmacen.art_ARTBLO === 1"
+                                    /> <span class="p-style">Bloqueado</span>
                                 </div>
-                            </div>
-                            <div class="chunk-five">
-                                <div class="left">
-                                    <p class="p-style">Pedido mínimo</p>
-                                    <p class="p-style">Valor existencia</p>
-                                    <p class="p-style">Estocaje mínimo</p>
-                                </div>
-                                <div class="right">
-                                    <div class="on-two">
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.art_ARTPMI"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
-                                        ></textarea>
-                                        <p class="p-style slight">Unidades en embalaje</p>
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.art_ARTUEM"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea fix2" 
-                                        ></textarea>
-                                    </div>
-                                    <div class="on-two">
-                                        <textarea
-                                            [ngModel]="calculateKvalExi(tempAlmacen.meauni, tempAlmacen.meapmp)"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
-                                        ></textarea>
-                                        <p class="p-style">Precio Medio ponoderado</p>
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.meapmp"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea fix2" 
-                                        ></textarea>
-                                    </div>
-                                    <div class="on-two">
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.meamin"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea" 
-                                        ></textarea>
-                                        <p class="p-style slightSecond">Estocaje óptimo</p>
-                                        <textarea
-                                            [(ngModel)]="tempAlmacen.meaopt"
-                                            [disabled]="!isUpdate"
-                                            (input)="allowToUpdate = true"
-                                            class="textArea-style smallTextArea fix2" 
-                                        ></textarea>
-                                    </div>
-                                </div>                                
-                            </div>
-                            <div class="chunk-six">
-                                <p class="p-style">Referencia virtual</p>
-                                <textarea
-                                    [(ngModel)]="tempAlmacen.art_ARTREF"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style tallSecond" 
-                                ></textarea>
-                                <p class="p-style">Solicitar</p>
-                                <textarea
-                                    [ngModel]="calculateKUniSol(tempAlmacen.meauni, tempAlmacen.measol, tempAlmacen.mearec, tempAlmacen.meamin, tempAlmacen.meaopt)"
-                                    [disabled]="!isUpdate"
-                                    (input)="allowToUpdate = true"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
                             </div>
                         </div>
                         <div class="more-detail-container">
