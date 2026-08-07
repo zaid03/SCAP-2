@@ -170,184 +170,226 @@
                         <span>actualizando</span>
                     </div>    
                     <div class="detail-container">
-                        <div class="chunk-one">
-                            <div class="left">
-                                <p class="p-style">Familia</p>
-                                <p class="p-style">Subfamilia</p>
-                                <p class="p-style">Código</p>
-                            </div>
-                            <div class="right">
-                                <div class="on-two">
+                        <table class="details-table">
+                            <tr>
+                                <td>
+                                    <p class="p-style">Familia</p>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.afacod"
+                                            class="textArea-style smallTextArea" 
+                                            disabled
+                                        ></textarea>
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.afa_AFADES"
+                                            class="textArea-style tallText" 
+                                            disabled
+                                        ></textarea>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="p-style">Existencias</p>
+                                </td>
+                                <td>
                                     <textarea
-                                        [(ngModel)]="tempArticulo.afacod"
-                                        class="textArea-style smallTextArea" 
+                                        [(ngModel)]="tempArticulo.artuni"
+                                        class="textArea-style averageTextArea" 
                                         disabled
                                     ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Stock virtual</p>
+                                </td>
+                                <td>
                                     <textarea
-                                        [(ngModel)]="tempArticulo.afa_AFADES"
-                                        class="textArea-style tallText" 
-                                        disabled
-                                    ></textarea>
-                                </div>
-                                <div class="on-two">
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.asucod"
-                                        class="textArea-style smallTextArea" 
-                                        disabled
-                                    ></textarea>
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.asu_ASUDES"
-                                        class="textArea-style tallText" 
-                                        disabled
-                                    ></textarea>
-                                </div>
-                                <div class="on-two">
-                                    <textarea
-                                        [(ngModel)]="tempArticulo.artcod"
-                                        class="textArea-style smallTextArea"
+                                        [ngModel]="calculateKEstVir(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec)"
+                                        class="textArea-style averageTextArea"
                                         disabled 
                                     ></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p class="p-style">Subfamilia</p>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.asucod"
+                                            class="textArea-style smallTextArea" 
+                                            disabled
+                                        ></textarea>
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.asu_ASUDES"
+                                            class="textArea-style tallText" 
+                                            disabled
+                                        ></textarea>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="p-style">Pte. Servir</p>
+                                </td>
+                                <td>
                                     <textarea
-                                        [(ngModel)]="tempArticulo.artdes"
-                                        class="textArea-style tallText" 
+                                        [(ngModel)]="tempArticulo.artsol"
+                                        class="textArea-style averageTextArea"
+                                        disabled 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Uni.Consumo/Unidad</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artuco"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style averageTextArea" 
+                                    ></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p class="p-style">Código</p>
+                                </td>
+                                <td>
+                                    <div class="cell-content">
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.artcod"
+                                            class="textArea-style smallTextArea"
+                                            disabled 
+                                        ></textarea>
+                                        <textarea
+                                            [(ngModel)]="tempArticulo.artdes"
+                                            class="textArea-style tallText" 
+                                            disabled
+                                        ></textarea>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="p-style">Pte. Entrada</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artrec"
+                                        class="textArea-style averageTextArea"
+                                        disabled 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Uni./Embalaje</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artuem"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style averageTextArea" 
+                                    ></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p class="p-style">Referencia virtual</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artref"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style fix" 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Óptimo</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artopt"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style averageTextArea" 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Solicitar</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [ngModel]="calculateKUniSol(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec, tempArticulo.artmin, tempArticulo.artopt)"
+                                        class="textArea-style averageTextArea" 
                                         disabled
                                     ></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chunk-two adjustedWidth">
-                            <div class="left">
-                                <p class="p-style">Existencias</p>
-                                <p class="p-style">Pte. Servir</p>
-                                <p class="p-style">Pte. Entrada</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artuni"
-                                    class="textArea-style smallTextArea" 
-                                    disabled
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artsol"
-                                    class="textArea-style smallTextArea"
-                                    disabled 
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artrec"
-                                    class="textArea-style smallTextArea"
-                                    disabled 
-                                ></textarea>
-                            </div>
-                        </div>
-                        <div class="chunk-two adjustedWidthSecond">
-                            <div class="left">
-                                <p class="p-style">Stock virtual</p>
-                                <p class="p-style">Uni.Consumo/Unidad</p>
-                                <p class="p-style">Uni./Embalaje</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [ngModel]="calculateKEstVir(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec)"
-                                    class="textArea-style smallTextArea"
-                                    disabled 
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artuco"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artuem"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
-                            </div>
-                        </div>
-                        <div class="chunk-three">
-                            <input 
-                                class="checkbox" 
-                                type="checkbox" 
-                                [disabled]="!isUpdate"
-                                [checked]="tempArticulo.artblo === 1"
-                                (change)="tempArticulo.artblo = (tempArticulo.artblo === 1 ? 0 : 1)"
-                            /> <span class="p-style">Bloqueado</span>
-                        </div>
-                        <div class="chunk-four adjustdSpecial">
-                            <div class="left">
-                                <p class="p-style">Pedido mínimo</p>
-                                <p class="p-style">Mínimo</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artpmi"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artmin"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
-                            </div>
-                        </div>
-                        <div class="chunk-five adjustdSpecial">
-                            <div class="left">
-                                <p class="p-style">Valor existencia</p>
-                                <p class="p-style">Precio Medio</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [ngModel]="calculateKvalExi(tempArticulo.artuni, tempArticulo.artpmp)"
-                                    class="textArea-style smallTextArea" 
-                                    disabled
-                                ></textarea>
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artpmp"
-                                    class="textArea-style smallTextArea"
-                                    disabled 
-                                ></textarea>
-                            </div>
-                        </div>
-                        <div class="chunk-six adjustdSpecial">
-                            <div class="left">
-                                <p class="p-style">Óptimo</p>
-                                <p class="p-style">Solicitar</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artopt"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style smallTextArea" 
-                                ></textarea>
-                                <textarea
-                                    [ngModel]="calculateKUniSol(tempArticulo.artuni, tempArticulo.artsol, tempArticulo.artrec, tempArticulo.artmin, tempArticulo.artopt)"
-                                    class="textArea-style smallTextArea" 
-                                    disabled
-                                ></textarea>
-                            </div>
-                        </div>
-                        <div class="chunk-seven lastOne">
-                            <div class="left">
-                                <p class="p-style">Referencia virtual</p>
-                                <p class="p-style">Tipo unidades</p>
-                            </div>
-                            <div class="right">
-                                <textarea
-                                    [(ngModel)]="tempArticulo.artref"
-                                    [disabled]="!isUpdate"
-                                    class="textArea-style tallText" 
-                                ></textarea>
-                                <select 
-                                    class="select-style selectSpecial tallText"
-                                    [disabled]="!isUpdate"
-                                    [(ngModel)]="auncodMod"
-                                >
-                                    <option *ngFor="let t of tipos" [value]="t.auncod">
-                                        {{t.aundes}}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p class="p-style">Tipo unidades</p>
+                                </td>
+                                <td>
+                                    <select 
+                                        class="select-style selectSpecial"
+                                        [disabled]="!isUpdate"
+                                        [(ngModel)]="auncodMod"
+                                    >
+                                        <option *ngFor="let t of tipos" [value]="t.auncod">
+                                            {{t.aundes}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <p class="p-style">Pedido mínimo</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artpmi"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style averageTextArea" 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Valor existencia</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [ngModel]="calculateKvalExi(tempArticulo.artuni, tempArticulo.artpmp)"
+                                        class="textArea-style averageTextArea" 
+                                        disabled
+                                    ></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class="bloq">
+                                        <input 
+                                            class="checkbox" 
+                                            type="checkbox" 
+                                            [disabled]="!isUpdate"
+                                            [checked]="tempArticulo.artblo === 1"
+                                            (change)="tempArticulo.artblo = (tempArticulo.artblo === 1 ? 0 : 1)"
+                                        /> <span class="p-style">Bloqueado</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="p-style">Mínimo</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artmin"
+                                        [disabled]="!isUpdate"
+                                        class="textArea-style averageTextArea" 
+                                    ></textarea>
+                                </td>
+                                <td>
+                                    <p class="p-style">Precio Medio</p>
+                                </td>
+                                <td>
+                                    <textarea
+                                        [(ngModel)]="tempArticulo.artpmp"
+                                        class="textArea-style averageTextArea"
+                                        disabled 
+                                    ></textarea>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="more-detail-container">
                         <div class="tabs" role="tablist" aria-label="Detalle tabs">
