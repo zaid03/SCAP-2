@@ -60,7 +60,18 @@ export class ConsultaGeneralExistenciasComponent {
   }
 
   fetchExistencias() {
-
+    this.isLoading = true;
+    this.http.get(`${environment.backendUrl}/api/art/Existencias/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.existencias = Array.isArray(res) ? [...res] : [];
+        this.updatePagination();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.existenciasError = err.error.error ?? err.error;
+      }
+    })
   }
    private updatePagination(): void {const total = this.totalPages;
     if (total === 0) {this.page = 0; return;}
@@ -87,6 +98,13 @@ export class ConsultaGeneralExistenciasComponent {
     }
   }
 
+  getkEstVir(artuni: number, artsol: number, artrec: number) {
+    if (!artuni || !artsol || !artrec) {
+      return;
+    }
+
+    return artuni - (artsol + artrec);
+  }
 
   //main table functions
   sortField: 'afacod' | 'asucod' | 'artcod' | 'artdes' | 'artuni' | 'artref' | 'artsol' | 'artrec' | 'kEstVir' | null = null;
@@ -151,6 +169,135 @@ export class ConsultaGeneralExistenciasComponent {
     this.resizingColIndex = null;
   };
 
+  excelDownload() {
+    this.limpiarMessages();
+    const rows = this.paginatedExistencias;
+    if (!rows || rows.length === 0) {
+      this.existenciasError = 'No hay datos para exportar.';
+      return;
+    }
+
+    const exportRows = rows.map((row, index) => ({
+      afacod: row.afacod ?? '',
+      asucod: row.asucod ?? '',
+      artcod: row.artcod ?? '',
+      afades: row.afades ?? '',
+      artuni: row.artuni ?? '',
+      artref: row.artref ?? '',
+      artsol: row.artsol ?? '',
+      artrec: row.artrec ?? '',
+      kEstVir: this.getkEstVir(row.artuni, row.artsol, row.artrec) ?? ''
+    }));
+
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['Listado de existencias']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['Familia', 'Subfamilia', 'Código', 'Descripción', 'Existencias', 'Referencia universal', 'Pte. Servir', 'Pte. Entrada', 'Estocaje virtual']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
+
+    worksheet['!cols'] = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 }
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Existencias');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'Existencias.xlsx'
+    );
+  }
+
+  exportPdf() {
+    this.limpiarMessages();
+    const source = this.existencias;
+    if (!source?.length) {
+      this.existenciasError = 'No hay datos para exportar.';
+      return;
+    }
+
+    const rows = source.map((row: any, index: number) => ({
+      afacod: row.afacod ?? '',
+      asucod: row.asucod ?? '',
+      artcod: row.artcod ?? '',
+      afades: row.afades ?? '',
+      artuni: row.artuni ?? '',
+      artref: row.artref ?? '',
+      artsol: row.artsol ?? '',
+      artrec: row.artrec ?? '',
+      kEstVir: this.getkEstVir(row.artuni, row.artsol, row.artrec) ?? ''
+    }));
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Listado de existencias', 40, 40);
+
+    const columns = [
+      { header: 'Familia', dataKey: 'afacod' },
+      { header: 'Subfamilia', dataKey: 'asucod' },
+      { header: 'Código', dataKey: 'artcod' },
+      { header: 'Descripción', dataKey: 'afades' },
+      { header: 'Existencias', dataKey: 'artuni' },
+      { header: 'Referencia universal', dataKey: 'artref' },
+      { header: 'Pte. Servir', dataKey: 'artsol' },
+      { header: 'Pte. Entrada', dataKey: 'artrec' },
+      { header: 'Estocaje virtual', dataKey: 'getkEstVir' }
+    ];
+
+    autoTable(doc, {
+      startY: 60,
+      head: [columns.map(col => col.header)],
+      body: rows.map(row => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' }
+    });
+
+    doc.save('Existencias.pdf');
+  }
+
+  campo: string = '';
+  afacod: string = '';
+  asucod: string = '';
+  searchExistencias() {
+    this.limpiarMessages();
+    let params = new HttpParams();
+    if (this.campo) {params = params.set('campo', this.campo);}
+    if (this.afacod) {params = params.set('afacod', this.afacod);}
+    if (this.asucod) {params = params.set('asucod', this.asucod);}
+
+    if (params.keys().length === 0) {return;}
+
+    this.isLoading = true;
+    this.http.get(`${environment.backendUrl}/api/art/existencias/${this.entcod}/search`, { params }).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.existencias = Array.isArray(res) ? [...res] : [];
+        this.updatePagination();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.existenciasError = err.error.error ?? err.error;
+      }
+    })
+  }
+
+  limpiarSearch() {
+    this.limpiarMessages();
+    this.campo = '';
+    this.afacod = '';
+    this.asucod = '';
+    this.fetchExistencias();
+  }
+  
   //misc
   limpiarMessages() {
     this.existenciasSuccess = '';

@@ -8,6 +8,7 @@ import com.example.backend.sqlserver2.repository.ArtRepository;
 import com.example.backend.sqlserver2.repository.AsuRepository;
 import com.example.backend.sqlserver2.repository.MeaRepository;
 import com.example.backend.sqlserver2.repository.AfaRepository;
+import com.example.backend.service.ExistenciasSearch;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.dto.magcodOnly;
 import com.example.backend.dto.articulosExistenciasProjection;
@@ -34,6 +35,8 @@ public class ArtController {
     private AsuRepository asuRepository;
     @Autowired
     private MeaRepository meaRepository;
+    @Autowired
+    private ExistenciasSearch existenciasSearch; 
     
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";
@@ -302,9 +305,30 @@ public class ArtController {
         @PathVariable Integer ent
     ) {
         try {
+            System.out.println("Controller reached");
             List<articulosExistenciasProjection> existencias = artRepository.findByENTAndARTBLONot(ent, 0);
             if (existencias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El artículo ya existe.");
+            }
+
+            return ResponseEntity.ok(existencias);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //search in C.general existencias
+    @GetMapping("/existencias/{ent}/search")
+    public ResponseEntity<?> searchExistenciasQuery(
+        @PathVariable Integer ent,
+        @RequestParam(required = false) String campo,
+        @RequestParam(required = false) String afacod,
+        @RequestParam(required = false) String asucod
+    ) {
+        try {
+            List<articulosExistenciasProjection> existencias = existenciasSearch.searchExistencias(ent, campo, afacod, asucod);
+            if (existencias.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
 
             return ResponseEntity.ok(existencias);
