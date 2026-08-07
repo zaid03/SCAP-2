@@ -157,6 +157,9 @@ export class SidebarComponent implements OnInit {
       case 'MAlmacen':
         this.router.navigate(['/MAlmacen']);
         break;
+      case 'Cexistencias':
+        this.router.navigate(['/Cexistencias']);
+        break;
       default:
         break;
     }

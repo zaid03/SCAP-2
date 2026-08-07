@@ -17,6 +17,7 @@ import { FamiliaComponent } from './familia/familia.component';
 import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.component';
 import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
 import { MantinimientoArticulosAlmacenComponent } from './mantinimiento-articulos-almacen/mantinimiento-articulos-almacen.component';
+import { ConsultaGeneralExistenciasComponent } from './consulta-general-existencias/consulta-general-existencias.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -36,6 +37,7 @@ export const routes: Routes = [
     { path: 'familia', component: FamiliaComponent},
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
     { path: 'unidades', component: TiposUnidadesComponent},
+    { path: 'Cexistencias', component: ConsultaGeneralExistenciasComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 
