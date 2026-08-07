@@ -14,30 +14,12 @@
 tr.bloqueado {background-color: #aaa;}
 /* table styles */
 /* detail style */
-.smallTextArea {width: 80px; max-width: 85px;}
-.tallText {width: 250px;}
-.tallSecond {width: 200px;}
-.detail-container {display: flex; gap: 10px; flex-wrap: wrap;}
-.chunk-one,
-.chunk-two,
-.chunk-three,
-.chunk-four,
-.chunk-five {width: 40%; display: flex; gap: 10px;}
-.chunk-three {width: 10%; align-items: center;}
-.adjustedWidth {width: 18%;}
-.adjustedWidth .left,
-.adjustedWidthSecond .left {width: 70%;}
-.adjustedWidthSecond {width: 28%;}
-.adjustedWidthFour .left {width: 25%;}
-.adjustedWidthFour {width: 45%;}
-.adjustedWidthFive {width: 50%;}
-.slight {margin-right: 25px;}
-.slightSecond {margin-right: 70px;}
-.left {width: 20%; display: flex; flex-direction: column; gap: 20px;}
-.right {width: 80%; display: flex; flex-direction: column; gap: 18px;}
-.on-two {display: flex; gap: 10px;}
+.smallTextArea {min-width: 10px; width: 50px; max-width: 80px;}
+.tallText {min-width: 80px; width: 200px; max-width: 250px;}
+.averageTextArea {min-width: 100px; width: 120px; max-width: 180px;}
 .checkbox {margin: 0; accent-color: #25176b; width: 14px; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
+.fix {width: 265px; max-width: 340px;}
+.bloq {display: flex; justify-content: center; align-items: center; gap: 10px;}
 /* detail style */
-
 @media (min-width: 1700px) {.search-form {flex-direction: row;} 
 .title-area {align-items: center;}}

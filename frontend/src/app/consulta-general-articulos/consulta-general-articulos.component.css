@@ -12,33 +12,6 @@
 tr.bloqueado {background-color: #aaa;}
 /* table styles */
 /* detail style */
-/* .smallTextArea {width: 80px; max-width: 85px;}
-.tallText {width: 250px;}
-.detail-container {display: flex; gap: 10px; flex-wrap: wrap;}
-.chunk-one,
-.chunk-two,
-.chunk-three,
-.chunk-four,
-.chunk-five,
-.chunk-six,
-.chunk-seven {width: 40%; display: flex; gap: 10px;}
-.chunk-three {width: 10%; align-items: center;}
-.adjustdSpecial .left {width: 80%;}
-.adjustdSpecial {width: 20%;}
-.adjustedWidth {width: 20%;}
-.adjustedWidth .left,
-.adjustedWidthSecond .left {width: 65%;}
-.adjustedWidthSecond {width: 22%;}
-.left {width: 20%; display: flex; flex-direction: column; gap: 20px;}
-.right {width: 80%; display: flex; flex-direction: column; gap: 18px;}
-.on-two {display: flex; gap: 10px;}
-.wrapper {width: 100%;  display: flex; justify-content: center; gap: 20px;}
-.margin {margin-top: 10px;}
-.lastOne {width: 37%;}
-.lastOne .left {width: 40%;}
-
-.gap {display: flex; justify-content: center;}
-.tallTextDetail {width: 180px;} */
 .smallTextArea {min-width: 10px; width: 50px; max-width: 80px;}
 .tallText {min-width: 80px; width: 200px; max-width: 250px;}
 .averageTextArea {min-width: 100px; width: 120px; max-width: 180px;}
