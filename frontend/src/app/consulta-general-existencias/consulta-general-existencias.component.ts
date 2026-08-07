@@ -98,14 +98,6 @@ export class ConsultaGeneralExistenciasComponent {
     }
   }
 
-  getkEstVir(artuni: number, artsol: number, artrec: number) {
-    if (!artuni || !artsol || !artrec) {
-      return;
-    }
-
-    return artuni - (artsol + artrec);
-  }
-
   //main table functions
   sortField: 'afacod' | 'asucod' | 'artcod' | 'artdes' | 'artuni' | 'artref' | 'artsol' | 'artrec' | 'kEstVir' | null = null;
   sortColumn: string = '';
@@ -186,7 +178,7 @@ export class ConsultaGeneralExistenciasComponent {
       artref: row.artref ?? '',
       artsol: row.artsol ?? '',
       artrec: row.artrec ?? '',
-      kEstVir: this.getkEstVir(row.artuni, row.artsol, row.artrec) ?? ''
+      kEstVir: this.calculateKEstVir(row.artuni, row.artsol, row.artrec) ?? ''
     }));
 
     const worksheet = XLSX.utils.aoa_to_sheet([]);
@@ -233,7 +225,7 @@ export class ConsultaGeneralExistenciasComponent {
       artref: row.artref ?? '',
       artsol: row.artsol ?? '',
       artrec: row.artrec ?? '',
-      kEstVir: this.getkEstVir(row.artuni, row.artsol, row.artrec) ?? ''
+      kEstVir: this.calculateKEstVir(row.artuni, row.artsol, row.artrec) ?? ''
     }));
 
     const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
@@ -298,9 +290,75 @@ export class ConsultaGeneralExistenciasComponent {
     this.fetchExistencias();
   }
   
+  //detail grid functions
+  selectedArticulo: any = null;
+  articuloDetailError: string = '';
+  articuloDetailSuccess: string = '';
+  isUpdating: boolean = false;
+  showDetails(articulo: any) {
+    this.limpiarMessages();
+    this.selectedArticulo = articulo;
+    this.tempArticulo = articulo;
+    this.fetchTipos();
+  }
+
+  closeDetails() {
+    this.selectedArticulo = null;
+    this.tempArticulo = [];
+    this.limpiarMessages();
+    this.clearTipos();
+  }
+
+  closeDetailsSure() {if (this.isUpdate) {return;} 
+    else {this.closeDetails();}
+  }
+
+  kestvir: number | null = null;
+  calculateKEstVir(artuni: number, artsol: number, artrec: number) {
+    this.kestvir = artuni - artsol + artrec;
+    return this.kestvir;
+  }
+  calculateKvalExi(artuni: number, artpmp: number) {
+    return artuni * artpmp;
+  }
+  calculateKUniSol(artuni: number, artsol: number, artrec: number, artmin: number, artopt: number): number {
+    const kestvir = this.calculateKEstVir(artuni, artsol, artrec);
+    if (!kestvir || kestvir < artmin) {return 0;}
+    this.kestvir = artopt - kestvir;
+    return this.kestvir;
+  }
+
+  tempArticulo: any = {};
+  isUpdate: boolean = false;
+
+  tipos: any = null;
+  auncodMod: string = '';
+  fetchTipos() {
+    this.http.get(`${environment.backendUrl}/api/aun/get-all/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.tipos = res;
+        const found = this.tipos.find(
+          (t: any) => t.aundes === this.tempArticulo?.aun_AUNDES
+        );
+
+        this.auncodMod = found?.auncod ?? this.tipos[0]?.auncod ?? '';
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
+  clearTipos() {
+    this.tipos = null;
+    this.auncodMod = '';
+  }
+
   //misc
   limpiarMessages() {
     this.existenciasSuccess = '';
     this.existenciasError = '';
+    this.articuloDetailError = '';
+    this.articuloDetailSuccess = '';
   }
 }
