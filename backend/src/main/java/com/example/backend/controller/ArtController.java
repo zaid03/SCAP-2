@@ -11,7 +11,6 @@ import com.example.backend.sqlserver2.repository.AfaRepository;
 import com.example.backend.service.ExistenciasSearch;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.dto.magcodOnly;
-import com.example.backend.dto.articulosExistenciasProjection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -306,7 +305,7 @@ public class ArtController {
     ) {
         try {
             System.out.println("Controller reached");
-            List<articulosExistenciasProjection> existencias = artRepository.findByENTAndARTBLONot(ent, 0);
+            List<ArticleProjection> existencias = artRepository.findByENTAndARTBLONot(ent, 0);
             if (existencias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El artículo ya existe.");
             }
@@ -326,7 +325,7 @@ public class ArtController {
         @RequestParam(required = false) String asucod
     ) {
         try {
-            List<articulosExistenciasProjection> existencias = existenciasSearch.searchExistencias(ent, campo, afacod, asucod);
+            List<ArticleProjection> existencias = existenciasSearch.searchExistencias(ent, campo, afacod, asucod);
             if (existencias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }

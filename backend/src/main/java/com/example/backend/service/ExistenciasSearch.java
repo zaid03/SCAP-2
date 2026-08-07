@@ -3,7 +3,7 @@ package com.example.backend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.backend.dto.articulosExistenciasProjection;
+import com.example.backend.dto.ArticleProjection;
 import com.example.backend.sqlserver2.repository.ArtRepository;
 
 import java.util.ArrayList;
@@ -14,13 +14,13 @@ public class ExistenciasSearch {
     @Autowired
     private ArtRepository artRepository;
 
-    public List<articulosExistenciasProjection> searchExistencias(
+    public List<ArticleProjection> searchExistencias(
         Integer ent,
         String campo,
         String afacod,
         String asucod
     ) {
-        List<articulosExistenciasProjection> existencias = new ArrayList<>();
+        List<ArticleProjection> existencias = new ArrayList<>();
         if (((afacod != null && !afacod.isBlank()) || (asucod != null && !asucod.isBlank())) && (campo == null || campo.isBlank())){
             existencias = artRepository.findByENTAndARTBLONotAndAFACODOrENTAndARTBLONotAndASUCOD(ent, 0, afacod, ent, 0, asucod);
         } else if (campo != null && !campo.isBlank()) {

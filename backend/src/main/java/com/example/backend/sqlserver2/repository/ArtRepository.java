@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
-import com.example.backend.dto.articulosExistenciasProjection;
 import com.example.backend.dto.AnaliticaArticulosProjectin;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.sqlserver2.model.Art;
@@ -85,15 +84,15 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
     int countByENTAndAUNCOD(Integer ent, String auncod);
 
     //main fetch for C.general existencias
-    List<articulosExistenciasProjection> findByENTAndARTBLONot(Integer ent, Integer artblo);
+    List<ArticleProjection> findByENTAndARTBLONot(Integer ent, Integer artblo);
 
     //searching in C.general existencias
-    List<articulosExistenciasProjection> findByENTAndARTBLONotAndAFACODOrENTAndARTBLONotAndASUCOD(Integer ent1, Integer artblo1, String afacod, Integer ent2, Integer artblo2, String asucod);
-    List<articulosExistenciasProjection> findByENTAndARTBLONotAndARTCODOrENTAndARTBLONotAndARTDESContainingOrENTAndARTBLONotAndARTREF(
+    List<ArticleProjection> findByENTAndARTBLONotAndAFACODOrENTAndARTBLONotAndASUCOD(Integer ent1, Integer artblo1, String afacod, Integer ent2, Integer artblo2, String asucod);
+    List<ArticleProjection> findByENTAndARTBLONotAndARTCODOrENTAndARTBLONotAndARTDESContainingOrENTAndARTBLONotAndARTREF(
         Integer ent1, Integer artblo1, String artcod,
         Integer ent2, Integer artblo2, String artdes,
         Integer ent3, Integer artblo3, String artref);
-    List<articulosExistenciasProjection> findByENTAndARTBLONotAndARTDESContainingOrENTAndARTBLONotAndARTREF(
+    List<ArticleProjection> findByENTAndARTBLONotAndARTDESContainingOrENTAndARTBLONotAndARTREF(
         Integer ent1, Integer artblo1, String artcod,
         Integer ent2, Integer artblo2, String artref
     );
