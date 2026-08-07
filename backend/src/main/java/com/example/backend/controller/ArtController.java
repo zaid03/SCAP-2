@@ -10,6 +10,7 @@ import com.example.backend.sqlserver2.repository.MeaRepository;
 import com.example.backend.sqlserver2.repository.AfaRepository;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.dto.magcodOnly;
+import com.example.backend.dto.articulosExistenciasProjection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -290,6 +291,23 @@ public class ArtController {
             }
 
             return ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //main fetch for C.general existencias
+    @GetMapping("/Existencias/{ent}")
+    public ResponseEntity<?> fetchExistencias(
+        @PathVariable Integer ent
+    ) {
+        try {
+            List<articulosExistenciasProjection> existencias = artRepository.findByENTAndARTBLONot(ent, 0);
+            if (existencias.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El artículo ya existe.");
+            }
+
+            return ResponseEntity.ok(existencias);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }

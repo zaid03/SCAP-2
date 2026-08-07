@@ -1,1 +1,118 @@
-<p>consulta-general-existencias works!</p>
+<div class="main-page">
+    <div 
+        class="sidebar-backdrop" 
+        *ngIf="!sidebar.collapsed" 
+        (click)="sidebar.collapsed = true"
+    >
+    </div>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
+        <div class="title-menu">
+            <div class="title-area">
+                <h2 class="margin-title">Consulta general existencias</h2>  
+            </div>
+            <div class="search-holder">
+                <div class="search-form">
+                    <span>Buscar</span>
+                    <input 
+                        type="text" 
+                        class="search-bar smallWidth" 
+                        name="main-search"
+                        placeholder="Buscar"
+                    >
+                    <span>Familia</span>
+                    <input 
+                        type="text" 
+                        class="search-bar smallWidth" 
+                        name="Familia"
+                        placeholder="Familia"
+                    >
+                    <span>Subfamilia</span>
+                    <input 
+                        type="text" 
+                        class="search-bar smallWidth" 
+                        name="Subfamilia"
+                        placeholder="Subfamilia"
+                    >
+                </div>
+                <div class="btns">
+                    <button type="button" class="purple-btn" >Buscar</button>
+                    <button type="button" class="purple-btn" >Limpiar</button>
+                </div>
+            </div>
+            <div class="group-menu" (click)="toggleMenu($event)">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="menu-panel" *ngIf="showMenu">
+                    <button class="purple-btn" >Exportar a PDF</button>
+                    <button class="purple-btn" >Exportar a EXCEL</button>
+                </div>
+            </div>
+        </div>
+        <h1 class="errorBtn">{{existenciasError}}</h1>
+        <h1 class="successBtn">{{existenciasSuccess}}</h1>
+        <div class="main-list">
+            <div *ngIf="isLoading" class="loading-message">
+                <div class="spinner"></div>
+                <span>Cargando</span>
+            </div>
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th  class="sortable resizable" (click)="toggleSort('afacod')">
+                            Familia
+                            <span class="sort-indicator" *ngIf="sortColumn === 'afacod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 0)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('asucod')">
+                            Subfamilia
+                            <span class="sort-indicator" *ngIf="sortColumn === 'asucod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 1)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artcod')">
+                            Código
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artcod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 2)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artdes')">
+                            Descripción
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 3)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artuni')">
+                            Existencias
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artuni'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 4)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artref')">
+                            Referencia universal
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artref'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 5)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artsol')">
+                            Pte. Servir
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artsol'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 6)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artrec')">
+                            Pte. Entrada
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artrec'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 7)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('kEstVir')">
+                            Estocaje virtual
+                            <span class="sort-indicator" *ngIf="sortColumn === 'kEstVir'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 8)"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

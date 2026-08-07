@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
+import com.example.backend.dto.articulosExistenciasProjection;
 import com.example.backend.dto.AnaliticaArticulosProjectin;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.sqlserver2.model.Art;
@@ -82,4 +83,7 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
 
     //needed for deleting a tipo de unidades
     int countByENTAndAUNCOD(Integer ent, String auncod);
+
+    //main fetch for C.general existencias
+    List<articulosExistenciasProjection> findByENTAndARTBLONot(Integer ent, Integer artblo);
 }
