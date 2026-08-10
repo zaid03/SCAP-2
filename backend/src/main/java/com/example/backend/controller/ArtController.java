@@ -11,6 +11,7 @@ import com.example.backend.sqlserver2.repository.AfaRepository;
 import com.example.backend.service.ExistenciasSearch;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.dto.magcodOnly;
+import com.example.backend.dto.existenciasProjection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -331,6 +332,26 @@ public class ArtController {
             }
 
             return ResponseEntity.ok(existencias);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
+        }
+    }
+
+    //selecting and searching in C.existencias por almacen
+    @GetMapping("/existencias-almacen/{ent}")
+    public ResponseEntity<?> existenciasAlmacen (
+        @PathVariable Integer ent,
+        @RequestParam(required = false) String cge,
+        @RequestParam(required = false) String percod,
+        @RequestParam(required = false) String eje,
+        @RequestParam(required = false) String depcod,
+        @RequestParam(required = false) String main_search,
+        @RequestParam(required = false) String afacod,
+        @RequestParam(required = false) String asucod
+    ) {
+        try {
+ 
+            
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ERROR + ex.getMostSpecificCause().getMessage());
         }
