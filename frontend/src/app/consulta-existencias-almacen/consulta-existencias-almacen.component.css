@@ -1,10 +1,8 @@
 /* search container and inputs */
-.title-area {width: 25%; justify-content: flex-end; align-items: flex-start;}
+.title-area {width: 26%; justify-content: flex-end; align-items: flex-start;}
+.search-holder {width: 73%;}
 .search-container {width: 100%;}
-.search-form {width: 86%; display: flex; flex-direction: column;}
+.search-form {width: 55%; display: flex; flex-direction: column;}
 .search-container .btns {width: 11%;}
-.group-menu {width: 1%;}
-.search-options label {display: flex; font-size: 15px; gap: 16px; color: #444; padding: 8px 14px; }
-.search-options input:focus {outline: none;}
-.search-options input[type="radio"] {margin: 0 6px 0 0; accent-color: #25176b; width: 18px; height: 18px; vertical-align: middle; outline: none; box-shadow: none;}
+.almacen-search {display: flex; align-items: center; gap: 10px;}
 /* search container and inputs */
