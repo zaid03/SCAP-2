@@ -22,6 +22,7 @@ export class SidebarComponent implements OnInit {
   perfil: string | null = null;
   cge: string = '';
   esContable: boolean = false;
+  esAlmacen: boolean = false;
   allowedMnucods: string[] = [];
   logoPath = 'assets/images/logo_iass.png';
 
@@ -38,12 +39,14 @@ export class SidebarComponent implements OnInit {
     const user = sessionStorage.getItem('USUCOD');
     const centroGestor = sessionStorage.getItem('CENTROGESTOR');
     const contable = sessionStorage.getItem('EsContable');
+    const almcenar = sessionStorage.getItem('EsAlmacen');
     const menus = sessionStorage.getItem('mnucods');
 
     if (profile) { const parsed = JSON.parse(profile); this.perfil = parsed.PERCOD;}
     if (user) { this.usucod = user;}
     if (centroGestor) { const parsed = JSON.parse(centroGestor); this.cge = parsed.value;}
     if (contable) { const parsed = JSON.parse(contable); this.esContable = parsed.value;}
+    if (almcenar) { const parsed = JSON.parse(almcenar); this.esAlmacen = parsed.value;}
     if (menus) {
       const parsed = JSON.parse(menus);
       this.allowedMnucods = parsed
@@ -62,7 +65,9 @@ export class SidebarComponent implements OnInit {
     if (code === 'acGBSM' && !this.cge) {
       return true;
     }
-
+    if ( code === 'CExictenciasAlmacen' && !this.esAlmacen) {
+      return true;
+    }
     return this.allowedMnucods.includes(code);
   }
 
@@ -159,6 +164,9 @@ export class SidebarComponent implements OnInit {
         break;
       case 'Cexistencias':
         this.router.navigate(['/Cexistencias']);
+        break;
+      case 'CExictenciasAlmacen':
+        this.router.navigate(['/CExictenciasAlmacen']);
         break;
       default:
         break;

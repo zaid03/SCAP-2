@@ -99,6 +99,9 @@ export class DashboardComponent implements OnInit {
     if (code === 'acGBSM' && !this.cge) {
       return true;
     }
+    if ( code === 'CExictenciasAlmacen' && !this.esAlmacen) {
+      return true;
+    }
 
     return this.allowedMnucods.includes(code);
   }
@@ -193,6 +196,9 @@ export class DashboardComponent implements OnInit {
         break;
       case 'Cexistencias':
         this.router.navigate(['/Cexistencias']);
+        break;
+      case 'CExictenciasAlmacen':
+        this.router.navigate(['/CExictenciasAlmacen']);
         break;
       default:
         break;

@@ -1,0 +1,169 @@
+<div class="main-page">
+    <div 
+        class="sidebar-backdrop" 
+        *ngIf="!sidebar.collapsed" 
+        (click)="sidebar.collapsed = true"
+    >
+    </div>
+    <app-sidebar #sidebar></app-sidebar>
+    <div class="main-container" [class.blurred]="!sidebar.collapsed">
+        <div class="title-menu">
+            <div class="title-area">
+                <h2 class="margin-title">Consulta de existencias por almacén</h2>  
+            </div>
+            <div class="search-holder">
+                <div class="search-container">
+                    <div class="search-form">
+                        <div>
+                            <span>Buscar</span>
+                            <select  
+                                class="search-bar"
+                                
+                            >
+                                <option 
+                                    
+                                    
+                                >test</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span>Buscar</span>
+                            <input 
+                                type="text"   
+                                class="search-bar" 
+                               
+                                placeholder="Buscar"
+                            />
+                            <span>Familia</span>
+                            <input 
+                                type="text" 
+                                class="search-bar smallWidth" 
+                                name="familia"
+                                placeholder="familia"
+                                
+                            >
+                            <span>Subfamilia</span>
+                            <input 
+                                type="text" 
+                                name="subfamilia" 
+                                placeholder="subfamilia"
+                                class="search-bar smallWidth"
+                               
+                            />
+                        </div>                   
+                    </div>
+                    <div class="btns">
+                        <button type="button" class="purple-btn">Buscar</button>
+                        <button type="button" class="purple-btn" >Limpiar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="group-menu" (click)="toggleMenu($event)">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="menu-panel" *ngIf="showMenu">
+                    <button class="purple-btn" >Exportar a PDF</button>
+                    <button class="purple-btn" >Exportar a EXCEL</button>
+                </div>
+            </div>
+        </div>
+        <h1 class="errorBtn">{{existenciasError}}</h1>
+        <h1 class="successBtn">{{existenciasSuccess}}</h1>
+        <div class="main-list">
+            <div *ngIf="isLoading" class="loading-message">
+                <div class="spinner"></div>
+                <span>Cargando</span>
+            </div>
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th  class="sortable resizable" (click)="toggleSort('afacod')">
+                            Familia
+                            <span class="sort-indicator" *ngIf="sortColumn === 'afacod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 0)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('asucod')">
+                            Subfamilia
+                            <span class="sort-indicator" *ngIf="sortColumn === 'asucod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 1)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artcod')">
+                            Código
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artcod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 2)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artdes')">
+                            Descripción
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 3)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artref')">
+                            Referencia universal
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artref'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 4)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('depdes')">
+                            almacén
+                            <span class="sort-indicator" *ngIf="sortColumn === 'depdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 5)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artuni')">
+                            Existencias
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artuni'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 6)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artsol')">
+                            Pte. Servir
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artsol'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 7)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('artrec')">
+                            Pte. Entrada
+                            <span class="sort-indicator" *ngIf="sortColumn === 'artrec'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 8)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('calculateKEstVir')">
+                            Estocaje virtual
+                            <span class="sort-indicator" *ngIf="sortColumn === 'calculateKEstVir'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 9)"></div>
+                        </th>
+                        <th  class="sortable resizable" (click)="toggleSort('mealoc')">
+                            Ubicación
+                            <span class="sort-indicator" *ngIf="sortColumn === 'mealoc'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <div class="resizer" (mousedown)="startResize($event, 10)"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let e of paginatedExistencias">
+                        <td>{{e.afacod}}</td>
+                        <td>{{e.asucod}}</td>
+                        <td>{{e.artcod}}</td>
+                        <td>{{e.artdes}}</td>
+                        <td>{{e.artuni}}</td>
+                        <td>{{e.artref}}</td>
+                        <td>{{e.artsol}}</td>
+                        <td>{{e.artrec}}</td>
+                        <td>{{calculateKEstVir(e.artuni, e.artsol, e.artrec)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination-controls">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+                <span>Página</span>
+                <input
+                    type="number"
+                    min="1"
+                    [max]="totalPages"
+                    [value]="page + 1"
+                    (change)="goToPage($event)"
+                    class="pagination-input"
+                    class="pagination-input"
+                />
+                <span>de {{ totalPages }}</span>
+                <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+            </div>
+        </div>
+    </div>
+</div>

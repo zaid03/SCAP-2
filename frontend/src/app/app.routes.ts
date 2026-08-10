@@ -18,6 +18,7 @@ import { TipoAlmacenajeComponent } from './tipo-almacenaje/tipo-almacenaje.compo
 import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.component';
 import { MantinimientoArticulosAlmacenComponent } from './mantinimiento-articulos-almacen/mantinimiento-articulos-almacen.component';
 import { ConsultaGeneralExistenciasComponent } from './consulta-general-existencias/consulta-general-existencias.component';
+import { ConsultaExistenciasAlmacenComponent } from './consulta-existencias-almacen/consulta-existencias-almacen.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -38,6 +39,7 @@ export const routes: Routes = [
     { path: 'almacenaje', component: TipoAlmacenajeComponent},
     { path: 'unidades', component: TiposUnidadesComponent},
     { path: 'Cexistencias', component: ConsultaGeneralExistenciasComponent},
+    { path: 'CExictenciasAlmacen', component: ConsultaExistenciasAlmacenComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 

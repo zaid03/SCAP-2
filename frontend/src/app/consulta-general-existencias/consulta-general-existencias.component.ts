@@ -73,7 +73,7 @@ export class ConsultaGeneralExistenciasComponent {
       }
     })
   }
-   private updatePagination(): void {const total = this.totalPages;
+  private updatePagination(): void {const total = this.totalPages;
     if (total === 0) {this.page = 0; return;}
     if (this.page >= total) {this.page = total - 1;}
   }
