@@ -31,7 +31,7 @@ public class existenciaAlmacenFetches {
         String cge,
         String percod,
         String eje,
-        Integer magcod_main,
+        String magcod_main,
         String main_search,
         String afacod,
         String asucod,
@@ -46,7 +46,13 @@ public class existenciaAlmacenFetches {
 
         if ((main_search == null || main_search.isBlank()) && (afacod == null || afacod.isBlank()) && (asucod == null || asucod.isBlank())) {
             if (magcod_main != null) {
-                List<existenciasProjection> existenciasList = meaRepository.findByENTAndMAGCODAndArt_ARTBLONot(ent, magcod_main, 0, PageRequest.of(page, PAGE_SIZE));
+                Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                if (almacen.isEmpty()) {
+                    throw new IllegalArgumentException("Almacen sin resultado.");
+                }
+
+                Integer magcod = almacen.get().getMAGCOD();
+                List<existenciasProjection> existenciasList = meaRepository.findByENTAndMAGCODAndArt_ARTBLONot(ent, magcod, 0, PageRequest.of(page, PAGE_SIZE));
                 if (existenciasList.isEmpty()) {
                     throw new IllegalArgumentException("Existencias sin resultado.");
                 }
@@ -74,21 +80,39 @@ public class existenciaAlmacenFetches {
         } else {
             if (magcod_main != null) {
                 if ((afacod != null && !afacod.isBlank()) && (asucod == null || asucod.isBlank())) {
-                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(ent, magcod_main, 0, afacod);
+                    Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                    if (almacen.isEmpty()) {
+                        throw new IllegalArgumentException("Almacen sin resultado.");
+                    }
+
+                    Integer magcod = almacen.get().getMAGCOD();
+                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(ent, magcod, 0, afacod);
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {
                         existencias.addAll(existenciasList);
                     }
                 } else if ((asucod != null && !asucod.isBlank()) && (afacod == null || afacod.isBlank())) {
-                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(ent, magcod_main, 0, asucod);
+                    Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                    if (almacen.isEmpty()) {
+                        throw new IllegalArgumentException("Almacen sin resultado.");
+                    }
+
+                    Integer magcod = almacen.get().getMAGCOD();
+                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(ent, magcod, 0, asucod);
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {
                         existencias.addAll(existenciasList);
                     }
                 } else {
-                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(ent, magcod_main, 0, afacod, asucod);
+                     Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                    if (almacen.isEmpty()) {
+                        throw new IllegalArgumentException("Almacen sin resultado.");
+                    }
+
+                    Integer magcod = almacen.get().getMAGCOD();
+                    List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(ent, magcod, 0, afacod, asucod);
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {

@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.service.existenciaAlmacenFetches;
 import com.example.backend.dto.ExistenciasMeaProjection;
 import com.example.backend.dto.ExistenciasMeaProjectionDTO;
+import com.example.backend.dto.ServiceMagsProjection;
+import com.example.backend.dto.magcodOnly;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
 import com.example.backend.sqlserver2.repository.MeaRepository;
+import com.example.backend.sqlserver2.repository.MagRepository;
 import com.example.backend.sqlserver2.model.Mea;
 
 @RestController
@@ -27,6 +31,8 @@ public class MeaController {
     private MeaRepository meaRepository;
     @Autowired
     private existenciaAlmacenFetches ExistenciaAlmacenFetches;
+    @Autowired
+    private MagRepository magRepository;
 
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";
@@ -137,7 +143,7 @@ public class MeaController {
         @RequestParam(required = false) String cge,
         @RequestParam(required = false) String percod,
         @RequestParam(required = false) String eje,
-        @RequestParam(required = false) Integer magcod_main,
+        @RequestParam(required = false) String magcod_main,
         @RequestParam(required = false) String main_search,
         @RequestParam(required = false) String afacod,
         @RequestParam(required = false) String asucod,
@@ -151,6 +157,27 @@ public class MeaController {
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
 
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+
+    //getting total pages for it
+    @GetMapping("/get-pag/{ent}/{depcod}")
+    public ResponseEntity<?> paginationExistencias (
+        @PathVariable Integer ent,
+        @PathVariable String depcod
+    ) {
+        try {
+            Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, depcod);
+            if (almacen.isEmpty()) {
+                throw new IllegalArgumentException("Almacen sin resultado.");
+            }
+            Integer magcod = almacen.get().getMAGCOD();
+
+            Long totalPages = meaRepository.countByMAGCODAndArt_ARTBLONot(magcod, 0);
+
+            return ResponseEntity.ok(totalPages);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
         }

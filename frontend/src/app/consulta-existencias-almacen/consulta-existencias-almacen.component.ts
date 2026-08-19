@@ -33,22 +33,29 @@ export class ConsultaExistenciasAlmacenComponent {
 
   //global variables
   private entcod: number | null = null;
-  existencias: any[] = [];
+  cge: string = '';
+  percod: string = '';
+  eje: string = '';
   page = 0;
   pageSize = 20;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  isLoading: boolean = false;
   existenciasSuccess: string = '';
   existenciasError: string = '';
   ngOnInit(): void{
     this.limpiarMessages();
     const entidad = sessionStorage.getItem('Entidad');
+    const centroGestor = sessionStorage.getItem('CENTROGESTOR');
+    const percodNam = sessionStorage.getItem('USUCOD');
+    const ejercicio = sessionStorage.getItem('EJERCICIO');
 
     if (entidad) {const parsed = JSON.parse(entidad); this.entcod = parsed.ENTCOD;}
+    if (centroGestor) {const parsed = JSON.parse(centroGestor); this.cge = parsed.value;}
+    if (percodNam) {this.percod = percodNam;}
+    if (ejercicio) {const parsed = JSON.parse(ejercicio); this.eje = parsed.eje;}
 
-    if (!entidad || this.entcod === null) {
+    if (!entidad || this.entcod === null || this.cge === '' || this.percod === '' || this.eje === '') {
       sessionStorage.clear();
       alert('Debes iniciar sesión para acceder a esta página.');
       this.router.navigate(['/login']);
@@ -58,36 +65,145 @@ export class ConsultaExistenciasAlmacenComponent {
     this.fetchExistencias();
   }
 
+  existencias: any[] = [];
+  almacenes: any[] = [];
+  isLoading: boolean = false;
+  magcod_main: string = '';
+  selectedAlmacenNombreSearch: string = '';
+  is_main_fetch: boolean = true;
   fetchExistencias() {
-
+    this.isLoading = true;
+    this.http.get<any>(`${environment.backendUrl}/api/mea/existencias-almacen/${this.entcod}?cge=${this.cge}&percod=${this.percod}&eje=${this.eje}&page=${this.page}`).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.existencias = res.existencias;
+        this.almacenes = res.almacenes;
+        this.magcod_main = this.almacenes[0]?.depcod;
+        this.selectedAlmacenNombreSearch = this.almacenes[0]?.dep_DEPDES;
+        this.fetchTotalPages();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.existencias = [];
+        this.almacenes = [];
+        this.existenciasError = err.error.error ?? err.error;
+      }
+    })
   }
-  private updatePagination(): void {const total = this.totalPages;
-    if (total === 0) {this.page = 0; return;}
-    if (this.page >= total) {this.page = total - 1;}
+  totalPagesMain = 0;
+  fetchTotalPages() {
+    this.http.get(`${environment.backendUrl}/api/mea/get-pag/${this.entcod}/${this.magcod_main}`).subscribe({
+      next: (res) => {
+        this.totalPagesMain = Math.ceil(2650 / 20);
+      },
+      error: (err) => {
+        this.totalPagesMain = 0;
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+  almacenChange() {
+    this.isLoading = true;
+    this.http.get<any>(`${environment.backendUrl}/api/mea/existencias-almacen/${this.entcod}?cge=${this.cge}&percod=${this.percod}&eje=${this.eje}&magcod_main=${this.magcod_main}`).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.existencias = res.existencias;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.existencias = [];
+        this.existenciasError = err.error.error ?? err.error;
+      }
+    })
   }
   get paginatedExistencias(): any[] {
-    if (!this.existencias || this.existencias.length === 0) return [];
-    const start = this.page * this.pageSize;
-    return this.existencias.slice(start, start + this.pageSize);
-  }
-  get totalPages(): number {
-    return Math.max(1, Math.ceil((this.existencias?.length ?? 0) / this.pageSize));
+    return this.existencias ?? [];
   }
   prevPage(): void {
-    if (this.page > 0) this.page--;
+    this.page--;
+    this.fetchExistencias();
   }
   nextPage(): void {
-    if (this.page < this.totalPages - 1) this.page++;
+    this.page++;
+    this.fetchExistencias();
   }
-  goToPage(event: any): void {
+
+  main_search: string = '';
+  afacod: string = '';
+  asucod: string = '';
+  is_search: boolean = false;
+  totalPagesSearch = 0;
+  search() {
+    if (this.main_search === '' && this.afacod === '' && this.asucod === '') {
+      this.almacenChange();
+      this.fetchTotalPages();
+      return;
+    }
+
+    this.is_main_fetch = false;
+    this.is_search = true;
+
+    let params = new HttpParams();
+    
+    if (this.main_search?.trim()) {
+      params = params.set('main_search', this.main_search.trim());
+    }
+    if (this.afacod?.trim()) {
+      params = params.set('afaCod', this.afacod.trim());
+    }
+    if (this.asucod?.trim()) {
+      params = params.set('asuCod', this.asucod.trim());
+    }
+    
+    console.log("here")
+    params = params.set('page', this.page.toString());
+    this.http.get<any>(`${environment.backendUrl}/api/mea/existencias-almacen/${this.entcod}?cge=${this.cge}&percod=${this.percod}&eje=${this.eje}&magcod_main=${this.magcod_main}`, { params }).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.existencias = res.existencias;
+        this.totalPagesSearch = Math.ceil(this.existencias.length / this.pageSize);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.existencias = [];
+        this.almacenes = [];
+        this.existenciasError = err.error.error ?? err.error;
+      }
+    })
+  }
+  get paginatedSearchExistencias(): any[] {
+    if (!this.existencias || this.existencias.length === 0) return [];
+
+    const start = this.page * this.pageSize;
+
+    return this.existencias.slice(start, start + this.pageSize);
+  }
+  prevPageSearch(): void {
+    if (this.page > 0) this.page--;
+  }
+  nextPageSearch(): void {
+    if (this.page < this.totalPagesSearch - 1) this.page++;
+  }
+  goToPageSearch(event: any): void {
     const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.totalPages) {
+    if (inputPage >= 1 && inputPage <= this.totalPagesSearch) {
       this.page = inputPage - 1;
     }
   }
 
+  clearSearch() {
+    this.limpiarMessages();
+    this.main_search = '';
+    this.afacod = '';
+    this.asucod= '';
+    this.page = 0;
+    this.is_main_fetch = true;
+    this.is_search = false;
+    this.fetchExistencias();
+  }
+
   //main functions
-  sortField: 'afacod' | 'asucod' | 'artcod' | 'artdes' | 'artref' | 'depdes' | 'meauni' | 'measol' | 'mearec' | 'calculateKEstVir' | 'mealoc' | null = null;
+  sortField: 'art_AFACOD' | 'art_ASUCOD' | 'art_ARTCOD' | 'art_ARTDES' | 'art_ARTREF' | 'selectedAlmacenNombreSearch' | 'meauni' | 'measol' | 'mearec' | 'calculateKEstVir' | 'mealoc' | null = null;
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   toggleSort(column: string) {
@@ -99,7 +215,6 @@ export class ConsultaExistenciasAlmacenComponent {
     }
     this.applySort();
     this.page = 0;
-    this.updatePagination();
   }
 
   private applySort(): void {

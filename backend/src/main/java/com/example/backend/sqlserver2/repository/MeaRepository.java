@@ -97,4 +97,7 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(Integer ent, Integer magcod, Integer artblo, String afacod);
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String asucod);
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String afacod, String asucod);
+
+    //getting total pages for it
+    long countByMAGCODAndArt_ARTBLONot(Integer magcod, Integer artblo);
 }

@@ -18,12 +18,12 @@
                             <span>Buscar</span>
                             <select  
                                 class="search-bar"
-                                
+                                [(ngModel)]="magcod_main"
                             >
                                 <option 
-                                    
-                                    
-                                >test</option>
+                                    *ngFor="let a of almacenes"
+                                    [value]="a.depcod"
+                                >{{a.dep_DEPDES}}</option>
                             </select>
                         </div>
                         <div class="almacen-search">
@@ -31,7 +31,7 @@
                             <input 
                                 type="text"   
                                 class="search-bar" 
-                               
+                                [(ngModel)]="main_search"
                                 placeholder="Buscar"
                             />
                             <span>Familia</span>
@@ -40,7 +40,7 @@
                                 class="search-bar smallWidth" 
                                 name="familia"
                                 placeholder="familia"
-                                
+                                [(ngModel)]="afacod"
                             >
                             <span>Subfamilia</span>
                             <input 
@@ -48,13 +48,13 @@
                                 name="subfamilia" 
                                 placeholder="subfamilia"
                                 class="search-bar smallWidth"
-                               
+                                [(ngModel)]="asucod"
                             />
                         </div>                   
                     </div>
                     <div class="btns">
-                        <button type="button" class="purple-btn">Buscar</button>
-                        <button type="button" class="purple-btn" >Limpiar</button>
+                        <button type="button" class="purple-btn" (click)="search()">Buscar</button>
+                        <button type="button" class="purple-btn" (click)="clearSearch()">Limpiar</button>
                     </div>
                 </div>
             </div>
@@ -78,49 +78,49 @@
             <table class="main-table">
                 <thead>
                     <tr>
-                        <th  class="sortable resizable" (click)="toggleSort('afacod')">
+                        <th  class="sortable resizable" (click)="toggleSort('art_AFACOD')">
                             Familia
-                            <span class="sort-indicator" *ngIf="sortColumn === 'afacod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'art_AFACOD'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 0)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('asucod')">
+                        <th  class="sortable resizable" (click)="toggleSort('art_ASUCOD')">
                             Subfamilia
-                            <span class="sort-indicator" *ngIf="sortColumn === 'asucod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'art_ASUCOD'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 1)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artcod')">
+                        <th  class="sortable resizable" (click)="toggleSort('art_ARTCOD')">
                             Código
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artcod'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'art_ARTCOD'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 2)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artdes')">
+                        <th  class="sortable resizable" (click)="toggleSort('art_ARTDES')">
                             Descripción
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'art_ARTDES'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 3)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artref')">
+                        <th  class="sortable resizable" (click)="toggleSort('art_ARTREF')">
                             Referencia universal
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artref'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'art_ARTREF'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 4)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('depdes')">
+                        <th  class="sortable resizable" (click)="toggleSort('selectedAlmacenNombreSearch')">
                             almacén
-                            <span class="sort-indicator" *ngIf="sortColumn === 'depdes'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'selectedAlmacenNombreSearch'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 5)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artuni')">
+                        <th  class="sortable resizable" (click)="toggleSort('meauni')">
                             Existencias
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artuni'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'meauni'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 6)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artsol')">
+                        <th  class="sortable resizable" (click)="toggleSort('measol')">
                             Pte. Servir
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artsol'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'measol'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 7)"></div>
                         </th>
-                        <th  class="sortable resizable" (click)="toggleSort('artrec')">
+                        <th  class="sortable resizable" (click)="toggleSort('mearec')">
                             Pte. Entrada
-                            <span class="sort-indicator" *ngIf="sortColumn === 'artrec'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            <span class="sort-indicator" *ngIf="sortColumn === 'mearec'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
                             <div class="resizer" (mousedown)="startResize($event, 8)"></div>
                         </th>
                         <th  class="sortable resizable" (click)="toggleSort('calculateKEstVir')">
@@ -137,32 +137,40 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let e of paginatedExistencias">
-                        <td>{{e.afacod}}</td>
-                        <td>{{e.asucod}}</td>
-                        <td>{{e.artcod}}</td>
-                        <td>{{e.artdes}}</td>
-                        <td>{{e.artuni}}</td>
-                        <td>{{e.artref}}</td>
-                        <td>{{e.artsol}}</td>
-                        <td>{{e.artrec}}</td>
-                        <td>{{calculateKEstVir(e.artuni, e.artsol, e.artrec)}}</td>
+                        <td>{{e.art_AFACOD}}</td>
+                        <td>{{e.art_ASUCOD}}</td>
+                        <td>{{e.art_ARTCOD}}</td>
+                        <td>{{e.art_ARTDES}}</td>
+                        <td>{{e.art_ARTREF}}</td>
+                        <td>{{selectedAlmacenNombreSearch}}</td>
+                        <td>{{e.meauni}}</td>
+                        <td>{{e.measol}}</td>
+                        <td>{{e.mearec}}</td>
+                        <td>{{calculateKEstVir(e.meauni, e.measol, e.mearec)}}</td>
+                        <td>{{e.mealoc}}</td>
                     </tr>
                 </tbody>
             </table>
-            <div class="pagination-controls">
-                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+            <div class="pagination-controls" *ngIf="is_search">
+                <button (click)="prevPageSearch()" [disabled]="page === 0">Anterior</button>
                 <span>Página</span>
                 <input
                     type="number"
                     min="1"
-                    [max]="totalPages"
+                    [max]="totalPagesSearch"
                     [value]="page + 1"
-                    (change)="goToPage($event)"
+                    (change)="goToPageSearch($event)"
                     class="pagination-input"
                     class="pagination-input"
                 />
-                <span>de {{ totalPages }}</span>
-                <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Siguiente</button>
+                <span>de {{ totalPagesSearch }}</span>
+                <button (click)="nextPageSearch()" [disabled]="page + 1 >= totalPagesSearch">Siguiente</button>
+            </div>
+            <div class="pagination-controls" *ngIf="is_main_fetch">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
+                <span>Página {{page}}</span>
+                <span>de {{totalPagesMain}}</span>
+                <button (click)="nextPage()" >Siguiente</button>
             </div>
         </div>
     </div>
