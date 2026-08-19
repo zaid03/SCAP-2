@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Pageable;
 
-import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.AnaliticaArticulosProjectin;
 import com.example.backend.dto.ArticleProjection;
 import com.example.backend.sqlserver2.model.Art;

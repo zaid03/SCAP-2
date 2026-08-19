@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
 import com.example.backend.sqlserver2.model.Mea;
 import com.example.backend.sqlserver2.model.MeaId;
@@ -90,4 +91,10 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
     //selecting existencias for articles with eager loading of relationships
     @EntityGraph(attributePaths = {"mag", "mag.dep"})
     List<Mea> findByENTAndAFACODAndASUCODAndARTCOD(Integer ent, String afacod, String asucod, String artcod);
+
+    //selecting and searching in C.existencias por almacen
+    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONot(Integer ent, Integer magcod, Integer artblo, Pageable pageable);
+    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_AFACOD(Integer ent, Integer magcod, Integer artblo, String afacod);
+    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_ASUCOD(Integer ent, Integer magcod, Integer artblo, String asucod);
+    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_AFACODAndART_ASUCOD(Integer ent, Integer magcod, Integer artblo, String afacod, String asucod);
 }

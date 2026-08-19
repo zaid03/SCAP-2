@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.backend.service.existenciaAlmacenFetches;
 import com.example.backend.dto.ExistenciasMeaProjection;
 import com.example.backend.dto.ExistenciasMeaProjectionDTO;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
@@ -24,6 +25,8 @@ import com.example.backend.sqlserver2.model.Mea;
 public class MeaController {
     @Autowired
     private MeaRepository meaRepository;
+    @Autowired
+    private existenciaAlmacenFetches ExistenciaAlmacenFetches;
 
     private static final String SIN_RESULTADO = "Sin resultado";
     private static final String ERROR = "Error :";
@@ -122,6 +125,32 @@ public class MeaController {
             .collect(Collectors.toList());
 
             return ResponseEntity.ok(result);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+
+    //selecting and searching in C.existencias por almacen
+    @GetMapping("/existencias-almacen/{ent}")
+    public ResponseEntity<?> existenciasAlmacen (
+        @PathVariable Integer ent,
+        @RequestParam(required = false) String cge,
+        @RequestParam(required = false) String percod,
+        @RequestParam(required = false) String eje,
+        @RequestParam(required = false) Integer magcod_main,
+        @RequestParam(required = false) String main_search,
+        @RequestParam(required = false) String afacod,
+        @RequestParam(required = false) String asucod,
+        @RequestParam(defaultValue = "0") int page
+    ) {
+        try {
+            existenciaAlmacenFetches.NamesResponse response = ExistenciaAlmacenFetches.existenciasService( ent, cge, percod, eje, magcod_main, main_search, afacod, asucod, page
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
         }
