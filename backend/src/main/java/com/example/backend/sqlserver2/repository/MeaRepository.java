@@ -93,8 +93,8 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
     List<Mea> findByENTAndAFACODAndASUCODAndARTCOD(Integer ent, String afacod, String asucod, String artcod);
 
     //selecting and searching in C.existencias por almacen
-    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONot(Integer ent, Integer magcod, Integer artblo, Pageable pageable);
-    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_AFACOD(Integer ent, Integer magcod, Integer artblo, String afacod);
-    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_ASUCOD(Integer ent, Integer magcod, Integer artblo, String asucod);
-    List<existenciasProjection> findByENTAndMAGCODAndART_ARTBLONotAndART_AFACODAndART_ASUCOD(Integer ent, Integer magcod, Integer artblo, String afacod, String asucod);
+    List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONot(Integer ent, Integer magcod, Integer artblo, Pageable pageable);
+    List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(Integer ent, Integer magcod, Integer artblo, String afacod);
+    List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String asucod);
+    List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String afacod, String asucod);
 }

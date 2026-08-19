@@ -2,5 +2,5 @@ package com.example.backend.dto;
 
 public interface ServiceMagsProjection {
     String getDEPCOD();
-    String getDEPDES();
+    String getDep_DEPDES();
 }

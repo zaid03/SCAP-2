@@ -15,5 +15,5 @@ public interface DpeRepository extends JpaRepository<Dpe, DpeId> {
     List<Dpe> findByENTAndEJEAndPERCOD(Integer ENT, String EJE, String PERCOD);
 
     //fetch for C.exitencias almacen
-    List<ServiceMagsProjection> findbyENTAndEJEAndPERCODAndCGECOD(Integer ent, String eje, String percod, String cgecod);
+    List<ServiceMagsProjection> findByENTAndEJEAndPERCODAndDep_Cge_CGECODAndDep_DEPALM(Integer ent, String eje, String percod, String cgecod, Integer depalm);
 }
