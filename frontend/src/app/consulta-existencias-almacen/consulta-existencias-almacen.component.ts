@@ -18,6 +18,7 @@ import { saveAs } from 'file-saver';
   templateUrl: './consulta-existencias-almacen.component.html',
   styleUrls: ['./consulta-existencias-almacen.component.css']
 })
+
 export class ConsultaExistenciasAlmacenComponent {
   //3 dots menu 
   showMenu = false;
@@ -153,9 +154,6 @@ export class ConsultaExistenciasAlmacenComponent {
         this.existencias = res.existencias;
         this.page = 0;
         this.totalPagesMain = Math.ceil(this.existencias.length / this.pageSize);
-        // if (this.existencias.length === 0) {
-        //   this.existenciasError = 'Sin resultado';
-        // }
       },
       error: (err) => {
         this.isLoading = false;
@@ -291,6 +289,159 @@ export class ConsultaExistenciasAlmacenComponent {
   calculateKEstVir(artuni: number, artsol: number, artrec: number) {
     this.kestvir = artuni - artsol + artrec;
     return this.kestvir;
+  }
+
+  exportExistencias: any = [];
+  isPdf: boolean = false;
+  isExcel: boolean = false;
+  getExportData() {
+    this.http.get(`${environment.backendUrl}/api/mea/export/${this.entcod}/${this.magcod_main}`).subscribe({
+      next: (res) => {
+        this.exportExistencias = res;
+        if (this.exportExistencias.length === 0) {
+          this.existenciasError = 'No hay datos para exportar.';
+          return;
+        }
+
+        if (this.isPdf) {
+          this.preparePDF();
+          return;
+        }
+        if (this.isExcel) {
+          this.prepareExcel();
+          return;
+        }
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
+  DownloadPDF() {
+    this.limpiarMessages();
+
+    this.isPdf = true;
+    if (this.exportExistencias.length === 0) {
+      this.getExportData();
+    } else {
+      this.preparePDF();
+    }
+  }
+
+  preparePDF() {
+    const rows = this.exportExistencias.map((row: any) => ({
+      afacod: row.art_AFACOD ?? '',
+      asucod: row.art_ASUCOD ?? '',
+      artcod: row.art_ARTCOD ?? '',
+      artdes: row.art_ARTDES ?? '',
+      artref: row.art_ARTREF ?? '',
+      depdes: this.selectedAlmacenNombreSearch,
+      meauni: row.meauni,
+      measol: row.measol,
+      mearec: row.mearec,
+      kestvir: this.calculateKEstVir(row.meauni, row.measol, row.mearec) ?? '',
+      mealoc: row.mealoc ?? ''
+    }));
+
+    const columns = [
+      { header: 'Familia', dataKey: 'afacod' },
+      { header: 'Subfamilia', dataKey: 'asucod'},
+      { header: 'Código', dataKey: 'artcod'},
+      { header: 'Descripción', dataKey: 'artdes'},
+      { header: 'Referencia universal', dataKey: 'artref'},
+      { header: 'almacén', dataKey: 'depdes'},
+      { header: 'Existencias', dataKey: 'meauni'},
+      { header: 'Pte. Servir', dataKey: 'measol'},
+      { header: 'Pte. Entrada', dataKey: 'mearec'},
+      { header: 'Estocaje virtual', dataKey: 'kestvir'},
+      { header: 'Ubicación', dataKey: 'mealoc'}
+    ];
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Consulta de existencias por almacén', 40, 40);
+
+    autoTable(doc, {
+      startY: 60,
+      head: [columns.map(col => col.header)],
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
+      columnStyles: {
+        afacod: { cellWidth: 10 },
+        asucod: { cellWidth: 10 },
+        artcod: { cellWidth: 10 },
+        artdes: { cellWidth: 30 },
+        artref: { cellWidth: 25 },
+        depdes: { cellWidth: 25 },
+        artuni: { cellWidth: 10 },
+        measol: { cellWidth: 10 },
+        mearec: { cellWidth: 10 },
+        kestvir: { cellWidth: 10 },
+        mealoc: { cellWidth: 25 },
+      }
+    });
+
+    doc.save('Consulta_de_existencias_por_almacen.pdf');
+    this.isPdf = false;
+  }
+
+  downloadExcel() {
+    this.limpiarMessages();
+
+    this.isExcel = true;
+    if (this.exportExistencias.length === 0) {
+      this.getExportData();
+    } else {
+      this.prepareExcel();
+    }
+  }
+
+  prepareExcel() {
+    const exportRows = this.exportExistencias.map((row: any) => ({
+      afacod: row.art_AFACOD ?? '',
+      asucod: row.art_ASUCOD ?? '',
+      artcod: row.art_ARTCOD ?? '',
+      artdes: row.art_ARTDES ?? '',
+      artref: row.art_ARTREF ?? '',
+      depdes: this.selectedAlmacenNombreSearch ?? '',
+      meauni: row.meauni ?? '',
+      measol: row.measol ?? '',
+      mearec: row.mearec ?? '',
+      kestvir: this.calculateKEstVir(row.meauni, row.measol, row.mearec) ?? '',
+      mealoc: row.mealoc ?? ''
+    }));
+
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['Consulta de existencias por almacén']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['Familias', 'Subfamilia', 'Código', 'Descripción', 'Referencia universal', 'almacén',  'Existencias', 'Pte. Servir', 'Pte. Entrada', 'Estocaje virtual', 'Ubicación']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
+
+    worksheet['!cols'] = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 30 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 25 },
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Existencias');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'Consulta_de_existencias_por_almacen.xlsx'
+    );
+    this.isExcel = false;
   }
 
   //misc

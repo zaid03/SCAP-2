@@ -18,6 +18,7 @@ import com.example.backend.service.existenciaAlmacenFetches;
 import com.example.backend.dto.ExistenciasMeaProjection;
 import com.example.backend.dto.ExistenciasMeaProjectionDTO;
 import com.example.backend.dto.ServiceMagsProjection;
+import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.magcodOnly;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
 import com.example.backend.sqlserver2.repository.MeaRepository;
@@ -178,6 +179,26 @@ public class MeaController {
             Long totalPages = meaRepository.countByMAGCODAndArt_ARTBLONot(magcod, 0);
 
             return ResponseEntity.ok(totalPages);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+
+    //fetch all for exporting data on C.existencias almacen
+    @GetMapping("/export/{ent}/{depcod}")
+    public ResponseEntity<?> dataExport(
+        @PathVariable Integer ent,
+        @PathVariable String depcod
+    ) {
+        try {
+            Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, depcod);
+            if (almacen.isEmpty()) {
+                throw new IllegalArgumentException("Almacen sin resultado.");
+            }
+            Integer magcod = almacen.get().getMAGCOD();
+            List<existenciasProjection> existencias = meaRepository.findAllByENTAndMAGCODAndArt_ARTBLONot(ent, magcod, 0);
+
+            return ResponseEntity.ok(existencias);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
         }
