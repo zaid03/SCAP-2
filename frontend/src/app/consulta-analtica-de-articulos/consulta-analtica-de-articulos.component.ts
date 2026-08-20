@@ -163,7 +163,7 @@ export class ConsultaAnalticaDeArticulosComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.paginatedArticulos;
+    const source = this.articulos;
     if (!source?.length) {
       this.articuloError = 'No hay datos para exportar.';
       return;
@@ -174,7 +174,7 @@ export class ConsultaAnalticaDeArticulosComponent {
       artcod: row.artcod ?? '',
       artdes: row.artdes ?? '',
       afacod: row.afacod ?? '',
-      afades: row.afa.afades ?? ''
+      afades: row.afa?.afades ?? ''
     }));
 
     const columns = [
@@ -210,7 +210,7 @@ export class ConsultaAnalticaDeArticulosComponent {
 
   DownloadExcel() {
     this.limpiarMEssages();
-    const rows = this.paginatedArticulos;
+    const rows = this.articulos;
     if (!rows || rows.length === 0) {
       this.articuloError = 'No hay datos para exportar.';
       return;
@@ -221,7 +221,7 @@ export class ConsultaAnalticaDeArticulosComponent {
       artcod: row.artcod ?? '',
       artdes: row.artdes ?? '',
       afacod: row.afacod ?? '',
-      afades: row.afa.afades ?? ''
+      afades: row.afa?.afades ?? ''
     }));
     
     const worksheet = XLSX.utils.aoa_to_sheet([]);

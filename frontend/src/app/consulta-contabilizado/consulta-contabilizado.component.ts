@@ -231,7 +231,7 @@ export class ConsultaContabilizadoComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.paginatedFacturas;
+    const source = this.facturas;
     if (!source?.length) {
       this.facturaError = 'No hay datos para exportar.';
       return;
@@ -249,24 +249,22 @@ export class ConsultaContabilizadoComponent {
       fdeeco: row.fdeeco ?? '',
       importe: this.importe(row.fdeimp, row.fdedif),
       ternif: row.fac.ter.ternif,
-      ternom: row.fac.ter.ternom,
-      cgecod: row.fac.cgecod
+      ternom: row.fac.ter.ternom
     }));
 
     const columns = [
       { header: 'Número', dataKey: 'facnum' },
-      { header: 'Año Factura', dataKey: 'facann' },
-      { header: 'Nº Registro C.F', dataKey: 'facfac' },
-      { header: 'Referencia Fact', dataKey: 'facdoc' },
-      { header: 'Fecha Factura', dataKey: 'facdat' },
-      { header: 'Fecha Contable', dataKey: 'facfco' },
+      { header: 'A.Factura', dataKey: 'facann' },
+      { header: 'R.C.F', dataKey: 'facfac' },
+      { header: 'Referencia.Fact', dataKey: 'facdoc' },
+      { header: 'F.Factura', dataKey: 'facdat' },
+      { header: 'F.Contable', dataKey: 'facfco' },
       { header: 'Orgánica', dataKey: 'fdeorg' },
       { header: 'Programa', dataKey: 'fdefun' },
       { header: 'Económica', dataKey: 'fdeeco' },
       { header: 'Importe', dataKey: 'importe' },
       { header: 'NIF', dataKey: 'ternif' },
       { header: 'Nombre', dataKey: 'ternom' },
-      { header: 'Centro Gestor', dataKey: 'cgecod' }
     ];
 
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -276,40 +274,32 @@ export class ConsultaContabilizadoComponent {
 
     autoTable(doc, {
       startY: 30,
-      theme: 'plain',
-      head: [columns.map(c => c.header)],
-      body: rows.map(row => columns.map(c => row[c.dataKey as keyof typeof row] ?? '')),
-      styles: { font: 'helvetica', fontSize: 8, cellPadding: 4 },
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: [33, 53, 71],
-        fontStyle: 'bold',
-        halign: 'left'
-      },
-      tableLineColor: [200, 200, 200],
-      tableLineWidth: 0.5,
+      head: [columns.map(col => col.header)],
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
       columnStyles: {
-        facnum: { cellWidth: 10 },
-        facann: { cellWidth: 10 },
-        facfac: { cellWidth: 12 },
+        facnum: { cellWidth: 6 },
+        facann: { cellWidth: 8 },
+        facfac: { cellWidth: 10 },
         facdoc: { cellWidth: 20 },
-        facdat: { cellWidth: 20 },
-        facfco: { cellWidth: 20 },
-        fdeorg: { cellWidth: 20 },
-        fdefun: { cellWidth: 15 },
+        facdat: { cellWidth: 18 },
+        facfco: { cellWidth: 18 },
+        fdeorg: { cellWidth: 10 },
+        fdefun: { cellWidth: 10 },
         fdeeco: { cellWidth: 15 },
-        importe: { cellWidth: 15 },
+        importe: { cellWidth: 10 },
         ternif: { cellWidth: 15 },
-        ternom: { cellWidth: 15 },
-        cgecod: { cellWidth: 25 }
+        ternom: { cellWidth: 25 },
       }
     });
+
     doc.save('consulta_del_contabilizado.pdf');
   }
 
   downloadExcel() {
     this.limpiarMEssages();
-    const rows = this.paginatedFacturas;
+    const rows = this.facturas;
     if (!rows || rows.length === 0) {
       this.facturaError = 'No hay datos para exportar.';
       return;

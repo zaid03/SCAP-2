@@ -156,7 +156,7 @@ export class ConsultaAnaliticaAlmacenesComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.paginatedAlmacenes;
+    const source = this.almacenes;
     if (!source?.length) {
       this.almacenError = 'No hay datos para exportar.';
       return;
@@ -203,7 +203,7 @@ export class ConsultaAnaliticaAlmacenesComponent {
 
   downloadExcel() {
     this.limpiarMEssages();
-    const rows = this.paginatedAlmacenes;
+    const rows = this.almacenes;
     if (!rows || rows.length === 0) {
       this.almacenError = 'No hay datos para exportar.';
       return;

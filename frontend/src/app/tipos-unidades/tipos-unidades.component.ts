@@ -198,7 +198,7 @@ export class TiposUnidadesComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.paginatedUnidades;
+    const rows = this.unidades;
     if (!rows || rows.length === 0) {
       this.unidadesError = 'No hay datos para exportar.';
       return;
@@ -235,14 +235,13 @@ export class TiposUnidadesComponent {
 
   pdfDownload() {
     this.limpiarMessages();
-    const source = this.paginatedUnidades;
+    const source = this.unidades;
     if (!source?.length) {
       this.unidadesError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       ent: row.ent ?? '',
       auncod: row.auncod ?? '',
       aundes: row.aundes ?? ''
@@ -254,7 +253,6 @@ export class TiposUnidadesComponent {
     doc.text('Listado de tipos de unidades', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Entidad', dataKey: 'ent' },
       { header: 'Código', dataKey: 'auncod' },
       { header: 'Descripción', dataKey: 'aundes' }

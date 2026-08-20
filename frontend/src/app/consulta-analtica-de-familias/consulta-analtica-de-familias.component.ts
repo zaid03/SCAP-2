@@ -157,7 +157,7 @@ export class ConsultaAnalticaDeFamiliasComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.paginatedFamilias;
+    const source = this.familias;
     if (!source?.length) {
       this.familiaError = 'No hay datos para exportar.';
       return;
@@ -198,7 +198,7 @@ export class ConsultaAnalticaDeFamiliasComponent {
 
   downloadExcel() {
     this.limpiarMEssages();
-    const rows = this.paginatedFamilias;
+    const rows = this.familias;
     if (!rows || rows.length === 0) {
       this.familiaError = 'No hay datos para exportar.';
       return;

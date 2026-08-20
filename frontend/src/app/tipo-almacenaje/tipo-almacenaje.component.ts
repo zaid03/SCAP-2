@@ -199,7 +199,7 @@ export class TipoAlmacenajeComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.paginatedAlmacenajes;
+    const rows = this.almacenajes;
     if (!rows || rows.length === 0) {
       this.almacenajesError = 'No hay datos para exportar.';
       return;
@@ -236,14 +236,13 @@ export class TipoAlmacenajeComponent {
 
   pdfDownload() {
     this.limpiarMessages();
-    const source = this.paginatedAlmacenajes;
+    const source = this.almacenajes;
     if (!source?.length) {
       this.almacenajesError = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       ent: row.ent ?? '',
       mtacod: row.mtacod ?? '',
       mtades: row.mtades ?? ''
@@ -255,7 +254,6 @@ export class TipoAlmacenajeComponent {
     doc.text('Listado de tipos de almacenajes', 40, 40);
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Entidad', dataKey: 'ent' },
       { header: 'Código', dataKey: 'mtacod' },
       { header: 'Descripción', dataKey: 'mtades' }

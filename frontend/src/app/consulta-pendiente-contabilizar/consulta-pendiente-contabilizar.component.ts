@@ -228,7 +228,7 @@ export class ConsultaPendienteContabilizarComponent {
   DownloadPDF() {
     this.limpiarMEssages();
 
-    const source = this.paginatedFacturas;
+    const source = this.facturas;
     if (!source?.length) {
       this.facturaError = 'No hay datos para exportar.';
       return;
@@ -236,17 +236,17 @@ export class ConsultaPendienteContabilizarComponent {
 
     const rows = source.map((row: any) => ({
       facnum: row.facnum ?? '',
-      facann: row.fac.facann ?? '',
-      facfac: row.fac.facfac ?? '',
-      facdoc: row.fac.facdoc ?? '',
-      facdat: this.formatDate(row.fac.facdat) ?? '',
+      facann: row.facann ?? '',
+      facfac: row.facfac ?? '',
+      facdoc: row.facdoc ?? '',
+      facdat: this.formatDate(row.facdat) ?? '',
       fdeorg: row.fdeorg ?? '',
       fdefun: row.fdefun ?? '',
       fdeeco: row.fdeeco ?? '',
       importe: this.importe(row.fdeimp, row.fdedif),
-      ternif: row.fac.ter.ternif,
-      ternom: row.fac.ter.ternom,
-      cgecod: row.fac.cgecod
+      ternif: row.ternif,
+      ternom: row.ternom,
+      cgecod: row.cgecod
     }));
 
     const columns = [
@@ -271,18 +271,10 @@ export class ConsultaPendienteContabilizarComponent {
 
     autoTable(doc, {
       startY: 30,
-      theme: 'plain',
       head: [columns.map(c => c.header)],
       body: rows.map(row => columns.map(c => row[c.dataKey as keyof typeof row] ?? '')),
       styles: { font: 'helvetica', fontSize: 8, cellPadding: 4 },
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: [33, 53, 71],
-        fontStyle: 'bold',
-        halign: 'left'
-      },
-      tableLineColor: [200, 200, 200],
-      tableLineWidth: 0.5,
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
       columnStyles: {
         facnum: { cellWidth: 10 },
         facann: { cellWidth: 10 },
@@ -303,7 +295,7 @@ export class ConsultaPendienteContabilizarComponent {
 
   downloadExcel() {
     this.limpiarMEssages();
-    const rows = this.paginatedFacturas;
+    const rows = this.facturas;
     if (!rows || rows.length === 0) {
       this.facturaError = 'No hay datos para exportar.';
       return;
@@ -311,17 +303,17 @@ export class ConsultaPendienteContabilizarComponent {
   
     const exportRows = rows.map(row => ({
       facnum: row.facnum ?? '',
-      facann: row.fac.facann ?? '',
-      facfac: row.fac.facfac ?? '',
-      facdoc: row.fac.facdoc ?? '',
-      facdat: this.formatDate(row.fac.facdat) ?? '',
+      facann: row.facann ?? '',
+      facfac: row.facfac ?? '',
+      facdoc: row.facdoc ?? '',
+      facdat: this.formatDate(row.facdat) ?? '',
       fdeorg: row.fdeorg ?? '',
       fdefun: row.fdefun ?? '',
       fdeeco: row.fdeeco ?? '',
       importe: this.importe(row.fdeimp, row.fdedif),
-      ternif: row.fac.ter.ternif,
-      ternom: row.fac.ter.ternom,
-      cgecod: row.fac.cgecod
+      ternif: row.ternif,
+      ternom: row.ternom,
+      cgecod: row.cgecod
     }));
   
     const worksheet = XLSX.utils.aoa_to_sheet([]);

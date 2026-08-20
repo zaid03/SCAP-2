@@ -137,7 +137,7 @@ export class FamiliaComponent {
 
   excelDownload() {
     this.limpiarMessages();
-    const rows = this.paginatedFamilias;
+    const rows = this.familias;
     if (!rows || rows.length === 0) {
       this.tableMessage = 'No hay datos para exportar.';
       return;
@@ -174,21 +174,20 @@ export class FamiliaComponent {
 
   toPrint() {
     this.limpiarMessages();
-    const source = this.paginatedFamilias;
+
+    const source = this.familias;
     if (!source?.length) {
       this.tableMessage = 'No hay datos para exportar.';
       return;
     }
 
     const rows = source.map((row: any, index: number) => ({
-      index: index + 1,
       ent: row.ent ?? '',
       afacod: row.afacod ?? '',
       afades: row.afades ?? ''
     }));
 
     const columns = [
-      { header: '#', dataKey: 'index' },
       { header: 'Entidad', dataKey: 'ent' },
       { header: 'Familia', dataKey: 'afacod' },
       { header: 'Descripción', dataKey: 'afades' }
@@ -197,27 +196,18 @@ export class FamiliaComponent {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
-    doc.text('Listado de familias', 10, 20);
+    doc.text('Listado de familias', 10, 15);
 
     autoTable(doc, {
-      startY: 30,
-      theme: 'plain',
-      head: [columns.map(c => c.header)],
-      body: rows.map(row => columns.map(c => row[c.dataKey as keyof typeof row] ?? '')),
-      styles: { font: 'helvetica', fontSize: 8, cellPadding: 4 },
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: [33, 53, 71],
-        fontStyle: 'bold',
-        halign: 'left'
-      },
-      tableLineColor: [200, 200, 200],
-      tableLineWidth: 0.5,
+      startY: 20,
+      head: [columns.map(col => col.header)],
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
       columnStyles: {
-        index: { cellWidth: 10 },
         ent: { cellWidth: 24 },
         afacod: { cellWidth: 28 },
-        afades: { cellWidth: 130 }
+        afades: { cellWidth: 50 }
       }
     });
 
