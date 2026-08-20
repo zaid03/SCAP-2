@@ -116,25 +116,15 @@ export class ConsultaExistenciasAlmacenComponent {
       }
     })
   }
-  get paginatedExistencias(): any[] {
-    return this.existencias ?? [];
-  }
-  prevPage(): void {
-    this.page--;
-    this.fetchExistencias();
-  }
-  nextPage(): void {
-    this.page++;
-    this.fetchExistencias();
-  }
 
   main_search: string = '';
   afacod: string = '';
   asucod: string = '';
   is_search: boolean = false;
-  totalPagesSearch = 0;
   search() {
+    this.limpiarMessages();
     if (this.main_search === '' && this.afacod === '' && this.asucod === '') {
+
       this.almacenChange();
       this.fetchTotalPages();
       return;
@@ -149,19 +139,23 @@ export class ConsultaExistenciasAlmacenComponent {
       params = params.set('main_search', this.main_search.trim());
     }
     if (this.afacod?.trim()) {
-      params = params.set('afaCod', this.afacod.trim());
+      params = params.set('afacod', this.afacod.trim());
     }
     if (this.asucod?.trim()) {
-      params = params.set('asuCod', this.asucod.trim());
+      params = params.set('asucod', this.asucod.trim());
     }
     
-    console.log("here")
+    this.isLoading = true;
     params = params.set('page', this.page.toString());
     this.http.get<any>(`${environment.backendUrl}/api/mea/existencias-almacen/${this.entcod}?cge=${this.cge}&percod=${this.percod}&eje=${this.eje}&magcod_main=${this.magcod_main}`, { params }).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.existencias = res.existencias;
-        this.totalPagesSearch = Math.ceil(this.existencias.length / this.pageSize);
+        this.page = 0;
+        this.totalPagesMain = Math.ceil(this.existencias.length / this.pageSize);
+        // if (this.existencias.length === 0) {
+        //   this.existenciasError = 'Sin resultado';
+        // }
       },
       error: (err) => {
         this.isLoading = false;
@@ -171,23 +165,52 @@ export class ConsultaExistenciasAlmacenComponent {
       }
     })
   }
-  get paginatedSearchExistencias(): any[] {
-    if (!this.existencias || this.existencias.length === 0) return [];
+  get paginatedExistencias(): any[] {
+    if (this.is_main_fetch) {
+      return this.existencias ?? [];
+    }
+    if (this.is_search) {
+      if (this.existencias.length > 20) {
+        const start = this.page * this.pageSize;
 
-    const start = this.page * this.pageSize;
-
-    return this.existencias.slice(start, start + this.pageSize);
+        return this.existencias.slice(start, start + this.pageSize);
+      } else {
+        return this.existencias ?? [];
+      }
+    }
+    return [];
   }
-  prevPageSearch(): void {
-    if (this.page > 0) this.page--;
+  prevPage(): void {
+    if (this.is_main_fetch) {
+      this.page--;
+      this.fetchExistencias();
+    }
+    if (this.is_search) {
+      if (this.page > 0) this.page--;
+    }
   }
-  nextPageSearch(): void {
-    if (this.page < this.totalPagesSearch - 1) this.page++;
+  nextPage(): void {
+    if (this.is_main_fetch) {
+      this.page++;
+      this.fetchExistencias();
+    }
+    if (this.is_search) {
+      if (this.page < this.totalPagesMain - 1) this.page++;
+    }
   }
-  goToPageSearch(event: any): void {
-    const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.totalPagesSearch) {
-      this.page = inputPage - 1;
+  goToPage(event: any): void {
+    if (this.is_main_fetch) {
+      const inputPage = Number(event.target.value);
+      if (inputPage >= 1 && inputPage <= this.totalPagesMain) {
+        this.page = inputPage - 1;
+        this.fetchExistencias();
+      }
+    }
+    if (this.is_search) {
+      const inputPage = Number(event.target.value);
+      if (inputPage >= 1 && inputPage <= this.totalPagesMain) {
+        this.page = inputPage - 1;
+      }
     }
   }
 

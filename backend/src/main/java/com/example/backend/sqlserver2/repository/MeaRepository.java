@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.ArticulosPorAlmcenProjection;
+import com.example.backend.dto.existenciasProjection;
 import com.example.backend.sqlserver2.model.Mea;
 import com.example.backend.sqlserver2.model.MeaId;
 
@@ -94,6 +94,7 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
 
     //selecting and searching in C.existencias por almacen
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONot(Integer ent, Integer magcod, Integer artblo, Pageable pageable);
+    List<existenciasProjection> findAllByENTAndMAGCODAndArt_ARTBLONot(Integer ent, Integer magcod, Integer artblo);
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(Integer ent, Integer magcod, Integer artblo, String afacod);
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String asucod);
     List<existenciasProjection> findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(Integer ent, Integer magcod, Integer artblo, String afacod, String asucod);

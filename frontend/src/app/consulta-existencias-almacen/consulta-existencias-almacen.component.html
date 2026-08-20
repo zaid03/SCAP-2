@@ -151,26 +151,19 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="pagination-controls" *ngIf="is_search">
-                <button (click)="prevPageSearch()" [disabled]="page === 0">Anterior</button>
+            <div class="pagination-controls">
+                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
                 <span>Página</span>
                 <input
                     type="number"
                     min="1"
-                    [max]="totalPagesSearch"
+                    [max]="totalPagesMain"
                     [value]="page + 1"
-                    (change)="goToPageSearch($event)"
-                    class="pagination-input"
+                    (change)="goToPage($event)"
                     class="pagination-input"
                 />
-                <span>de {{ totalPagesSearch }}</span>
-                <button (click)="nextPageSearch()" [disabled]="page + 1 >= totalPagesSearch">Siguiente</button>
-            </div>
-            <div class="pagination-controls" *ngIf="is_main_fetch">
-                <button (click)="prevPage()" [disabled]="page === 0">Anterior</button>
-                <span>Página {{page}}</span>
-                <span>de {{totalPagesMain}}</span>
-                <button (click)="nextPage()" >Siguiente</button>
+                <span>de {{ totalPagesMain }}</span>
+                <button (click)="nextPage()" [disabled]="page + 1 >= totalPagesMain">Siguiente</button>
             </div>
         </div>
     </div>

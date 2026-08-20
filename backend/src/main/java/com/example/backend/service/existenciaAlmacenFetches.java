@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.ServiceMagsProjection;
+import com.example.backend.dto.existenciasProjection;
 import com.example.backend.dto.magcodOnly;
 import com.example.backend.sqlserver2.repository.DpeRepository;
-import com.example.backend.sqlserver2.repository.MeaRepository;
 import com.example.backend.sqlserver2.repository.MagRepository;
+import com.example.backend.sqlserver2.repository.MeaRepository;
 
 @Service
 public class existenciaAlmacenFetches {
@@ -54,7 +54,7 @@ public class existenciaAlmacenFetches {
                 Integer magcod = almacen.get().getMAGCOD();
                 List<existenciasProjection> existenciasList = meaRepository.findByENTAndMAGCODAndArt_ARTBLONot(ent, magcod, 0, PageRequest.of(page, PAGE_SIZE));
                 if (existenciasList.isEmpty()) {
-                    throw new IllegalArgumentException("Existencias sin resultado.");
+                    throw new IllegalArgumentException("Sin resultado");
                 }
                 existencias.addAll(existenciasList);
             } else {
@@ -73,7 +73,7 @@ public class existenciaAlmacenFetches {
                 Integer magcod = almacen.get().getMAGCOD();
                 List<existenciasProjection> existenciasList = meaRepository.findByENTAndMAGCODAndArt_ARTBLONot(ent, magcod, 0, PageRequest.of(page, PAGE_SIZE));
                 if (existenciasList.isEmpty()) {
-                    throw new IllegalArgumentException("Existencias sin resultado.");
+                    throw new IllegalArgumentException("Sin resultado");
                 }
                 existencias.addAll(existenciasList);
             }
@@ -87,6 +87,9 @@ public class existenciaAlmacenFetches {
 
                     Integer magcod = almacen.get().getMAGCOD();
                     List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACOD(ent, magcod, 0, afacod);
+                    if (existenciasList.isEmpty()) {
+                        throw new IllegalArgumentException("Sin resultado");
+                    }
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {
@@ -100,24 +103,42 @@ public class existenciaAlmacenFetches {
 
                     Integer magcod = almacen.get().getMAGCOD();
                     List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_ASUCOD(ent, magcod, 0, asucod);
+                    if (existenciasList.isEmpty()) {
+                        throw new IllegalArgumentException("Sin resultado");
+                    }
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {
                         existencias.addAll(existenciasList);
                     }
-                } else {
-                     Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                } else if ((asucod != null && !asucod.isBlank()) && (afacod != null && !afacod.isBlank())) {
+                    Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
                     if (almacen.isEmpty()) {
                         throw new IllegalArgumentException("Almacen sin resultado.");
                     }
 
                     Integer magcod = almacen.get().getMAGCOD();
                     List<existenciasProjection> existenciasList =  meaRepository.findByENTAndMAGCODAndArt_ARTBLONotAndArt_AFACODAndArt_ASUCOD(ent, magcod, 0, afacod, asucod);
+                    if (existenciasList.isEmpty()) {
+                        throw new IllegalArgumentException("Sin resultado");
+                    }
                     if (main_search != null && !main_search.isBlank()) {
                         existencias.addAll(applyMainSearch(existenciasList, main_search));
                     } else {
                         existencias.addAll(existenciasList);
                     }
+                } else {
+                    Optional<magcodOnly> almacen = magRepository.findByENTAndDEPCOD(ent, magcod_main);
+                    if (almacen.isEmpty()) {
+                        throw new IllegalArgumentException("Almacen sin resultado.");
+                    }
+
+                    Integer magcod = almacen.get().getMAGCOD();
+                    List<existenciasProjection> existenciasList =  meaRepository.findAllByENTAndMAGCODAndArt_ARTBLONot(ent, magcod, 0);
+                    if (existenciasList.isEmpty()) {
+                        throw new IllegalArgumentException("Sin resultado");
+                    }
+                    existencias.addAll(applyMainSearch(existenciasList, main_search));
                 }
             } else {
                 throw new IllegalArgumentException("Magcod sin resultado.");
