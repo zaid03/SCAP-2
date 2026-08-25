@@ -15,8 +15,9 @@ import com.example.backend.sqlserver2.model.MeaId;
 
 @Repository
 public interface MeaRepository extends JpaRepository<Mea, MeaId> {
-    //selecting articulos por almacen
+    //selecting articulos por almacen and exporting
     List<ArticulosPorAlmcenProjection> findByENT(Integer ent, Pageable pageable);
+    List<ArticulosPorAlmcenProjection> findAllByENT(Integer ent);
 
     //getting pagination number
     Integer countByENT(Integer ent);

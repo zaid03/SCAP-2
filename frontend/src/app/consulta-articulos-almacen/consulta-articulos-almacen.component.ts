@@ -215,16 +215,46 @@ export class ConsultaArticulosAlmacenComponent {
     this.resizingColIndex = null;
   };
 
+  exportArticulos: any = [];
+  isPdf: boolean = false;
+  isExcel: boolean = false;
+  getExportData() {
+    this.http.get(`${environment.backendUrl}/api/mea/export/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.exportArticulos = res;
+        if (this.exportArticulos.length === 0) {
+          this.almacenError = 'No hay datos para exportar.';
+          return;
+        }
+
+        if (this.isPdf) {
+          this.preparePDF();
+          return;
+        }
+        if (this.isExcel) {
+          this.prepareExcel();
+          return;
+        }
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
   DownloadPDF() {
     this.limpiarMessages();
 
-    const source = this.almacenes;
-    if (!source?.length) {
-      this.almacenError = 'No hay datos para exportar.';
-      return;
+    this.isPdf = true;
+    if (this.exportArticulos.length === 0) {
+      this.getExportData();
+    } else {
+      this.preparePDF();
     }
+  }
 
-    const rows = source.map((row: any) => ({
+  preparePDF() {
+    const rows = this.exportArticulos.map((row: any) => ({
       afacod: row.art_Afa_AFACOD ?? '',
       asucod: row.art_Asu_ASUCOD ?? '',
       artcod: row.art_ARTCOD ?? '',
@@ -252,7 +282,7 @@ export class ConsultaArticulosAlmacenComponent {
     autoTable(doc, {
       startY: 60,
       head: [columns.map(col => col.header)],
-      body: rows.map(row => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
       styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
       headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
       columnStyles: {
@@ -271,13 +301,17 @@ export class ConsultaArticulosAlmacenComponent {
 
   downloadExcel() {
     this.limpiarMessages();
-    const rows = this.almacenes;
-    if (!rows || rows.length === 0) {
-      this.almacenError = 'No hay datos para exportar.';
-      return;
+
+    this.isExcel = true;
+    if (this.exportArticulos.length === 0) {
+      this.getExportData();
+    } else {
+      this.prepareExcel();
     }
-  
-    const exportRows = rows.map((row:any) => ({
+  }
+
+  prepareExcel() {
+    const exportRows = this.exportArticulos.map((row:any) => ({
       afacod: row.art_Afa_AFACOD ?? '',
       asucod: row.art_Asu_ASUCOD ?? '',
       artcod: row.art_ARTCOD ?? '',

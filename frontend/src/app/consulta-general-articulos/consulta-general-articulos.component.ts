@@ -219,7 +219,7 @@ export class ConsultaGeneralArticulosComponent {
       next: (res) => {
         this.exportArticulos = res;
         if (this.exportArticulos.length === 0) {
-          this.existenciasError = 'No hay datos para exportar.';
+          this.articuloError = 'No hay datos para exportar.';
           return;
         }
 

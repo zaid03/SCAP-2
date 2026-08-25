@@ -39,7 +39,7 @@ public class MeaController {
     private static final String ERROR = "Error :";
     private static final int PAGE_SIZE = 20;
 
-    //selecting existencias for articles
+    //selecting existencias for articles and articulos por almacen and exporting data
     @GetMapping("/fetch-articulos-por-almacen/{ent}")
     public ResponseEntity<?> fetchArticulosPorAlmacen(
         @PathVariable Integer ent,
@@ -47,6 +47,21 @@ public class MeaController {
     ) {
         try {
             List<ArticulosPorAlmcenProjection> Almacenes = meaRepository.findByENT(ent, PageRequest.of(page, PAGE_SIZE));
+            if (Almacenes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+
+            return ResponseEntity.ok(Almacenes);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+    @GetMapping("/export/{ent}")
+    public ResponseEntity<?> fetchArticulosPorAlmacenExport(
+        @PathVariable Integer ent
+    ) {
+        try {
+            List<ArticulosPorAlmcenProjection> Almacenes = meaRepository.findAllByENT(ent);
             if (Almacenes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
