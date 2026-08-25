@@ -23,3 +23,13 @@ tr.bloqueado {background-color: #aaa;}
 /* detail style */
 @media (min-width: 1700px) {.search-form {flex-direction: row;} 
 .title-area {align-items: center;}}
+@media (min-width: 1700px) {
+    .title-area {width: 19%;}
+    .search-container {width: 100%;}
+    .search-form {width: 82%; gap: 10px;}
+}
+@media (min-width: 1950px) {
+    .title-area {width: 19%;}
+    .search-container {width: 100%;}
+    .search-form {width: 70%; gap: 10px;}
+}
