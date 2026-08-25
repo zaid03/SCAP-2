@@ -82,8 +82,7 @@ public class MeaController {
         @RequestParam(required = false) String afaCod,
         @RequestParam(required = false) String asuCod,
         @RequestParam(defaultValue = "Todos") String bloqueado,
-        @RequestParam(required = false) String almacen,
-        @RequestParam(defaultValue = "0") int page
+        @RequestParam(required = false) String almacen
     ) {
         try {
             List<ArticulosPorAlmcenProjection> articulos = meaRepository.searchArticulos(
@@ -92,8 +91,7 @@ public class MeaController {
                 afaCod,
                 asuCod,
                 bloqueado,
-                almacen,
-                PageRequest.of(page, PAGE_SIZE)
+                almacen
             );
             
             if (articulos.isEmpty()) {

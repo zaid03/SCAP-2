@@ -74,6 +74,7 @@ export class ConsultaGeneralArticulosComponent {
         this.isLoading = false;
         this.articulos = res;
         this.backupArticulos = [...this.articulos];
+        this.getPagination();
       },
       error: (err) => {
         this.articuloError = err.error.error || err.error;

@@ -84,8 +84,7 @@ public interface MeaRepository extends JpaRepository<Mea, MeaId> {
         String afaCod,
         String asuCod,
         String bloqueado,
-        String almacen,
-        Pageable pageable
+        String almacen
     );
 
     //selecting existencias for articles with eager loading of relationships
