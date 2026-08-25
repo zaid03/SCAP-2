@@ -19,8 +19,9 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
     //main select for analitica de articulos
     List<AnaliticaArticulosProjectin> findByENT(Integer ent);
 
-    //main fetch for consulta general de articulos
+    //main fetch for consulta general de articulos and exporting data
     List<ArticleProjection> findByENT(Integer ent, Pageable pageable);
+    List<ArticleProjection> findAllByENT(Integer ent);
 
     //getting pagination number
     Integer countByENT(Integer ent);
@@ -65,13 +66,12 @@ public interface ArtRepository extends JpaRepository<Art, ArtId> {
         ")", 
         nativeQuery = true
     )
-    Page<ArticleProjection> searchArticles(
+    List<ArticleProjection> searchArticles(
         @Param("ent") Integer ent,
         @Param("search") String search,
         @Param("afacod") String afacod,
         @Param("asucod") String asucod,
-        @Param("bloqueado") String bloqueado,
-        Pageable pageable
+        @Param("bloqueado") String bloqueado
     );
 
     //delete a familia check

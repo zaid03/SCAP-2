@@ -74,7 +74,6 @@ export class ConsultaGeneralArticulosComponent {
         this.isLoading = false;
         this.articulos = res;
         this.backupArticulos = [...this.articulos];
-        this.updatePagination;
       },
       error: (err) => {
         this.articuloError = err.error.error || err.error;
@@ -82,33 +81,66 @@ export class ConsultaGeneralArticulosComponent {
       }
     })
   }
-
-  pagination: number = 0;
+  totalPagesMain: number = 0;
   getPagination() {
     this.http.get<any>(`${environment.backendUrl}/api/art/get-pag/${this.entcod}`).subscribe({
       next: (res) => {
-        this.pagination = this.Math.ceil(res/20);
+        this.totalPagesMain = this.Math.ceil(res/20);
       },
       error: (err) => {
         console.warn(err.error.error || err.error);
       }
     })
   }
-  private updatePagination(): void {const total = this.totalPages;
-    if (total === 0) {this.page = 0; return;}
+  is_main_fetch: boolean = true;
+  is_search: boolean = false;
+  get paginatedArticulos(): any[] {
+    if (this.is_main_fetch) {
+      return this.articulos ?? [];
+    }
+    if (this.is_search) {
+      if (this.articulos.length > 20) {
+        const start = this.page * this.pageSize;
+
+        return this.articulos.slice(start, start + this.pageSize);
+      } else {
+        return this.articulos ?? [];
+      }
+    }
+    return [];
   }
-  get paginatedArticulos(): any[] {return this.articulos || [];}
-  get totalPages(): number {return Math.max(1, Math.ceil((this.articulos?.length ?? 0) / this.pageSize));}
-  prevPage() {
-    if (this.page == 0) return;
-    this.page = this.page - 1;
-    this.isSearching ? this.searchArticulo() : this.fetchArticulos();
-    return;
+  prevPage(): void {
+    if (this.is_main_fetch) {
+      this.page--;
+      this.fetchArticulos();
+    }
+    if (this.is_search) {
+      if (this.page > 0) this.page--;
+    }
   }
-  nextPage() {
-    this.page = this.page + 1;
-    this.isSearching ? this.searchArticulo() : this.fetchArticulos();
-    return;
+  nextPage(): void {
+    if (this.is_main_fetch) {
+      this.page++;
+      this.fetchArticulos();
+    }
+    if (this.is_search) {
+      if (this.page < this.totalPagesMain - 1) this.page++;
+    }
+  }
+  goToPage(event: any): void {
+    if (this.is_main_fetch) {
+      const inputPage = Number(event.target.value);
+      if (inputPage >= 1 && inputPage <= this.totalPagesMain) {
+        this.page = inputPage - 1;
+        this.fetchArticulos();
+      }
+    }
+    if (this.is_search) {
+      const inputPage = Number(event.target.value);
+      if (inputPage >= 1 && inputPage <= this.totalPagesMain) {
+        this.page = inputPage - 1;
+      }
+    }
   }
 
   isBloqueado(artblo: number): string {
@@ -129,7 +161,6 @@ export class ConsultaGeneralArticulosComponent {
     }
     this.applySort();
     this.page = 0;
-    this.updatePagination();
   }
 
   private applySort(): void {
@@ -179,16 +210,46 @@ export class ConsultaGeneralArticulosComponent {
     this.resizingColIndex = null;
   };
 
+  exportArticulos: any = [];
+  isPdf: boolean = false;
+  isExcel: boolean = false;
+  getExportData() {
+    this.http.get(`${environment.backendUrl}/api/art/export-consulta-general/${this.entcod}`).subscribe({
+      next: (res) => {
+        this.exportArticulos = res;
+        if (this.exportArticulos.length === 0) {
+          this.existenciasError = 'No hay datos para exportar.';
+          return;
+        }
+
+        if (this.isPdf) {
+          this.preparePDF();
+          return;
+        }
+        if (this.isExcel) {
+          this.prepareExcel();
+          return;
+        }
+      },
+      error: (err) => {
+        console.warn(err.error.error ?? err.error);
+      }
+    })
+  }
+
   DownloadPDF() {
     this.limpiarMessages();
 
-    const source = this.paginatedArticulos;
-    if (!source?.length) {
-      this.articuloError = 'No hay datos para exportar.';
-      return;
+    this.isPdf = true;
+    if (this.exportArticulos.length === 0) {
+      this.getExportData();
+    } else {
+      this.preparePDF();
     }
+  }
 
-    const rows = source.map((row: any) => ({
+  preparePDF() {
+    const rows = this.exportArticulos.map((row: any) => ({
       afacod: row.afacod ?? '',
       asucod: row.asucod ?? '',
       artcod: row.artcod ?? '',
@@ -216,16 +277,16 @@ export class ConsultaGeneralArticulosComponent {
     autoTable(doc, {
       startY: 60,
       head: [columns.map(col => col.header)],
-      body: rows.map(row => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      body: rows.map((row:any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
       styles: { font: 'helvetica', fontSize: 10, cellPadding: 6 },
       headStyles: { fillColor: [240, 240, 240], textColor: 33, fontStyle: 'bold' },
       columnStyles: {
         afacod: { cellWidth: 10 },
         asucod: { cellWidth: 10 },
         artcod: { cellWidth: 10 },
-        artdes: { cellWidth: 50 },
+        artdes: { cellWidth: 40 },
         artuni: { cellWidth: 10 },
-        artref: { cellWidth: 15 },
+        artref: { cellWidth: 25 },
         artblo: { cellWidth: 8 }
       }
     });
@@ -235,13 +296,17 @@ export class ConsultaGeneralArticulosComponent {
 
   downloadExcel() {
     this.limpiarMessages();
-    const rows = this.paginatedArticulos;
-    if (!rows || rows.length === 0) {
-      this.articuloError = 'No hay datos para exportar.';
-      return;
+
+    this.isExcel = true;
+    if (this.exportArticulos.length === 0) {
+      this.getExportData();
+    } else {
+      this.prepareExcel();
     }
-  
-    const exportRows = rows.map(row => ({
+  }
+
+  prepareExcel() {
+    const exportRows = this.exportArticulos.map((row: any) => ({
       afacod: row.afacod ?? '',
       asucod: row.asucod ?? '',
       artcod: row.artcod ?? '',
@@ -280,13 +345,13 @@ export class ConsultaGeneralArticulosComponent {
   afacod: string ='';
   asucod: string = '';
   bloqueado: 'bloqueado' | 'nobloqueado' | 'todos' = 'nobloqueado';
-  isSearching: boolean = false;
   searchArticulo () {
     this.limpiarMessages();
     this.page = 0;
     this.isLoading = true;
-    this.isSearching = true; 
 
+    this.is_main_fetch = false;
+    this.is_search = true;
     const params = new URLSearchParams();
     params.append('page', this.page.toString());
     if (this.search) params.append('search', this.search);
@@ -300,6 +365,8 @@ export class ConsultaGeneralArticulosComponent {
       next: (res) => {
         this.isLoading = false;
         this.articulos = res;
+        this.page = 0;
+        this.totalPagesMain = Math.ceil(this.articulos.length / this.pageSize);
       },
       error: (err) => {
         this.articulos = [];
@@ -315,7 +382,9 @@ export class ConsultaGeneralArticulosComponent {
     this.afacod ='';
     this.asucod = '';
     this.bloqueado = 'nobloqueado';
-    this.isSearching = false; 
+    this.is_main_fetch = true;
+    this.is_search = false;
+    this.page = 0;
     this.fetchArticulos();
   }
 
@@ -437,7 +506,7 @@ export class ConsultaGeneralArticulosComponent {
   prevPageProv(): void {if (this.pageProv > 0) this.pageProv--;}
   nextPageProv(): void {if (this.pageProv < this.totalPagesProveedores - 1) this.pageProv++;}
   goToPageProv(event: any): void {const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.totalPages) {this.pageProv = inputPage - 1;}
+    if (inputPage >= 1 && inputPage <= this.totalPagesProveedores) {this.pageProv = inputPage - 1;}
   }
 
   showExistenciasGrid: boolean = false;
@@ -481,7 +550,7 @@ export class ConsultaGeneralArticulosComponent {
   prevPageExistencias(): void {if (this.pageExistencia > 0) this.pageExistencia--;}
   nextPageExistencias(): void {if (this.pageExistencia < this.totalPagesExistencias - 1) this.pageExistencia++;}
   goToPageExistencias(event: any): void {const inputPage = Number(event.target.value);
-    if (inputPage >= 1 && inputPage <= this.totalPages) {this.pageExistencia = inputPage - 1;}
+    if (inputPage >= 1 && inputPage <= this.totalPagesExistencias) {this.pageExistencia = inputPage - 1;}
   }
 
   //misc

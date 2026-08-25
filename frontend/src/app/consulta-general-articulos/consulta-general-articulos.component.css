@@ -20,3 +20,9 @@ tr.bloqueado {background-color: #aaa;}
 .fix {width: 265px; max-width: 340px;}
 .bloq {display: flex; justify-content: center; align-items: center; gap: 10px;}
 /* detail style */
+@media (max-width: 1299px), (min-width: 1700px) {
+    .search-form {width: 68%;}
+}
+@media (max-width: 1299px), (min-width: 1700px) {
+    .search-form {width: 58%;}
+}

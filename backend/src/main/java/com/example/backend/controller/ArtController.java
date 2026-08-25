@@ -60,7 +60,7 @@ public class ArtController {
         }
     }
 
-    //fetching articulos for consulta general
+    //main fetch for consulta general and exporting data
     @GetMapping("/fetch-consulta-general/{ent}")
     public ResponseEntity<?> fetchConsultaGeneral(
         @PathVariable Integer ent,
@@ -68,6 +68,21 @@ public class ArtController {
     ) {
         try {
             List<ArticleProjection> articles = artRepository.findByENT(ent, PageRequest.of(page, PAGE_SIZE));
+            if (articles.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
+            }
+            return ResponseEntity.ok(articles);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
+        }
+    }
+
+    @GetMapping("/export-consulta-general/{ent}")
+    public ResponseEntity<?> fetchConsultaGeneralExport(
+        @PathVariable Integer ent
+    ) {
+        try {
+            List<ArticleProjection> articles = artRepository.findAllByENT(ent);
             if (articles.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
@@ -97,20 +112,17 @@ public class ArtController {
     @GetMapping("/search/{ent}")
     public ResponseEntity<?> searchArticles(
         @PathVariable Integer ent,
-        @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) String search,
         @RequestParam(required = false) String afacod,
         @RequestParam(required = false) String asucod,
         @RequestParam(defaultValue = "todos") String bloqueado
     ) {
         try {
-            Page<ArticleProjection> articles = artRepository.searchArticles(
-                ent, search, afacod, asucod, bloqueado, PageRequest.of(page, PAGE_SIZE)
-            );
+            List<ArticleProjection> articles = artRepository.searchArticles(ent, search, afacod, asucod, bloqueado);
             if (articles.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(SIN_RESULTADO);
             }
-            return ResponseEntity.ok(articles.getContent());
+            return ResponseEntity.ok(articles);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + ex.getMessage());
         }
