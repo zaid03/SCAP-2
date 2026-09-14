@@ -47,8 +47,8 @@
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="menu-panel" *ngIf="showMenu">
-                    <button class="purple-btn" >Exportar a PDF</button>
-                    <button class="purple-btn" >Exportar a EXCEL</button>
+                    <button class="purple-btn" (click)="pdfDownload()">Exportar a PDF</button>
+                    <button class="purple-btn" (click)="excelDownload()">Exportar a EXCEL</button>
                 </div>
             </div>
         </div>

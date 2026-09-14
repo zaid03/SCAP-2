@@ -226,7 +226,7 @@ export class TipoAlmacenajeComponent {
     ];
   
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Ejercicios');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'almacenajes');
     const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     saveAs(
       new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),

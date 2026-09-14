@@ -189,6 +189,144 @@ export class ConsultaSaldoCoontratosComponent {
     return (cogimp + cogim2) - cogiap;
   }
 
+  private formatCurrency(value: any): string {
+    if (value === null || value === undefined || value === '') return '';
+    const numberValue = typeof value === 'number' ? value : Number(value);
+    if (isNaN(numberValue)) return '';
+    const formatted = new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2
+    }).format(numberValue);
+    return formatted;
+  }
+
+  excelDownload() {
+    this.limpiarMessages();
+    const rows = this.contratos;
+    if (!rows || rows.length === 0) {
+      this.ContratosError = 'No hay datos para exportar.';
+      return;
+    }
+  
+    const exportRows = rows.map((row: any, index: number) => ({
+      Contrato: row.concod ?? '',
+      Económica: row.cot?.conn?.conlot ?? '',
+      Descripción: row.cot?.conn?.condes ?? '',
+      Cód_Proveedor : row.cot?.tercod ?? '',
+      Proveedor: row.cot?.ter?.ternom ?? '',
+      NIF: row.cot?.ter?.ternif ?? '',
+      Cód_C_Gestor: row.cgecod ?? '',
+      Centro_Gestor: row.cge?.cgedes ?? '',
+      AD_principal: row.cogopd ?? '',
+      AD_secundaria : row.cogop2 ?? '',
+      Saldo_total_AD : this.formatCurrency(this.calculateSaldoTotal(row?.cogimp, row?.cogim2)),
+      Pedidos_Pte_Contabilizar : this.formatCurrency(row.cogiap),
+      Saldo: this.formatCurrency(this.calculateSaldo(row?.cogimp, row?.cogim2, row?.cogiap))
+    }));
+  
+    const worksheet = XLSX.utils.aoa_to_sheet([]);
+    XLSX.utils.sheet_add_aoa(worksheet, [['listas de saldo de contratos']], { origin: 'A1' });
+    worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
+    XLSX.utils.sheet_add_aoa(worksheet, [['Contrato', 'Económica', 'Descripción', 'Cód. Proveedor', 'Proveedor', 'NIF', 'Cód. C. Gestor', 'AD principal', 'AD secundaria', 'Saldo total AD', 'Pedidos Pte. Contabilizar', 'Saldo']], { origin: 'A2' });
+    XLSX.utils.sheet_add_json(worksheet, exportRows, { origin: 'A3', skipHeader: true });
+
+    worksheet['!cols'] = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 40 },
+      { wch: 10 },
+      { wch: 40 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 25 },
+      { wch: 25 },
+      { wch: 25 },
+    ];
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'contratos');
+    const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    saveAs(
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      'Consulta_saldo_contratos.xlsx'
+    );
+  }
+
+  pdfDownload() {
+    this.limpiarMessages();
+    const source = this.contratos;
+    if (!source?.length) {
+      this.ContratosError = 'No hay datos para exportar.';
+      return;
+    }
+
+    const rows = source.map((row: any, index: number) => ({
+      Contrato: row.concod ?? '',
+      conlot: row.cot?.conn?.conlot ?? '',
+      condes: row.cot?.conn?.condes ?? '',
+      tercod : row.cot?.tercod ?? '',
+      ternom: row.cot?.ter?.ternom ?? '',
+      ternif: row.cot?.ter?.ternif ?? '',
+      cgecod: row.cgecod ?? '',
+      cgedes: row.cge?.cgedes ?? '',
+      cogopd: row.cogopd ?? '',
+      cogop2 : row.cogop2 ?? '',
+      calculateSaldoTotal : this.formatCurrency(this.calculateSaldoTotal(row?.cogimp, row?.cogim2)),
+      cogiap : this.formatCurrency(row.cogiap),
+      calculateSaldo: this.formatCurrency(this.calculateSaldo(row?.cogimp, row?.cogim2, row?.cogiap))
+    }));
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Listado de saldo de contratos', 40, 40);
+
+    const columns = [
+      { header: 'Contrato', dataKey: 'Contrato' },
+      { header: 'Económica', dataKey: 'conlot' },
+      { header: 'Descripción', dataKey: 'condes' },
+      { header: 'Cód.Proveedor', dataKey: 'tercod' },
+      { header: 'Proveedor', dataKey: 'ternom' },
+      { header: 'NIF', dataKey: 'ternif' },
+      { header: 'Cód.C.Gestor', dataKey: 'cgecod' },
+      { header: 'Centro Gestor', dataKey: 'cgedes' },
+      { header: 'AD principal', dataKey: 'cogopd' },
+      { header: 'AD secundaria', dataKey: 'cogop2' },
+      { header: 'Saldo total AD', dataKey: 'calculateSaldoTotal' },
+      { header: 'Pedidos Pte Contabilizar', dataKey: 'cogiap' },
+      { header: 'Saldo', dataKey: 'calculateSaldo' }
+    ];
+
+    autoTable(doc, {
+      startY: 15,
+      head: [columns.map(col => col.header)],
+      body: rows.map((row: any) => columns.map(col => row[col.dataKey as keyof typeof row] ?? '')),
+      styles: { font: 'helvetica', fontSize: 8 },
+      headStyles: { fillColor: [240, 240, 240], textColor: 33 },
+      columnStyles: {
+        Contrato: { cellWidth: 10 },
+        conlot: { cellWidth: 10 },
+        condes: { cellWidth: 40 },
+        tercod: { cellWidth: 10 },
+        ternom: { cellWidth: 40 },
+        ternif: { cellWidth: 15 },
+        cgecod: { cellWidth: 15 },
+        cgedes: { cellWidth: 40 },
+        cogopd: { cellWidth: 20 },
+        cogop2: { cellWidth: 20 },
+        calculateSaldoTotal: { cellWidth: 25 },
+        cogiap: { cellWidth: 25 },
+        calculateSaldo: { cellWidth: 25 },
+      }
+    });
+
+    doc.save('consulta-saldo-contratos.pdf');
+  }
+
   //misc
   limpiarMessages() {
     this.ContratosSuccess = '';
