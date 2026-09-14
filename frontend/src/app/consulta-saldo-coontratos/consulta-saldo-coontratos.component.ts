@@ -88,6 +88,22 @@ export class ConsultaSaldoCoontratosComponent {
     if (this.page >= total) {this.page = total - 1;}
   }
 
+  cge: string = '';
+  contrato: string = '';
+  proveedor: string = '';
+  search() {
+    this.limpiarMessages();
+    
+  }
+
+  limpiarSearch() {
+    this.limpiarMessages();
+    this.cge = '';
+    this.contrato = '';
+    this.proveedor = '';
+    this.fetchContratos();
+  }
+
   toggleSort(field: 'concod' | 'cot.conn.conlot' | 'cot.conn.condes' | 'cot.tercod' | 'cot.ter.ternom' | 'cot.ter.ternif' | 'cgecod' | 'cge.cgedes' | 'cogopd' | 'cogop2' | 'calculateSaldoTotal' | 'cogiap' | 'calculateSaldo'): void {
     if (this.sortField !== field) {
       this.sortField = field;
