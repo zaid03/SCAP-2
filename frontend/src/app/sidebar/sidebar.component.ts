@@ -168,6 +168,12 @@ export class SidebarComponent implements OnInit {
       case 'CExictenciasAlmacen':
         this.router.navigate(['/CExictenciasAlmacen']);
         break;
+      case 'CSaldoCon':
+        this.router.navigate(['/CSaldoCon']);
+        break;
+      case 'CHistoriaADCon':
+        this.router.navigate(['/CHistoriaADCon']);
+        break;
       default:
         break;
     }

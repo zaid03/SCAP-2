@@ -19,6 +19,8 @@ import { TiposUnidadesComponent } from './tipos-unidades/tipos-unidades.componen
 import { MantinimientoArticulosAlmacenComponent } from './mantinimiento-articulos-almacen/mantinimiento-articulos-almacen.component';
 import { ConsultaGeneralExistenciasComponent } from './consulta-general-existencias/consulta-general-existencias.component';
 import { ConsultaExistenciasAlmacenComponent } from './consulta-existencias-almacen/consulta-existencias-almacen.component';
+import { ConsultaSaldoCoontratosComponent } from './consulta-saldo-coontratos/consulta-saldo-coontratos.component';
+import { ConsultaHistoricaAdContratosComponent } from './consulta-historica-ad-contratos/consulta-historica-ad-contratos.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -40,6 +42,8 @@ export const routes: Routes = [
     { path: 'unidades', component: TiposUnidadesComponent},
     { path: 'Cexistencias', component: ConsultaGeneralExistenciasComponent},
     { path: 'CExictenciasAlmacen', component: ConsultaExistenciasAlmacenComponent},
+    { path: 'CSaldoCon', component: ConsultaSaldoCoontratosComponent},
+    { path: 'CHistoriaADCon', component: ConsultaHistoricaAdContratosComponent},
     { path: '', redirectTo: '/login', pathMatch: 'full' }, //route by default
 ];
 
