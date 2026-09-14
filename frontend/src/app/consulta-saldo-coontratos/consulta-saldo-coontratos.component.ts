@@ -34,7 +34,7 @@ export class ConsultaSaldoCoontratosComponent {
   //global variables
   private entcod: number | null = null;
   private eje: number | null = null;
-  contratos: any[] = [];
+  contratos: any = [];
   page = 0;
   pageSize = 20;
 
@@ -62,7 +62,17 @@ export class ConsultaSaldoCoontratosComponent {
   }
 
   fetchContratos() {
-
+    this.isLoading = true;
+    this.http.get(`${environment.backendUrl}/api/cog/Saldo-contrato/${this.entcod}/${this.eje}`).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.contratos = res;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.ContratosError = err.error.error || err.error;
+      }
+    })
   }
   get paginatedContratos(): any[] { if (!this.contratos || this.contratos.length === 0) return [];
     const start = this.page * this.pageSize; return this.contratos.slice(start, start + this.pageSize);
@@ -78,7 +88,7 @@ export class ConsultaSaldoCoontratosComponent {
     if (this.page >= total) {this.page = total - 1;}
   }
 
-  toggleSort(field: 'concod' | 'CONLOT' | 'CONDES' | 'tercod' | 'TERNOM' | 'ternif' | 'CGECOD' | 'CGEDES' | 'COGOPD' | 'COGOP2' | 'total' | 'COGAIP' | 'saldo'): void {
+  toggleSort(field: 'concod' | 'cot.conn.conlot' | 'cot.conn.condes' | 'cot.tercod' | 'cot.ter.ternom' | 'cot.ter.ternif' | 'cgecod' | 'cge.cgedes' | 'cogopd' | 'cogop2' | 'calculateSaldoTotal' | 'cogiap' | 'calculateSaldo'): void {
     if (this.sortField !== field) {
       this.sortField = field;
       this.sortDirection = 'asc';
@@ -95,7 +105,7 @@ export class ConsultaSaldoCoontratosComponent {
     this.applySort();
   }
 
-  sortField: 'concod' | 'CONLOT' | 'CONDES' | 'tercod' | 'TERNOM' | 'ternif' | 'CGECOD' | 'CGEDES' | 'COGOPD' | 'COGOP2' | 'total' | 'COGAIP' | 'saldo' | null = null;
+  sortField: 'concod' | 'cot.conn.conlot' | 'cot.conn.condes' | 'cot.tercod' | 'cot.ter.ternom' | 'cot.ter.ternif' | 'cgecod' | 'cge.cgedes' | 'cogopd' | 'cogop2' | 'calculateSaldoTotal' | 'cogiap' | 'calculateSaldo' | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
   private applySort(): void {
     if (!this.sortField) {
@@ -103,20 +113,41 @@ export class ConsultaSaldoCoontratosComponent {
     }
 
     const field = this.sortField;
-    const collator = new Intl.Collator('es', { numeric: true, sensitivity: 'base' });
+    const direction = this.sortDirection === 'asc' ? 1 : -1;
 
-    const sorted = [...this.contratos].sort((a, b) => {
-      const extract = (item: any, prop: string) =>
-        (item?.[prop] ?? item?.[prop.toUpperCase()] ?? '').toString();
+    const getValue = (item: any, path: string): string | number => {
+      if (path === 'calculateSaldoTotal') {
+        return (item?.cogimp ?? 0) + (item?.cogim2 ?? 0);
+      }
 
-      const aVal = extract(a, field);
-      const bVal = extract(b, field);
-      return this.sortDirection === 'asc'
-        ? collator.compare(aVal, bVal)
-        : collator.compare(bVal, aVal);
+      if (path === 'calculateSaldo') {
+        return (item?.cogimp ?? 0)
+          + (item?.cogim2 ?? 0)
+          - (item?.cogiap ?? 0);
+      }
+
+      return path
+        .split('.')
+        .reduce((value, property) => value?.[property], item) ?? '';
+    };
+
+    this.contratos = [...this.contratos].sort((first, second) => {
+      const firstValue = getValue(first, field);
+      const secondValue = getValue(second, field);
+
+      if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+        return (firstValue - secondValue) * direction;
+      }
+
+      return new Intl.Collator('es', {
+        numeric: true,
+        sensitivity: 'base'
+      }).compare(
+        String(firstValue),
+        String(secondValue)
+      ) * direction;
     });
 
-    this.contratos = sorted;
     this.page = 0;
     this.updatePagination();
   }
@@ -149,6 +180,14 @@ export class ConsultaSaldoCoontratosComponent {
     document.removeEventListener('mouseup', this.stopResize);
     this.resizingColIndex = null;
   };
+
+  calculateSaldoTotal(cogimp: number, cogim2: number): number {
+    return cogimp + cogim2;
+  }
+
+  calculateSaldo(cogimp: number, cogim2: number, cogiap: number): number {
+    return (cogimp + cogim2) - cogiap;
+  }
 
   //misc
   limpiarMessages() {
