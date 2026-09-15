@@ -10,4 +10,13 @@ import java.util.List;
 public interface CogRepository extends JpaRepository<Cog, CogId> {
   //main fetch for C.saldo de contrato
   List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONot(Integer ent, String eje, Integer contip, Integer conblo);
+
+  //filtering for C.saldo de contrato
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCge_CGECOD(Integer ent, String eje, Integer contip, Integer conblo, String cgecod);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCONCOD(Integer ent, String eje, Integer contip, Integer conblo, Integer concod);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCot_conn_CONDESContaining(Integer ent, String eje, Integer contip, Integer conblo, String condes);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCot_ter_TERCODOrENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCot_ter_TERNIFContaining(Integer ent1, String eje1, Integer contip1, Integer conblo1, Integer tercod, Integer ent2, String eje2, Integer contip2, Integer conblo2, String ternif);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCot_ter_TERNOMContainingOrENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCot_ter_TERNIFContaining(Integer ent1, String eje1, Integer contip1, Integer conblo1, String ternom, Integer ent2, String eje2, Integer contip2, Integer conblo2, String ternif);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCge_CGECODAndCONCOD(Integer ent, String eje, Integer contip, Integer conblo, String cgecod, Integer concod);
+  List<SaldoContrato> findByENTAndEJEAndCot_conn_CONTIPAndCot_conn_CONBLONotAndCge_CGECODAndCot_conn_CONDESContaining(Integer ent, String eje, Integer contip, Integer conblo, String cgecod, String condes);
 }
