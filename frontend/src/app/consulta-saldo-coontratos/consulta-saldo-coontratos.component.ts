@@ -69,6 +69,7 @@ export class ConsultaSaldoCoontratosComponent {
         this.contratos = res;
       },
       error: (err) => {
+        this.contratos = [];
         this.isLoading = false;
         this.ContratosError = err.error.error || err.error;
       }
@@ -94,6 +95,28 @@ export class ConsultaSaldoCoontratosComponent {
   search() {
     this.limpiarMessages();
     
+    let params = new HttpParams;
+    if (this.cge?.trim()) {
+      params = params.set('cge', this.cge?.trim());
+    }
+    if (this.contrato?.trim()) {
+      params = params.set('contrato', this.contrato?.trim());
+    }
+    if (this.proveedor?.trim()) {
+      params = params.set('proveedor', this.proveedor?.trim());
+    }
+    this.isLoading = true;
+    this.http.get(`${environment.backendUrl}/api/cog/search-saldo-contrato/${this.entcod}/${this.eje}`, {params}).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.contratos = res;
+      },
+      error:(err) => {
+        this.isLoading = false;
+        this.contratos = [];
+        this.ContratosError = err.error.error || err.error;
+      }
+    })
   }
 
   limpiarSearch() {
