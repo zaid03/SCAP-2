@@ -19,7 +19,7 @@ public interface AsuRepository extends JpaRepository<Asu, AsuId> {
     List<Asu> findByENTAndASUCOD(int ent, String asucod);
 
     // Method to find Asu records by ENT and ASUCOD like
-    List<Asu> findByENTAndASUDESContaining(int ent, String asudes);
+    List<Asu> findAllByENTAndASUDESContaining(int ent, String asudes);
 
     //find an art name to add subs
     List<Asu> findByENTAndAFACODAndASUCOD(int ENT, String AFACOD, String ASUCOD);

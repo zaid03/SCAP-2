@@ -10,11 +10,12 @@ import com.example.backend.service.ContabilizarSearch;
 import com.example.backend.dto.FdeFacTerProjection;
 import com.example.backend.service.ContabilizadoSearch;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fde")

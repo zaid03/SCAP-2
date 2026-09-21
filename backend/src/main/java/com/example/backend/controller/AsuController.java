@@ -60,7 +60,7 @@ public class AsuController {
             @PathVariable String asudes
     ) {
         try {
-            List<Asu> subfamilias = asuRepository.findByENTAndASUDESContaining(ent, asudes);
+            List<Asu> subfamilias = asuRepository.findAllByENTAndASUDESContaining(ent, asudes);
             if(subfamilias.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(SIN_RESULTADO);

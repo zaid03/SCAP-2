@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +86,7 @@ public class AprController {
     }
 
     //deleting a proveedor from an article
-    @DeleteMapping("delete-proveedor-art/{ent}/{afacod}/{asucod}/{artcod}/{tercod}")
+    @DeleteMapping("/delete-proveedor-art/{ent}/{afacod}/{asucod}/{artcod}/{tercod}")
     public ResponseEntity<?> artProveedorDelete(
         @PathVariable Integer ent,
         @PathVariable String afacod,

@@ -108,6 +108,7 @@ public class ArtController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ERROR + ex.getMessage());
         }
     }
+    
     //search in articulos general
     @GetMapping("/search/{ent}")
     public ResponseEntity<?> searchArticles(
